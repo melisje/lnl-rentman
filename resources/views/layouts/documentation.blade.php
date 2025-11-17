@@ -27,6 +27,12 @@
 
         <li class="dropdown-divider"></li>
         <li>
+            <h6 class="dropdown-header">Rentman</h6>
+        </li>
+
+        <li class="px-3"><a class="dropdown-item" href="https://api.rentman.net/" target="_blank">Rentman API Documentation</a></li>
+        <li class="dropdown-divider"></li>
+        <li>
             <h6 class="dropdown-header">Divers</h6>
         </li>
         <li class="px-3"><a class="dropdown-item" href="https://loremgenerator.io/" target="_blank">Lorem Ipsum Generator</a></li>

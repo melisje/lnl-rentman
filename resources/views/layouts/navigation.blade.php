@@ -11,21 +11,18 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a href="{{ route('home' )}}" class="nav-link active">Home</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">menu link1</a></li>
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Extra dropdown
+                        Invoices
                     </a>
                     <ul class="dropdown-menu">
                         <li class="">
-                            <a class="dropdown-item" href="#" target="_blank">dropdown-item</a>
+                            <a class="dropdown-item" href="{{ route('invoices.index')}}">{{ __('Overview')}}</a>
+                            <a class="dropdown-item" href="{{ route('invoices.fetch')}}">{{ __('Fetch')}}</a>
                         </li>
                     </ul>
                 </li>
-
-
-
 
                 <!-- Allow adding extra navbar items form child views -->
                 @stack('navbar-top-left')
