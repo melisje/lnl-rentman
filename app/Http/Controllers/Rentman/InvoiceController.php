@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -54,9 +55,11 @@ class InvoiceController extends Controller
      */
     public function index()
     {
+        $invoices = Invoice::paginate(15);
+
         return view('rentman.invoice.index')
-            ->with('token',null)
-            ->with('response',null);
+            ->with('invoices',$invoices)
+        ;
     }
 
     /**
@@ -79,9 +82,14 @@ class InvoiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    // public function show(string $id)
+    public function show(Request $request, Invoice $invoice)
     {
-        return 'SHOW';
+        // return $invoice;
+        // return 'SHOW';
+        return view('rentman.invoice.show')
+            ->with('invoice', $invoice)
+        ;
     }
 
     /**
