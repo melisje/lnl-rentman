@@ -14,6 +14,7 @@
         <li class="px-3"><a class="dropdown-item" href="https://getbootstrap.com/docs/5.3" target="_blank">Bootstrap 5.3 Docs</a></li>
         <li class="px-3"><a class="dropdown-item" href="https://getbootstrap.com/docs/5.3/examples/" target="_blank">Bootstrap 5.3 Examples</a></li>
         <li class="px-3"><a class="dropdown-item" href="https://getbootstrap.com/docs/5.3/examples/cheatsheet/" target="_blank">Bootstrap 5.3 Cheatsheet</a></li>
+        <li class="px-3"><a class="dropdown-item" href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a></li>
 
         <li class="dropdown-divider"></li>
         <li>
