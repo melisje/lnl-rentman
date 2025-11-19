@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -11,15 +12,22 @@ class InvoiceController extends Controller
     public function fetch(Request $request)
     {
         $url = 'https://api.rentman.net/invoices';
-        $token = env('RENTMAN_BEARER_TOKEN');
-        $limit = env('RENTMAN_PAGE_LIMIT=300');
+        $token = env('RENTMAN_BEARER_TOKEN','*** Add token in .env as RENTMAN_BEARER_TOKEN ***');
+        $limit = env('RENTMAN_PAGE_LIMIT',10);
         $offset = 0;
 
-
-        $response = Http::withToken($token)->get($url,[
+        $queryParams = [
             'limit' => $limit,
             'offset' => $offset
-        ]);
+        ];
+
+        // build full http request url incl. query parameters
+        $queryString = http_build_query($queryParams);
+        $fullRequestUrl = $url . '?' . $queryString;
+
+        // Send the request
+        // $response = Http::withToken($token)->get($url,$queryParams);
+        $response = Http::withToken($token)->get($fullRequestUrl);
 
         if ($response->successful())
         {
@@ -30,12 +38,14 @@ class InvoiceController extends Controller
                 'data' => $invoices
             ], 200);
 
+            $response4view = $response;
         }
         else
         {
             $statusCode = $response->status();
             $errorMessage = $response->body();
             $response4view = response()->json([
+                'url' => $fullRequestUrl,
                 'status' => 'error',
                 'message' => 'We could not fetch the data from the external API',
                 'statusCode' => $statusCode,
@@ -43,9 +53,18 @@ class InvoiceController extends Controller
             ], $statusCode);
         }
 
+        // dd(
+        //     $response,
+        //     $fullRequestUrl,
+        //     $response->object()
+        // );
+
         return view('rentman.invoice.fetch', [
+            'response' => $response,
+            'fullRequestUrl' => $fullRequestUrl,
+            'responseObject' => $response->object(),
             'response' => $response4view,
-            'token' => env('RENTMAN_BEARER_TOKEN')
+            'token' => $token
         ]);
     }
 
@@ -54,9 +73,11 @@ class InvoiceController extends Controller
      */
     public function index()
     {
+        $invoices = Invoice::paginate(15);
+
         return view('rentman.invoice.index')
-            ->with('token',null)
-            ->with('response',null);
+            ->with('invoices',$invoices)
+        ;
     }
 
     /**
@@ -79,9 +100,14 @@ class InvoiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    // public function show(string $id)
+    public function show(Request $request, Invoice $invoice)
     {
-        return 'SHOW';
+        // return $invoice;
+        // return 'SHOW';
+        return view('rentman.invoice.show')
+            ->with('invoice', $invoice)
+        ;
     }
 
     /**
