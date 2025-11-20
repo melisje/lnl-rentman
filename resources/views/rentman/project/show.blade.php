@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="bg-light rounded-2 p-3">
-        <h1>{{ $invoice->displayname }}</h1>
+        <h1>{{ $project->number }} - {{ $project->name }}</h1>
 
         <table class="table table-sm table-bordered table-striped table-hover">
             <thead class="table-dark">
@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (json_decode($invoice) as $key => $value)
+                @foreach (json_decode($project) as $key => $value)
                 <tr>
                     <td scope="row">{{ $key }}</td>
                     <td>{{ $value }}</td>

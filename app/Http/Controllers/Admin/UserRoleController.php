@@ -1,0 +1,82 @@
+<?php
+
+// app/Http/Controllers/Admin/UserRoleController.php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Http\Request;
+
+class UserRoleController extends Controller
+{
+    public function index()
+    {
+        $users = User::all();
+        $roles = Role::all();
+
+        return view('admin.roles',compact('users','roles'));
+    }
+
+    /**
+     * Toon het formulier om de rollen van een gebruiker te bewerken.
+     * De User $user wordt automatisch opgehaald door Route Model Binding.
+     */
+    public function edit(User $user)
+    {
+        // Haal alle beschikbare rollen op uit de database
+        $roles = Role::all();
+
+        // Haal de namen van de rollen van de huidige gebruiker op
+        // Dit wordt gebruikt om de juiste checkboxes aan te vinken in de view
+        $userRoles = $user->roles->pluck('name')->toArray();
+
+        // Stuur de data naar de view
+        return view('admin.users.roles-edit', compact('user', 'roles', 'userRoles'));
+    }
+
+    /**
+     * Verwerk de POST/PUT aanvraag en werk de rollen bij.
+     */
+    public function update(Request $request, Role $role, User $user)
+    {
+        $isAssigned = $request->is_assigned;
+
+        if ($isAssigned)
+        {
+            $user->roles()->attach($role->id);
+        }
+        else
+        {
+            $user->roles()->detach($role->id);
+        }
+
+        $result = [
+            'isAssigned' => $isAssigned,
+            'message' => 'This is a message',
+            'request' => $request
+        ];
+        return json_encode($result);
+    }
+
+    public function xxx(Request $request)
+    {
+        // 1. Valideer de aanvraag (optioneel, maar aangeraden)
+        $request->validate([
+            'roles' => 'nullable|array',
+            'roles.*' => 'exists:roles,id', // Zorg ervoor dat de ID's bestaan in de 'roles' tabel
+        ]);
+
+        // 2. Rollen Synchroniseren:
+        // De attach, detach, sync methode op de many-to-many relatie
+        // zal de pivot-tabel (role_user) bijwerken.
+        // We gebruiken sync() om ervoor te zorgen dat ALLE oude rollen worden verwijderd,
+        // behalve degene die in de 'roles' array zitten.
+        $user->roles()->sync($request->roles);
+
+        // 3. Terugkeren met een succesboodschap
+        return redirect()->route('admin.users.roles.edit', $user)
+            ->with('success', "Rollen voor gebruiker **{$user->name}** succesvol bijgewerkt.");
+    }
+}

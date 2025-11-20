@@ -12,17 +12,8 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a href="{{ route('home' )}}" class="nav-link active">Home</a></li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Invoices
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="">
-                            <a class="dropdown-item" href="{{ route('invoices.index')}}">{{ __('Overview')}}</a>
-                            <a class="dropdown-item" href="{{ route('invoices.fetch')}}">{{ __('Fetch')}}</a>
-                        </li>
-                    </ul>
-                </li>
+                @include('layouts.nav_invoices')
+                @include('layouts.nav_projects')
 
                 <!-- Allow adding extra navbar items form child views -->
                 @stack('navbar-top-left')
@@ -35,6 +26,9 @@
 
                 @include('layouts.documentation')
 
+                {{-- Add admin menu items --}}
+                @include('layouts.nav_admin')
+
                 <!-- Authentication Links -->
                 @guest
                 @if (Route::has('login'))
@@ -42,6 +36,7 @@
                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                 </li>
                 @endif
+
 
                 @if (Route::has('register'))
                 <li class="nav-item">
