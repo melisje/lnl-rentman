@@ -71,13 +71,32 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::paginate(15);
+        // 1. Haal de sorteerparameters op uit de URL (met veilige defaults)
+        $sortBy = $request->get('sort', 'number'); // Sorteer standaard op 'name'
+        $sortDirection = $request->get('direction', 'asc'); // Standaard oplopend
 
-        return view('rentman.invoice.index')
-            ->with('invoices',$invoices)
-        ;
+        // 2. Definieer toegestane kolommen om te voorkomen dat kwaadwillende code wordt uitgevoerd
+        $allowedColumns = ['id', 'number', 'displayname', 'customer', 'account_manager', 'created', 'modified'];
+
+        // Beveiliging: Als de kolom niet is toegestaan, gebruik dan de default
+        if (!in_array($sortBy, $allowedColumns)) {
+            $sortBy = 'number';
+        }
+
+        // Zorg ervoor dat de richting 'asc' of 'desc' is
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'asc';
+        }
+
+        // 3. Pas de sortering en paginering toe op de query
+        $invoices = Invoice::orderBy($sortBy,$sortDirection)
+        ->paginate(15) // paginate
+        ->withQueryString(); // Important: Remain the sort/direction parametes from the pagination links
+
+        // 4. Stuur alle data naar de view
+        return view('rentman.invoice.index',compact('invoices','sortBy', 'sortDirection'));
     }
 
     /**
