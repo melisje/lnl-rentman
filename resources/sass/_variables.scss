@@ -5,3 +5,16 @@ $body-bg: #f8fafc;
 $font-family-sans-serif: 'Nunito', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
+
+// $primary: #008080; // Een Teal-kleur
+
+// // Definieer eerst je nieuwe kleur als een losse variabele
+$tertiary: #6f42c1; // Een paarse kleur
+
+// // // Voeg de nieuwe kleur toe aan de $theme-colors map
+$theme-colors: map-merge($theme-colors,
+    ("primary": $primary,
+      "success": $success,
+      "danger": $danger,
+      "tertiary": $tertiary // Dit voegt 'tertiary' toe als een nieuwe utility class
+    ));
