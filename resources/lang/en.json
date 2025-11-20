@@ -1,0 +1,22 @@
+{
+  "home": "Home",
+  "login": "Login",
+  "logout": "Logout",
+  "register": "Register",
+  "documentation": "Documentation",
+  "id": "id",
+  "invoice": "Invoice",
+  "invoices": "Invoices",
+  "number": "Number",
+  "displayname": "Display Name",
+  "customer": "Customer",
+  "account_manager": "Account Manager",
+  "overview": "Overview",
+  "fetch": "Fetch",
+  "projects": "Projects",
+  "name": "Name",
+  "value": "Value",
+  "invalid language code": "Invalid language code.",
+  "": "",
+  "zzz": "zzz"
+}

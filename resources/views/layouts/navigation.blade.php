@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a href="{{ route('home' )}}" class="nav-link active">Home</a></li>
+                <li class="nav-item"><a href="{{ route('home' )}}" class="nav-link active">{{ __('home') }}</a></li>
 
                 @include('layouts.nav_invoices')
                 @include('layouts.nav_projects')
@@ -24,23 +24,26 @@
                 <!-- Allow adding extra navbar items form child views -->
                 @stack('navbar-top-right')
 
-                @include('layouts.documentation')
+                @include('layouts.nav_documentation')
 
                 {{-- Add admin menu items --}}
                 @include('layouts.nav_admin')
+                @include('layouts.nav_locale')
+
+
 
                 <!-- Authentication Links -->
                 @guest
                 @if (Route::has('login'))
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                    <a class="nav-link" href="{{ route('login') }}">{{ __('login') }}</a>
                 </li>
                 @endif
 
 
                 @if (Route::has('register'))
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                    <a class="nav-link" href="{{ route('register') }}">{{ __('register') }}</a>
                 </li>
                 @endif
                 @else
@@ -52,7 +55,7 @@
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                            {{ __('Logout') }}
+                            {{ __('logout') }}
                         </a>
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

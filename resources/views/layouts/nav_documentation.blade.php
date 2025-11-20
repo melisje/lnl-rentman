@@ -1,5 +1,5 @@
 <li class="nav-item dropdown">
-    <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{__('Documentatie')}} </a>
+    <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{__('documentation')}} </a>
     <ul class="dropdown-menu">
         <li>
             <h6 class="dropdown-header">Laravel</h6>

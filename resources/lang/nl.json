@@ -1,0 +1,22 @@
+{
+  "home": "Start",
+  "login": "Aanmelden",
+  "logout": "Afmelden",
+  "register": "Registeer",
+  "documentation": "Documentatie",
+  "id": "id",
+  "invoice": "Factuur",
+  "invoices": "Facturen",
+  "number": "Nummer",
+  "displayname": "Display Naam",
+  "customer": "Klant",
+  "account_manager": "Account Manager",
+  "overview": "Overzicht",
+  "fetch": "Ophalen",
+  "projects": "Projecten",
+  "name": "Naam",
+  "value": "Waarde",
+  "invalid language code": "Ongeldige taalcode.",
+  "": "",
+  "zzz": "zzz"
+}

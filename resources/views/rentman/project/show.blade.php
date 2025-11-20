@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container">
-    <div class="bg-light rounded-2 p-3">
+    <div class="bg-light s rounded-2 p-3">
         <h1>{{ $project->number }} - {{ $project->name }}</h1>
 
         <table class="table table-sm table-bordered table-striped table-hover">
             <thead class="table-dark">
                 <tr class="">
-                    <th scope="col">Name</th>
-                    <th scope="col">Value</th>
+                    <th scope="col">{{ __('name') }}</th>
+                    <th scope="col">{{ __('value') }}</th>
                 </tr>
             </thead>
             <tbody>

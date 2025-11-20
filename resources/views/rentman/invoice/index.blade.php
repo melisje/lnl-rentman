@@ -3,13 +3,13 @@
 @section('content')
 <div class="container">
     <div class="p-5 mb-4 bg-body-secondary rounded-3 ">
-        <h1>Invoices</h1>
+        <h1>{{ __('invoices') }}</h1>
         <div class="my-2 table-responsive">
             <div class="table-responsive">
                 <table class="table table-sm table-bordered table-hover table-striped">
                     <thead class="table-dark">
                         <tr>
-                            <th class="text-center" scope="col">id</th>
+                            <th class="text-center" scope="col">{{ __('id') }} </th>
                             <th class="text-center" scope="col">
                                 <a class="table-dark text-decoration-none" href="{{ sortableLink('number', $sortBy, $sortDirection, 'invoices.index') }}">
                                     {{ __('number')}}
@@ -21,7 +21,7 @@
                             </th>
                             <th scope="col">
                                 <a class="table-dark text-decoration-none" href="{{ sortableLink('displayname', $sortBy, $sortDirection, 'invoices.index') }}">
-                                    DisplayName
+                                    {{ __('displayname') }}
                                     {{-- Show arrow only if table is sorted on this column --}}
                                     @if ($sortBy === 'displayname')
                                     {{ $sortDirection === 'asc' ? '▲' : '▼' }}
@@ -30,7 +30,7 @@
                             </th>
                             <th scope="col">
                                 <a class="table-dark text-decoration-none" href="{{ sortableLink('customer', $sortBy, $sortDirection, 'invoices.index') }}">
-                                    Customer
+                                    {{ __('customer') }}
                                     {{-- Show arrow only if table is sorted on this column --}}
                                     @if ($sortBy === 'customer')
                                     {{ $sortDirection === 'asc' ? '▲' : '▼' }}
@@ -39,7 +39,7 @@
                             </th>
                             <th scope="col">
                                 <a class="table-dark text-decoration-none" href="{{ sortableLink('account_manager', $sortBy, $sortDirection, 'invoices.index') }}">
-                                    Account Manager
+                                    {{ __('account_manager') }}
                                     {{-- Show arrow only if table is sorted on this column --}}
                                     @if ($sortBy === 'account_manager')
                                     {{ $sortDirection === 'asc' ? '▲' : '▼' }}
