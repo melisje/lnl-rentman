@@ -10,7 +10,8 @@
         Route::controller(InvoiceController::class)
           ->name('invoices.')
           ->group(function () {
-            Route::get('/fetch', 'fetch')->name('fetch');
+            Route::get('/fetch', 'fetchview')->name('fetchview');
+            Route::post('/fetch', 'fetch')->name('fetch');
           });
       });
 

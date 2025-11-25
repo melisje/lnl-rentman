@@ -22,7 +22,7 @@
                     <tr>
                         <td class="text-center">
                             <a href="{{ route('projects.show', $project->id) }}">
-                                <i class="bi bi-pencil-fill"></i>
+                                <i class="bi bi-pencil-fill"></i>{{ $project->id }}
                             </a>
                         </td>
                         <td class="text-center">{{ $project->number }} </td>

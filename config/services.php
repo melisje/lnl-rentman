@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'rentman' => [
+        'base_url' => env('RENTMAN_API_URL', 'https://api.rentman.net/'),
+        'token' => trim(env('RENTMAN_API_TOKEN', '*** Add token in .env as RENTMAN_BEARER_TOKEN ***')),
+        'page_limit' => env('RENTMAN_PAGE_LIMIT',100),
+    ]
+
 ];
