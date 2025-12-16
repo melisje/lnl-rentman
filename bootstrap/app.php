@@ -17,5 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+        $exceptions->reportable(function (\App\Exceptions\EmergencyException $e)
+        {
+
+            \Illuminate\Support\Facades\Log::emergency($e->getMessage()); //, ['exception' => $e]);
+
+            // Retourneer true om aan te geven dat deze handler het rapporteerproces heeft afgehandeld.
+            return true;
+        });
+    })
+    ->withCommands([
+    __DIR__ . '/../app/Console/Commands/Rentman',
+    ])
+    ->create();

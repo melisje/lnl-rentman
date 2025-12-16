@@ -4,69 +4,92 @@ namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rentman\Project;
+use App\Services\RentmanApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 
 class ProjectController extends Controller
 {
+    protected RentmanApiService $rentmanApi;
+
+    /**
+     * Dependency Injection (DI) via constructor.
+     * Laravel's Service Container create a RentmanApiService instance
+     * automatically and passes to this controller instance.
+     */
+    public function __construct(RentmanApiService $rentmanApi)
+    {
+        $this->rentmanApi = $rentmanApi;
+    }
+
     public function fetch(Request $request)
     {
-        $url = 'https://api.rentman.net/projects';
-        $token = env('RENTMAN_BEARER_TOKEN','*** Add token in .env as RENTMAN_BEARER_TOKEN ***');
-        $limit = env('RENTMAN_PAGE_LIMIT',10);
-        $offset = 0;
+        $validatedData = collect();
+        $formData = collect();
 
-        $queryParams = [
-            'limit' => $limit,
-            'offset' => $offset
-        ];
-
-        // build full http request url incl. query parameters
-        $queryString = http_build_query($queryParams);
-        $fullRequestUrl = $url . '?' . $queryString;
-
-        // Send the request
-        // $response = Http::withToken($token)->get($url,$queryParams);
-        $response = Http::withToken($token)->get($fullRequestUrl);
-
-        if ($response->successful())
+        if($request->isMethod('GET'))
         {
-            $projects = $response->json();
 
-            $response4view = $response->json([
-                'status' => 'success',
-                'data' => $projects
-            ], 200);
+            $test = collect(
+                [
+                    'filter'=> http_build_query(['modified[gte]'=> '2025-11-20','number'=>33],'idx'),
+                    'projects' => $this->rentmanApi->getEndpointData('projects',['modified[gte]'=>'2025-10-21','limit'=>50, 'fields' => 'displayname,number',]),
+                    'invoices' => $this->rentmanApi->getEndpointData('invoices',['modified[gte]'=>'2025-10-21','limit'=>50, 'fields' => 'displayname,number']),
+                    'proj8245' => $this->rentmanApi->getEndpointData('projects/8444',['fields' => '']),
+                    // 'subprojects' => $this->rentmanApi->getEndpointData('projects/8444/subprojects',['modified[gte]'=>'2025-10-21','limit'=>50, 'fields' => 'displayname,number']),
 
-            $response4view = $response;
-        }
-        else
-        {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            $response4view = response()->json([
-                'url' => $fullRequestUrl,
-                'status' => 'error',
-                'message' => 'We could not fetch the data from the external API',
-                'statusCode' => $statusCode,
-                'details' => $errorMessage
-            ], $statusCode);
+                ]
+            );
+
+            if (!empty($test[ 'proj8245']))
+            {
+                $project = $test['proj8245'][0];
+
+                // dd($project);
+
+                $validatedData = ['number' => 'xxxx'];
+                return view('rentman.project.detail', compact('formData', 'validatedData', 'test', 'project'));
+            }
+
+
+            return $test;
         }
 
-        // dd(
-        //     $response,
-        //     $fullRequestUrl,
-        //     $response->object()
-        // );
+        if ($request->isMethod('POST'))
+        {
+            $validatedData = $request->validate(
+            [
+                'number' => 'required|string'
+            ]);
 
-        return view('rentman.invoice.fetch', [
-            'response' => $response,
-            'fullRequestUrl' => $fullRequestUrl,
-            'responseObject' => $response->object(),
-            'response' => $response4view,
-            'token' => $token
-        ]);
+
+            // fetch project
+            $queryParams = [
+                'filter' => '',
+                'offset' => 0,
+                'filter' => 'number=' . $validatedData['number']
+            ];
+            $endpoint1 = 'projects' ;
+
+            $project =  collect(ApiConctroller::fetch($endpoint1, $queryParams)[0]);
+
+            // Fetch subproject
+            $queryParams = [
+                'limit' => 300,
+                'filter' => '',
+                'offset' => 0,
+            ];
+
+            $projectId = $project['id'];
+            $endpoint2 = $endpoint1 ."/". $projectId .   "/subprojects";
+            $subprojects =  collect(ApiConctroller::fetch($endpoint2, $queryParams));
+
+            return view('rentman.project.detail', compact('formData', 'validatedData','project', 'subprojects'));
+        }
+
+
+
     }
 
     /**
@@ -74,7 +97,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::paginate(15);
+        $projects = Project::paginate(25);
 
         return view('rentman.project.index',compact('projects'));
     }
@@ -129,4 +152,5 @@ class ProjectController extends Controller
     {
         return 'DESTROY';
     }
+
 }

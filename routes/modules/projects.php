@@ -12,6 +12,7 @@
           ->name('projects.')
           ->group(function () {
             Route::get('/fetch', 'fetch')->name('fetch');
+            Route::post('/fetch', 'fetch')->name('fetch');
           });
       });
 
