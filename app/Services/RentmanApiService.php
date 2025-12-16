@@ -64,7 +64,7 @@ class RentmanApiService
 
         // If no offset is given, the default offset is 0
         // Actually, this is not necessary, because this is also the
-        // standaard offset from Rentman when no offset is given
+        // standard offset from Rentman when no offset is given
         if (! isset($queryParameters['offset'])) {
             $queryParameters['offset'] = 0;
         }
