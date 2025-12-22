@@ -11,65 +11,48 @@ return new class extends Migration
      */
     public function up(): void
     {
-
-        $fields = [
-            'id',
-            'created',
-            'modified',
-            'displayname',
-            'name',
-            'planperiod_start',
-            'planperiod_end',
-            'usageperiod_start',
-            'usageperiod_end',
-            'equipment_period_from',
-            'equipment_period_to',
-            'custom_1',
-            'custom_2',
-            'custom_32',
-            'custom_33',
-            'custom_38',
-            'updateHash',
-            'creator',
-
-            'number',
-            'reference',
-            'customer',
-            'project_type',
-            'color',
-            'cust_contact',
-            'loc_contact',
-            'account_manager',
-        ];
-
         Schema::create('rm_projects', function (Blueprint $table) {
-            $table->id();
+            $table->integer('id')->primary();  /* no autoincrement */
+            $table->string('created')->nullable();
+            $table->string('modified')->nullable();
+            $table->string('updateHash')->nullable();
             $table->string('number')->nullable();
-            $table->string('created',255);
-            $table->string('displayname',255);
-            $table->string('name',255);
+            $table->string('displayname')->nullable();
+            $table->string('name')->nullable();
             $table->string('reference')->nullable();
-            $table->string('planperiod_start',255)->nullable();
-            // $table->timestamp('planperiod_start2')->nullable();
-            $table->string('planperiod_end',255)->nullable();
-            $table->string('usageperiod_start',255)->nullable();
-            $table->string('usageperiod_end',255)->nullable();
-            $table->string('equipment_period_from',255)->nullable();
-            $table->string('equipment_period_to',255)->nullable();
-            $table->integer('custom_1')->nullable();
+            $table->string('location')->nullable();
+            $table->string('project_type')->nullable();
+            $table->string('creator')->nullable();
+            $table->string('deposit_status')->nullable();
+            $table->string('customer')->nullable();
+            $table->string('loc_contact')->nullable();
+            $table->string('cust_contact')->nullable();
+            $table->string('account_manager')->nullable();
+            $table->string('color')->nullable();
+            $table->string('tags')->nullable();
+            $table->string('usageperiod_start')->nullable();
+            $table->string('usageperiod_end')->nullable();
+            $table->string('planperiod_start')->nullable();
+            $table->string('planperiod_end')->nullable();
+            $table->string('equipment_period_from')->nullable();
+            $table->string('equipment_period_to')->nullable();
             $table->string('custom_2')->nullable();
             $table->string('custom_32')->nullable();
             $table->string('custom_33')->nullable();
-            $table->string('custom_38')->nullable();
-            $table->string('updateHash')->nullable();
-            $table->string('creator')->nullable();
-            $table->string('account_manager')->nullable();
-            $table->string('customer')->nullable();
-            $table->string('cust_contact')->nullable();
-            $table->string('loc_contact')->nullable();
-            $table->string('project_type')->nullable();
-            $table->string('color')->nullable();
-            $table->string('modified',255);
+            $table->longText('conditions')->nullable();
+            $table->integer('custom_1')->nullable();
+            $table->integer('custom_38')->nullable();
+            $table->double('refundabledeposit')->nullable();
+            $table->double('already_invoiced')->nullable();
+            $table->double('weight')->nullable();
+            $table->double('power')->nullable();
+            $table->double('current')->nullable();
+            $table->double('purchasecosts')->nullable();
+            $table->double('volume')->nullable();
+
+            $table->timestamp('_created')->nullable()->useCurrent();
+            $table->timestamp('_updated')->nullable()->useCurrentOnUpdate();
+
             $table->timestamps();
         });
     }

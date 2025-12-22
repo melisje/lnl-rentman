@@ -60,6 +60,7 @@ class FetchProjects extends Command
             'custom_2',
             'custom_32',
             'custom_33',
+            'custom_38',
             'updateHash',
             'creator',
             'number',
@@ -70,6 +71,19 @@ class FetchProjects extends Command
             'cust_contact',
             'loc_contact',
             'account_manager',
+
+            'deposit_status',
+            'customer',
+            'color',
+            'tags',
+            'conditions',
+            'refundabledeposit',
+            'already_invoiced',
+            'weight',
+            'power',
+            'current',
+            'purchasecosts',
+            'volume',
             // '',
         ],$timestampFields) ;
 
