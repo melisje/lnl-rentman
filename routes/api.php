@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post('/webhook/rentman', [WebhookController::class, 'handle']);
+Route::get('/webhook/rentman', [WebhookController::class, 'handle']);
