@@ -6,66 +6,40 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+use function Illuminate\Events\queueable;
 
 class InvoiceController extends Controller
 {
+    public function fetchView(Request $request)
+    {
+        $limit = env('RENTMAN_PAGE_LIMIT',5);
+        $offset = 0;
+        $response = json_encode("to be developped");
+        return view('rentman.invoice.fetch',compact('limit','offset','response'));
+    }
+
     public function fetch(Request $request)
     {
-        $url = 'https://api.rentman.net/invoices';
-        $token = env('RENTMAN_BEARER_TOKEN','*** Add token in .env as RENTMAN_BEARER_TOKEN ***');
-        $limit = env('RENTMAN_PAGE_LIMIT',10);
-        $offset = 0;
+        $validatedData = $request->validate([
+            'limit' => 'required|integer',
+            'offset' => 'required|integer',
+            'filter' => 'nullable|string',
+            'fields' => 'nullable|string',
+            'endpoint' => 'string'
+        ]);
 
         $queryParams = [
-            'limit' => $limit,
-            'offset' => $offset
+            'limit' => $validatedData['limit'],
+            'offset' => $validatedData['offset'],
+            'filter' => $validatedData['filter'],
+            'fields' => $validatedData['fields'],
         ];
 
-        // build full http request url incl. query parameters
-        $queryString = http_build_query($queryParams);
-        $fullRequestUrl = $url . '?' . $queryString;
+        $data =  ApiConctroller::fetch($validatedData['endpoint'],$queryParams);
 
-        // Send the request
-        // $response = Http::withToken($token)->get($url,$queryParams);
-        $response = Http::withToken($token)->get($fullRequestUrl);
-
-        if ($response->successful())
-        {
-            $invoices = $response->json();
-
-            $response4view = $response->json([
-                'status' => 'success',
-                'data' => $invoices
-            ], 200);
-
-            $response4view = $response;
-        }
-        else
-        {
-            $statusCode = $response->status();
-            $errorMessage = $response->body();
-            $response4view = response()->json([
-                'url' => $fullRequestUrl,
-                'status' => 'error',
-                'message' => 'We could not fetch the data from the external API',
-                'statusCode' => $statusCode,
-                'details' => $errorMessage
-            ], $statusCode);
-        }
-
-        // dd(
-        //     $response,
-        //     $fullRequestUrl,
-        //     $response->object()
-        // );
-
-        return view('rentman.invoice.fetch', [
-            'response' => $response,
-            'fullRequestUrl' => $fullRequestUrl,
-            'responseObject' => $response->object(),
-            'response' => $response4view,
-            'token' => $token
-        ]);
+        return view('rentman.invoice.fetch', compact('data', 'validatedData' ));
     }
 
     /**
@@ -152,4 +126,5 @@ class InvoiceController extends Controller
     {
         return 'DESTROY';
     }
+
 }

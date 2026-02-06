@@ -1,7 +1,7 @@
     <?php
 
     use Illuminate\Support\Facades\Route;
-    use App\Http\Controllers\rentman\InvoiceController;
+    use App\Http\Controllers\Rentman\InvoiceController;
 
     Route::middleware(['can:access-invoices'])->group(function()
     {
@@ -10,7 +10,8 @@
         Route::controller(InvoiceController::class)
           ->name('invoices.')
           ->group(function () {
-            Route::get('/fetch', 'fetch')->name('fetch');
+            Route::get('/fetch', 'fetchview')->name('fetchview');
+            Route::post('/fetch', 'fetch')->name('fetch');
           });
       });
 

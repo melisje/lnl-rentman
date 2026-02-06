@@ -6,7 +6,7 @@
     <ul class="dropdown-menu">
         <li class="">
             <a class="dropdown-item" href="{{ route('invoices.index')}}">{{ __('overview')}}</a>
-            <a class="dropdown-item" href="{{ route('invoices.fetch')}}">{{ __('fetch')}}</a>
+            <a class="dropdown-item" href="{{ route('invoices.fetchview')}}">{{ __('fetch')}}</a>
         </li>
     </ul>
 </li>
