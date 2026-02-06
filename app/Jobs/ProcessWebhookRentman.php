@@ -26,22 +26,16 @@ class ProcessWebhookRentman implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('Webhok ontvangen:', $this->payload);
-
-        $eventype = $this->payload['eventType'] ?? 'unknown';
-        $itemtype = $this->payload['itemType'] ?? 'unknown';
-        $items = $this->payload['items'];
-        $eventdate = $this->payload['eventDate'];
-
+        Log::info('Processing webhook payload:', $this->payload);
 
         $wbc = new WebhookCall;
+        $wbc->payload = json_encode($this->payload);
         $wbc->account = $this->payload['account'] ?? 'unknown';
         $wbc->user = $this->payload['user']['id'] ?? 'unknown';
         $wbc->eventType = $this->payload['eventType'] ?? 'unknown';
         $wbc->itemType = $this->payload['itemType'] ?? 'unknown';
         $wbc->items = json_encode($this->payload['items']);
         $wbc->eventDate = $this->payload['eventDate'];
-
         $wbc->save();
 
     }
