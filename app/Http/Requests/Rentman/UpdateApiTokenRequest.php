@@ -27,7 +27,8 @@ class UpdateApiTokenRequest extends FormRequest
         return [
             'account' => 'required|string|max:255',
             'url' => 'required|string|max:255',
-            'token' => 'required|string|max:500',
+            'api_token' => 'max:500',
+            'webhook_token' => 'max:500',
         ];
     }
 }

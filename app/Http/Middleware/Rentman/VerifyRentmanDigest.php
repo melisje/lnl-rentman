@@ -33,6 +33,7 @@ class VerifyRentmanDigest
 
         // Find the account's encryption token in the database
         $apiToken = ApiToken::where('account', $accountName)->first();
+        Log::info($apiToken);
 
         if (!$apiToken) {
             return response()->json(['error' => 'Unknown account'], 401);
@@ -49,9 +50,10 @@ class VerifyRentmanDigest
         // Gebruik de raw content voor de verificatie
         // Verify the raw content
         $rawBody = $request->getContent();
-        $calculatedDigest = hash_hmac($algo, $rawBody, $apiToken->token);
+        $calculatedDigest = hash_hmac($algo, $rawBody, $apiToken->webhook_token);
 
-        Log::info("Digest: ", [$calculatedDigest]);
+        Log::info("calculated: ", [$calculatedDigest]);
+        Log::info("Digest: ", [$digestHeader]);
 
         if (!hash_equals($receivedDigest, $calculatedDigest))
         {
