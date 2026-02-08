@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Rentman\Api;
 
 use App\Exceptions\EmergencyException;
 use App\Models\Rentman\Endpoint;
