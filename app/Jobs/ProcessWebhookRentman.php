@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\Rentman\WebhookReceived;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -56,7 +57,15 @@ class ProcessWebhookRentman implements ShouldQueue
         $wbc->save();
 
         // TODO: process - inform interested listeners about new webhook call
-
+        /**
+         * We implement the observer/listener patern.
+         * This means that we reveiving a webcall fires an event (the observer).
+         * Then we can implment listeners that are activated when the event
+         * happens.
+         * This allows us to decouple the implementation of specific actions from
+         * the functionality of recieving the wehbookcall.
+         */
+        WebhookReceived::dispatch($wbc); // Fire event, the observer !
     }
 
     /**

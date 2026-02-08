@@ -9,4 +9,6 @@ class CustomField extends Model
     protected $table = 'rm_customfields';
     protected $primaryKey = 'id';
     public $incrementing = false;
+    protected $guarded = [];
+
 }

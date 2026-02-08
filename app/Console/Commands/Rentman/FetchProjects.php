@@ -113,6 +113,7 @@ class FetchProjects extends Command
             {
             // create or update project in database
             // $project['planperiod_start'] = Carbon::parse($project['planperiod_start']);
+            // $project['planperiod_start'] = Carbon::parse($project['planperiod_start']);
             // Project::upsert($project,uniqueBy: ['id'], update: $fields);
         }
         Project::upsert($projects,uniqueBy: ['id'], update: $fields);
