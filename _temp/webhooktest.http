@@ -1,0 +1,23 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+
+{
+  "account":"restclient",
+  "user":
+  {
+    "itemType":"Crew",
+    "id":33,
+    "ref":"/crew/33"
+  },
+  "eventType":"update",
+  "itemType":"Contact",
+  "items":
+  [
+    {
+      "id":4592,
+      "ref":"/contacts/4592",
+      "parent":null
+    }
+  ],
+  "eventDate":"2026-02-06T11:44:12+01:00"
+}
