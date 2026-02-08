@@ -24,7 +24,6 @@ class ApiTokenSeeder extends Seeder
         $token = ApiToken::updateOrCreate(
             ["account" => "ledvisions"],
             [
-                "token" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZWRld2Vya2VyIjoyMzUsImFjY291bnQiOiJsZWR2aXNpb25zIiwiY2xpZW50X3R5cGUiOiJvcGVuYXBpIiwiY2xpZW50Lm5hbWUiOiJvcGVuYXBpIiwiZXhwIjoyMDY1OTQzODQ2LCJpc3MiOiJ7XCJuYW1lXCI6XCJiYWNrZW5kXCIsXCJ2ZXJzaW9uXCI6XCI0Ljc1NC4wLjFcIn0iLCJpYXQiOjE3NTA0MTEwNDZ9.Hhf8qpROUkJbLIlpfcGGKPVAVda-ksBPGszCaaB0HPc",
                 "token" => "eDv8pxhtfawkmS0nJSOKiN76HGJyk39csaQIHSBz9xluiJD3FeIlsOEv27bJ1N2PxSajy8iRaumgD7mQzcNGOxrJq05yAs55JgE8fCtdMoCPinbbObJEn1p3NwSQlrzmbL27NGua41NaPMhkolj4ba538lds7aEnkbcpGgeQtH8nyf79mNJ4y0atPiKpqIxQNAqJPaykH7tLp6hjuwBOQ0oJrF21Gz3wCd1CF01ElzSq01hzj44gk6IvEc7l78j4",
                 "url" => "https://api.rentman.net"
             ]);
