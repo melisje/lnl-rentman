@@ -12,6 +12,11 @@
             <a class="dropdown-item" href="{{ route('admin.roles')}}">{{ __('roles')}}</a>
         </li>
         @endcan
+        @can('access-apitokens')
+        <li class="">
+            <a class="dropdown-item" href="{{ route('admin.apitoken.index')}}">{{ __('apitokens')}}</a>
+        </li>
+        @endcan
     </ul>
 </li>
 @endcan

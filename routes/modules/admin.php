@@ -3,6 +3,8 @@
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\Admin\AdminController;
     use App\Http\Controllers\Admin\UserRoleController;
+    use App\Http\Controllers\Rentman\ApiTokenController;
+use App\Models\Rentman\ApiToken;
 
     /*
     |--------------------------------------------------------------------------
@@ -15,13 +17,15 @@
 
     Route::middleware(['auth'])
       ->prefix('admin')
+      ->name('admin.')
       ->group(function ()
       {
 
         // Route to the admin dashboard
         Route::middleware(['can:access-admin'])
           ->get('/', [AdminController::class, 'dashboard'])
-          ->name('admin.dashboard');
+          ->name('dashboard')
+          ;
 
         /*
         |-----------------------------------------------------------------------
@@ -35,8 +39,23 @@
             ->prefix('/roles')
             ->group(function()
               {
-                  Route::get('/', [UserRoleController::class, 'index'])->name('admin.roles');
-                  Route::patch('/{role}/user/{user}', [UserRoleController::class, 'update'])->name('admin.roles.user.toggle');
+                  Route::get('/', [UserRoleController::class, 'index'])->name('roles');
+                  Route::patch('/{role}/user/{user}', [UserRoleController::class, 'update'])->name('roles.user.toggle');
               });
 
+        /*
+        |-----------------------------------------------------------------------
+        | Admin > Rentman API Tokens Routes
+        |-----------------------------------------------------------------------
+        | Requirements:
+        | 1. Authenticated (middleware:auth)
+        | 2. Authorised (middleware:can)
+        */
+        Route::middleware(['auth','can:access-admin','can:access-apitokens'])
+            // ->prefix('/apitokens')
+            ->group(function()
+              {
+                Route::resource('apitoken',ApiTokenController::class);
+
+              });
       });

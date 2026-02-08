@@ -44,5 +44,11 @@ class AppServiceProvider extends ServiceProvider
 
             return $user->hasAnyRole(['invoices','admin']);
         });
+
+        // api tokens rights
+        Gate::define('access-apitokens', function (User $user) {
+
+            return $user->hasAnyRole(['api_tokens','admin']);
+        });
     }
 }
