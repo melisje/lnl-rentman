@@ -53,10 +53,13 @@ class VerifyRentmanDigest
 
         Log::info("Digest: ", [$calculatedDigest]);
 
-        if (!hash_equals($receivedDigest, $calculatedDigest)) {
+        if (!hash_equals($receivedDigest, $calculatedDigest))
+        {
+            Log::error('Signature mismatch');
             return response()->json(['error' => 'Signature mismatch'], 401);
         }
 
+        Log::info("Signature matched...");
         // Optional: add the model to the request for usage in the controller
         $request->attributes->add(['api_token_model' => $apiToken]);
 
