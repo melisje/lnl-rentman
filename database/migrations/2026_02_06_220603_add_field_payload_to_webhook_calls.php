@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('rm_webhook_calls', function (Blueprint $table) {
-            $table->longText('payload')->nullable()->after('id');
+            $table->text('payload')->nullable()->after('id');
             //
         });
     }
