@@ -10,27 +10,33 @@ use App\Models\Rentman\WebhookCall;
 
 class WebhookController extends Controller
 {
-    //
+    /**
+     * Retrieve info and data from request
+     *
+     * The signature verification is already done via the VerifyRentmanDigest middleware.
+     * So we are sure the webhook is sent by the correct Rentman environment
+     *
+     * In this method we receive the verified request and acknowledge reception to the sender.
+     * Then we dispatch the processing of the payload to the ProcessWebhookRentman worker job.
+     */
     public function handle(Request $request)
     {
+        // retrieve data from request
+        $data =
+        [
+            'payload' => $request->all(),  // allprocessed data, inclusive (request/query) parameters
+            'rawcontent' => $request->getContent(),  // the raw content of the request
+            'headers' => json_encode($request->headers->all()),  // all headers
+            'ip' =>  $request->ip(),
+        ];
+
         // Log incoming data (Usefull for debugging)
-        Log::info('Webhook ontvangen:',$request->all());
+        Log::info("Webhook received from ". $data['ip']. ":", $data['payload']);
 
-        // Signature verification
-        $secret = config('services.webhook.secret'); // the secret key
-        $signature = $request->header('X-Signature-Header'); // The header can be different per service
+        // Dispatch data to job ...
+        ProcessWebhookRentman::dispatch($data);
 
-        // Calculate the expecte signatur (often HMAC SHA256)
-        $payload = $request->getContent();
-        $expected = hash_hmac('sha256', $payload, $secret);
-
-        // if (!hash_equals($expected, $signature)) {
-        //     abort(403, 'Unauthorized webhook signature.');
-        // }
-
-        // Dispatch job and immediately return response
-        ProcessWebhookRentman::dispatch($request->all());
-
+        // ... and immediately return response
         // ALWAYS return a 200 OK code, asap
         return response()->json(['status' => 'received']);
     }

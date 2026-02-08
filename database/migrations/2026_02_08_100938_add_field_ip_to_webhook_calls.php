@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('rm_webhook_calls', function (Blueprint $table) {
-            $table->text('payload')->nullable()->after('id');
-            //
+            $table->text('headers')
+                ->nullable()
+                ->after('payload')
+                ;
+            $table->string('ip')
+                ->nullable()
+                ->after('headers')
+            ;
         });
     }
 
@@ -23,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rm_webhook_calls', function (Blueprint $table) {
-            $table->dropColumn('payload');
+            $table->dropColumn(['ip','headers']);
         });
     }
 };
