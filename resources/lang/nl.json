@@ -17,6 +17,9 @@
   "name": "Naam",
   "value": "Waarde",
   "invalid language code": "Ongeldige taalcode.",
+  "save": "Bewaar",
   "": "",
-  "zzz": "zzz"
+  "zzz": "zzz",
+  "apitoken": "API Token",
+  "apitokens": "API Tokens"
 }

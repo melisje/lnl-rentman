@@ -17,6 +17,9 @@
   "name": "Name",
   "value": "Value",
   "invalid language code": "Invalid language code.",
+  "save": "Save",
   "": "",
-  "zzz": "zzz"
+  "zzz": "zzz",
+  "apitoken": "API Token",
+  "apitokens": "API Tokens"
 }
