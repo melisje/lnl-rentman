@@ -38,8 +38,8 @@ class ProcessWebhookRentman implements ShouldQueue
         Log::info('Processing webhook payload:', $payload);
 
         // Make sure user exists in crew table from given account
-        $account = $payload ? $payload['account'] : null;
-        $user = $payload ? $payload['user']['id'] : null;
+        $account = $payload['account'];
+        $user = $payload['user'] ? $payload['user']['id'] : null;
         $this->sync_crew_user($account,$user);
 
         // store the call info in the database
