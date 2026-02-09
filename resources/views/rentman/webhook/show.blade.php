@@ -82,14 +82,26 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">{{ __('headers')}}</span>
             <div class="form-control">
-                {{ $webhookcall->headers}}
+                @if($webhookcall->headers)
+                @foreach(json_decode($webhookcall->headers) as $key => $header)
+                <div class="row">
+                    <div class="col-2">{{ $key}} </div>
+                    <div class="col"> {{ $header[0] }}
+                    </div>
+                </div>
+                @endforeach
+                @endif
             </div>
         </div>
 
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">{{ __('items')}}</span>
             <div class="form-control">
-                {{ $webhookcall->items}}
+                @if($webhookcall->items)
+                @foreach(json_decode($webhookcall->items) as $key => $item)
+                <div>{{ json_encode($item) }}</div>
+                @endforeach
+                @endif
             </div>
         </div>
 
