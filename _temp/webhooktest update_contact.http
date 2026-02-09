@@ -1,0 +1,24 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=709d2d5c41a20b06232b987fa722f9273288300383b4048aa9fdd8172b386cb2bed139bd42b2bbb972a9547fa54db279f13573d413b49224afcebc5f009e5114
+
+{
+  "account":"rentmantest",
+  "user":
+  {
+    "itemType":"Crew",
+    "id":33,
+    "ref":"\/crew\/33"
+  },
+  "eventType":"update",
+  "itemType":"Contact",
+  "items":
+  [
+    {
+      "id":4592,
+      "ref":"\/contacts\/4592",
+      "parent":null
+    }
+  ],
+  "eventDate":"2026-02-06T11:44:12+01:00"
+}
