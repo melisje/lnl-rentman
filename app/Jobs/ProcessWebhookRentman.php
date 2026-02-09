@@ -29,32 +29,29 @@ class ProcessWebhookRentman implements ShouldQueue
      */
     public function handle(): void
     {
-        // Explode received data array
-        $payload = $this->data['payload'];
-        $headers = $this->data['headers'];
-        $rawcontent = $this->data['rawcontent'];
-        $ip = $this->data['ip'];
+        // Create a new WebhookCall instance
+        $whc = new WebhookCall;
 
-        Log::info('Processing webhook payload:', $payload);
+        // Explode received data array and store it in the model
+        $whc->headers = $this->data['headers'];
+        $whc->payload = $this->data['rawcontent'];
+        $whc->ip = $this->data['ip'];
+
+        Log::info('Processing webhook payload:', [$whc->payload]);
+
+        $payload = $this->data['payload'];
+        $whc->account = $payload['account'];
+        $whc->eventType = $payload['eventType'] ?? 'unknown';
+        $whc->itemType = $payload['itemType'] ?? 'unknown';
+        $whc->items = json_encode($payload['items']);
+        $whc->eventDate = $payload['eventDate'];
 
         // Make sure user exists in crew table from given account
-        $account = $payload['account'];
-        $user = $payload['user'] ? $payload['user']['id'] : null;
-        $this->sync_crew_user($account,$user);
+        $whc->user = $payload['user'] ? $payload['user']['id'] : null;
+        $this->sync_crew_user($whc->account,$whc->user);
 
-        // store the call info in the database
-        $wbc = new WebhookCall;
-        // $wbc->payload = json_encode($payload);
-        $wbc->payload = $rawcontent;
-        $wbc->account = $account;
-        $wbc->user = $user;
-        $wbc->ip = $ip;
-        $wbc->headers = $headers;
-        $wbc->eventType = $payload['eventType'] ?? 'unknown';
-        $wbc->itemType = $payload['itemType'] ?? 'unknown';
-        $wbc->items = json_encode($payload['items']);
-        $wbc->eventDate = $payload['eventDate'];
-        $wbc->save();
+        // save model to db
+        $whc->save();
 
         // TODO: process - inform interested listeners about new webhook call
         /**
@@ -65,7 +62,7 @@ class ProcessWebhookRentman implements ShouldQueue
          * This allows us to decouple the implementation of specific actions from
          * the functionality of recieving the wehbookcall.
          */
-        WebhookReceived::dispatch($wbc); // Fire event, the observer !
+        WebhookReceived::dispatch($whc); // Fire event, the observer !
     }
 
     /**
