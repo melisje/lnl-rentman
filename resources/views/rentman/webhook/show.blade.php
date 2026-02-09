@@ -64,7 +64,7 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text">{{ __('eventdate')}}</span>
                     <div class="form-control">
-                        {{ $webhookcall->eventDate}}
+                        {{ $webhookcall->eventDate->diffForHumans()}}
                     </div>
                 </div>
             </div>

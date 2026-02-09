@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="mx-2 p-3 bg-light rounded-3">
-        <H1>Projects</H1>
+        <H1>{{ __('webhookcalls')}}</H1>
 
         <div class="table-responsive">
             <table class="table table-sm table-bordered table-hover table-striped">
@@ -33,6 +33,7 @@
                         <td>{{ $whc->user }} </td>
                         <td>{{ $whc->eventType }} </td>
                         <td>{{ $whc->itemType }} </td>
+                        <td>{{ $whc->eventDate?->diffForHumans() }} </td>
                         <td>{{ $whc->eventDate }} </td>
                     </tr>
                     @endforeach
