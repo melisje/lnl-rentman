@@ -14,6 +14,7 @@
 
                 @include('layouts.nav_invoices')
                 @include('layouts.nav_projects')
+                @include('layouts.nav_webhookcalls')
 
                 <!-- Allow adding extra navbar items form child views -->
                 @stack('navbar-top-left')
