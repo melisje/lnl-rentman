@@ -4,7 +4,7 @@ namespace App\Console\Commands\Rentman;
 
 use App\Models\Rentman\Endpoint;
 use App\Models\Rentman\EndpointField;
-use App\Services\RentmanApiService;
+use App\Services\Rentman\Api\RentmanApiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Pluralizer;
 

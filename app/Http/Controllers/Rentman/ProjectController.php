@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rentman\Project;
-use App\Services\RentmanApiService;
+use App\Services\Rentman\Api\RentmanApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
