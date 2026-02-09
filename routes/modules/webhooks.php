@@ -7,5 +7,5 @@ use Illuminate\Support\Facades\Route;
       ->group(function ()
       {
         // Project resourse routes
-        Route::resource('webhookcalls', WebhookCallController::class);
+        Route::resource('webhookcall', WebhookCallController::class);
       });

@@ -5,7 +5,7 @@
     </a>
     <ul class="dropdown-menu">
         <li class="">
-            <a class="dropdown-item" href="{{ route('webhookcalls.index')}}">{{ __('overview')}}</a>
+            <a class="dropdown-item" href="{{ route('webhookcall.index')}}">{{ __('overview')}}</a>
         </li>
     </ul>
 </li>

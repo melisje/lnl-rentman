@@ -23,7 +23,7 @@
                     @foreach($items as $key => $whc)
                     <tr>
                         <td class="text-center">
-                            <a href="{{ route('webhookcalls.show', $whc->id) }}">
+                            <a href="{{ route('webhookcall.show', $whc->id) }}">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
                         </td>

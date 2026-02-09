@@ -40,9 +40,9 @@ class WebhookCallController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(WebhookCall $webhookcall)
     {
-        //
+        return view('rentman.webhook.show', compact('webhookcall'));
     }
 
     /**
