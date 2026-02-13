@@ -3,6 +3,8 @@
 namespace App\Services\Rentman\Api;
 
 use App\Exceptions\EmergencyException;
+use App\Models\Rentman\ApiToken;
+use App\Models\Rentman\Crew;
 use App\Models\Rentman\Endpoint;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Client\ConnectionException;
@@ -26,12 +28,21 @@ class RentmanApiService
      */
     public function __construct()
     {
+
         $this->client = Http::baseUrl(config('services.rentman.base_url'))
             ->withHeaders([
                 'Accept' => 'application/json',
             ])
+
+            /**
+             * Since we are calling the api for multiple accounts (ledvisions
+             * and llstageservice) we need to be able to dynamically choose
+             * an apitoken based on the account. We ommit adding the token
+             * in the constructor and add it to the call
+            */
             // Gebruik de Authorization header voor het Bearer Token
-            ->withToken(config('services.rentman.token'));
+            // ->withToken(config('services.rentman.token'))
+        ;
     }
 
     /**
@@ -303,8 +314,65 @@ class RentmanApiService
     }
 
 
-    public function sync()
+    /**
+     * To call a rentman API endpoint, we must have the proper api key that belongs to the correct account
+     */
+    public function sync_crew_user($account, $user)
     {
+        Log::info("+++ sync_crew_user +++");
+        // $endpoint = "/crew/$user";
+        $endpoint = $user['ref'];
+        $crewid = $user['id'];
+        Log::info("Endpoint: $endpoint");
 
+        // fetch the API token for the given account
+        $apiToken = ApiToken::where('account', $account)->first();
+        $token = $apiToken->api_token;
+
+        // $base_url = config('services.rentman.base_url');
+
+        $response = $this->client
+            ->withToken($token)
+            ->get($endpoint)
+        ;
+
+        if ($response->successful()) {
+            $data = $response->json()['data']; // De resultaten zitten meestal in een 'data' key
+            // Log::info("crew data: json_encode($data)");
+
+            // update or create crew model
+            $crew = Crew::upsert(
+                [
+                    'account' => $account,
+                    'rm_id' => $crewid,
+                    'created' => $data['created'],
+                    'modified' => $data['modified'],
+                    'creator' => $data['creator'],
+                    'displayname' => $data['displayname'],
+                    'updateHash' => $data['updateHash'],
+                    'folder' => $data['folder'],
+                    'street' => $data['street'],
+                    'housenumber' => $data['housenumber'],
+                    'city' => $data['city'],
+                    'postal_code' => $data['postal_code'],
+                    'addressline2' => $data['addressline2'],
+                    'firstname' => $data['firstname'],
+                    'middle_name' => $data['middle_name'],
+                    'lastname' => $data['lastname'],
+                    'email' => $data['email'],
+                    'active' => $data['active'],
+                    'tags' => $data['tags'],
+                    'custom' => json_encode($data['custom']),
+                ],
+                [
+                    'account' => $account,
+                    'rm_id' => $user
+                ]
+            );
+
+            Log::info("Crew $crewid synced for account $account");
+        }
+
+        return $response->throw();
     }
 }

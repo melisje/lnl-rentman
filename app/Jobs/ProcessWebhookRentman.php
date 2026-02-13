@@ -3,10 +3,14 @@
 namespace App\Jobs;
 
 use App\Events\Rentman\WebhookReceived;
+use App\Models\Rentman\ApiToken;
+use App\Models\Rentman\Crew;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use App\Models\Rentman\WebhookCall;
+use App\Services\Rentman\Api\RentmanApiService;
+use Illuminate\Support\Facades\Http;
 
 class ProcessWebhookRentman implements ShouldQueue
 {
@@ -27,7 +31,7 @@ class ProcessWebhookRentman implements ShouldQueue
      * 1. Store the webhook call in the database
      * 2. Notify listeners for the received events
      */
-    public function handle(): void
+    public function handle(RentmanApiService $rentmanApiService): void
     {
         // Create a new WebhookCall instance
         $whc = new WebhookCall;
@@ -47,8 +51,11 @@ class ProcessWebhookRentman implements ShouldQueue
         $whc->eventDate = $payload['eventDate'];
 
         // Make sure user exists in crew table from given account
-        $whc->user = $payload['user'] ? $payload['user']['id'] : null;
-        $this->sync_crew_user($whc->account,$whc->user);
+        // $whc->user = $payload['user'] ? $payload['user']['id'] : null;
+        $user = $payload['user'];
+        $whc->user = $user ? $user['id'] : null;
+
+        $rentmanApiService->sync_crew_user($whc->account,$user);
 
         // save model to db
         $whc->save();
@@ -65,12 +72,5 @@ class ProcessWebhookRentman implements ShouldQueue
         WebhookReceived::dispatch($whc); // Fire event, the observer !
     }
 
-    /**
-     * To call a rentman API endpoint, we must have the proper api key that belongs to the correct account
-     */
-    public function sync_crew_user($account,$user)
-    {
-        $rmapiurl = "";
-        $url = "$account.$rmapiurl";
-    }
+
 }
