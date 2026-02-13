@@ -19,9 +19,9 @@
                         <th scope="col" class="text-center">{{__('eventdate')}}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="webhook-table-body">
                     @foreach($items as $key => $whc)
-                    <tr>
+                    <tr id="row-{{ $whc->id }}">
                         <td class="text-center">
                             <a href="{{ route('webhookcall.show', $whc->id) }}">
                                 <i class="bi bi-pencil-fill"></i>
@@ -46,3 +46,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+
+@endpush
