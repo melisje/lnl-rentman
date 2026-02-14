@@ -3,46 +3,48 @@
 namespace App\Models\Rentman;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
     protected $table = 'rm_projects';
     protected $primaryKey = 'id';
-    public $incrementing = false;
+    // public $incrementing = true;
 
-    protected $casts = [
-        'planperiod_start2' => 'datetime',
-    ];
     /**
      * The attributes that aren't mass assignable.
      * An empty list means that all fields are mass assignable
      *
      * @var array<string>|bool
      */
-    protected $guarded = [];
+    protected $guarded = ['id'];
 
     /**
-     * The attributes that are mass assignable.
+     * De casts die moeten worden toegepast.
      *
-     * @var array<string>|bool
+     * @return array<string, string>
      */
-    // protected $fillable = [
-    //     'created',
-    //     'modified',
-    //     'displayname',
-    //     'name',
-    //     'planperiod_start',
-    //     'planperiod_end',
-    //     'ussageperiod_start',
-    //     'ussageperiod_end',
-    //     'custom_1',
-    //     'custom_2',
-    //     'custom_32',
-    //     'custom_33',
-    //     'updateHash',
-    //     ];
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime', // Optioneel: direct formatteren
+            'modified_at' => 'datetime', // Optioneel: direct formatteren
+            'created' => 'datetime', // Dit cast de kolom naar Carbon
+            'modified' => 'datetime', // Dit cast de kolom naar Carbon
+            'usageperiod_start' => 'datetime', // Dit cast de kolom naar Carbon
+            'usageperiod_end' => 'datetime', // Dit cast de kolom naar Carbon
+            'planperiod_start' => 'datetime', // Dit cast de kolom naar Carbon
+            'planperiod_end' => 'datetime', // Dit cast de kolom naar Carbon
+            'equipment_period_from' => 'datetime', // Dit cast de kolom naar Carbon
+            'equipment_period_to' => 'datetime', // Dit cast de kolom naar Carbon
+        ];
+    }
 
-
-    // const CREATED_AT = '_created';
-    // const UPDATED_AT = '_updated';
+    /**
+     * Get the subprojects for the project.
+     */
+    public function subprojects(): HasMany
+    {
+        return $this->hasMany(SubProject::class,'projects_id','id');
+    }
 }

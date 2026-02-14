@@ -4,6 +4,7 @@ namespace App\Models\Rentman;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubProject extends Model
 {
@@ -35,5 +36,14 @@ class SubProject extends Model
             'modified_at' => 'datetime:Y-m-d H:i', // Optioneel: direct formatteren
         ];
     }
+
+    /**
+     * Get the Project that owns the subproject.
+     */
+    public function parent_project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class,'projects_id','id');
+    }
+
 }
 
