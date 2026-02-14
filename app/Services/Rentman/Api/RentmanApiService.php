@@ -333,7 +333,7 @@ class RentmanApiService
         $apiToken = ApiToken::where('account', $account)->first();
         $token = $apiToken->api_token;
 
-        Log::info("+++ Calling endpoint $url for account $account ... ");
+        Log::info("~~~~> Calling endpoint $url for account $account ... ");
 
         // send get request
         $response = Http::withHeaders(
@@ -368,12 +368,13 @@ class RentmanApiService
      */
     public function sync_crew_user($account, $user)
     {
-        Log::info("+++ sync_crew_user +++");
+        $userid = $user['id'];
+        Log::info("~~> fetching crew member $userid  for account $account ...");
 
         // initialise some variables
         $endpoint = $user['ref'];
-        Log::info("Endpoint: $endpoint");
 
+        // Fetch crew member data
         $data = $this->get_rentman_endpoint($account,$endpoint);
 
         return $data;
@@ -385,7 +386,7 @@ class RentmanApiService
      */
     public function get_project($account, $rentman_id)
     {
-        Log::info("+++ fetching project $rentman_id for account $account +++");
+        Log::info("~~> fetching project $rentman_id for account $account ...");
 
         // build endpoint path
         $endpoint = "/projects/$rentman_id";
@@ -394,5 +395,23 @@ class RentmanApiService
         return $this->get_rentman_endpoint($account, $endpoint);
 
 
+    }
+
+    /**
+     * Fetch the subprojects'data for a given $project_id
+     * from the Rentman API for a given $account
+     * @param string $account The Rentman account identifier
+     * @param string $project_id The id of the project the subprojects are fetched for
+     * @return array Data array with the subprojects
+     */
+    public function get_subprojects($account, $project_id)
+    {
+        Log::info("~~> Fetching subprojects for project $project_id for account $account");
+
+        // build endpoint path
+        $endpoint = "/projects/$project_id/subprojects";
+
+        // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account,$endpoint);
     }
 }

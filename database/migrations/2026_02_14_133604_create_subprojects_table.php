@@ -66,7 +66,7 @@ return new class extends Migration
             $table->unique(['account', 'rm_id']);
 
             // Foreign Keys
-            $table->foreign('projects_id')->references('id')->on('rm_projects');
+            $table->foreign('projects_id')->references('id')->on('rm_projects')->onDelete('cascade');
         });
     }
 
