@@ -71,6 +71,10 @@ class ProjectsService
     // status will be 'Varies'.
 
     $this->sync_subprojects($account, $project);
+
+    // Calculate the status of the project and save it in the status field
+    $project->status = $project->calculated_status;
+    $project->save();
   }
 
   /**
