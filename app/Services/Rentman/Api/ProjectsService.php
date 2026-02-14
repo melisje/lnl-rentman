@@ -75,6 +75,7 @@ class ProjectsService
     // Calculate the status of the project and save it in the status field
     $project->status = $project->calculated_status;
     $project->save();
+    Log::info("~~> Project status for project $project->rm_id calculated on account $account: $project->status");
   }
 
   /**
