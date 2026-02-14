@@ -1,0 +1,28 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=427caa4c20fb02e1d9facc78ed633bc32acb92b5fba9bfae1e0c5d90d44226d0bdc92e0bed9ecfc25b19daa1d0457d4ed533e951d5a99c21539a7ebd421d23c6
+
+{
+  "account":"ledvisions",
+  "user":{
+    "itemType":"Crew",
+    "id":280,
+    "ref":"/crew/280"
+  },
+  "eventType":"create",
+  "itemType":"Subproject",
+  "items":
+  [
+    {
+      "id":1546,
+      "ref":"/subprojects/1546",
+      "parent":
+      {
+        "id":730,
+        "itemType":"Project",
+        "ref":"/projects/730"
+      }
+    }
+  ],
+  "eventDate":"2026-02-14T19:38:51+01:00"
+}
