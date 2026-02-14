@@ -3,6 +3,7 @@
 namespace App\Models\Rentman;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
@@ -10,6 +11,8 @@ class Project extends Model
     protected $table = 'rm_projects';
     protected $primaryKey = 'id';
     // public $incrementing = true;
+
+    protected $appends = ['calculated_status'];
 
     /**
      * The attributes that aren't mass assignable.
@@ -46,5 +49,31 @@ class Project extends Model
     public function subprojects(): HasMany
     {
         return $this->hasMany(SubProject::class,'projects_id','id');
+    }
+
+    /**
+     * Berekende status op basis van subprojecten
+     */
+    protected function calculatedStatus(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                // 1. Haal alle unieke statussen van de subprojecten op
+                $uniqueStatuses = $this->subprojects->pluck('status')->unique();
+
+                // 2. Als er geen subprojecten zijn
+                if ($uniqueStatuses->isEmpty()) {
+                    return 'geen subprojecten';
+                }
+
+                // 3. Als er precies 1 unieke status is, hebben ze allemaal dezelfde status
+                if ($uniqueStatuses->count() === 1) {
+                    return $uniqueStatuses->first();
+                }
+
+                // 4. In alle andere gevallen zijn de statussen verschillend
+                return 'gevarieerd';
+            },
+        )->shouldCache();
     }
 }
