@@ -2,22 +2,18 @@
 
 namespace App\Services\Rentman\Api;
 
-use App\Exceptions\EmergencyException;
 use App\Models\Rentman\ApiToken;
 use App\Models\Rentman\Crew;
-use App\Models\Rentman\Endpoint;
-use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-
 
 class RentmanApiService
 {
     protected PendingRequest $client;
+    protected $baseUrl;
 
     // Maximum limit per page. Rentman support often higher limits,
     // but this value is a safe standard to avoid timeouts or size limits.
@@ -29,7 +25,8 @@ class RentmanApiService
     public function __construct()
     {
 
-        $this->client = Http::baseUrl(config('services.rentman.base_url'))
+        $this->baseUrl = config('services.rentman.base_url');
+        $this->client = Http::baseUrl($this->baseUrl)
             ->withHeaders([
                 'Accept' => 'application/json',
             ])
@@ -43,6 +40,15 @@ class RentmanApiService
             // Gebruik de Authorization header voor het Bearer Token
             // ->withToken(config('services.rentman.token'))
         ;
+    }
+
+    /**
+     * Test function to check if the RentmanApiService
+     * class is injected and accessible
+     */
+    public function service_injected(string $message, string $level = 'info')
+    {
+        Log::info("RentmanApiService is injected and accessible");
     }
 
     /**
@@ -143,8 +149,6 @@ class RentmanApiService
 
         return $dataset;
     }
-
-
 
     public function getEndpointData($endpoint, array $queryParameters): array
     {
@@ -313,66 +317,82 @@ class RentmanApiService
         return $dataset;
     }
 
-
     /**
-     * To call a rentman API endpoint, we must have the proper api key that belongs to the correct account
+     * Send GET call to Rentman API for a given $account
+     * @param string $account The account to be used in the API call
+     * @param string $endpoint The endpoint path
+     * @return array the retrieved data
      */
-    public function sync_crew_user($account, $user)
+    public function get_rentman_endpoint(string $account, string $endpoint)
     {
-        Log::info("+++ sync_crew_user +++");
-        // $endpoint = "/crew/$user";
-        $endpoint = $user['ref'];
-        $crewid = $user['id'];
-        Log::info("Endpoint: $endpoint");
+        // build endpoint url
+        $base_url = config('services.rentman.base_url');
+        $url = $base_url . $endpoint;
 
         // fetch the API token for the given account
         $apiToken = ApiToken::where('account', $account)->first();
         $token = $apiToken->api_token;
 
-        // $base_url = config('services.rentman.base_url');
+        Log::info("+++ Calling endpoint $url for account $account ... ");
 
-        $response = $this->client
+        // send get request
+        $response = Http::withHeaders(
+            [
+                'Accept' => 'application/json',
+            ]
+        )
             ->withToken($token)
-            ->get($endpoint)
-        ;
+            ->get($url);
 
-        if ($response->successful()) {
-            $data = $response->json()['data']; // De resultaten zitten meestal in een 'data' key
-            // Log::info("crew data: json_encode($data)");
-
-            // update or create crew model
-            $crew = Crew::upsert(
-                [
-                    'account' => $account,
-                    'rm_id' => $crewid,
-                    'created' => $data['created'],
-                    'modified' => $data['modified'],
-                    'creator' => $data['creator'],
-                    'displayname' => $data['displayname'],
-                    'updateHash' => $data['updateHash'],
-                    'folder' => $data['folder'],
-                    'street' => $data['street'],
-                    'housenumber' => $data['housenumber'],
-                    'city' => $data['city'],
-                    'postal_code' => $data['postal_code'],
-                    'addressline2' => $data['addressline2'],
-                    'firstname' => $data['firstname'],
-                    'middle_name' => $data['middle_name'],
-                    'lastname' => $data['lastname'],
-                    'email' => $data['email'],
-                    'active' => $data['active'],
-                    'tags' => $data['tags'],
-                    'custom' => json_encode($data['custom']),
-                ],
-                [
-                    'account' => $account,
-                    'rm_id' => $user
-                ]
-            );
-
-            Log::info("Crew $crewid synced for account $account");
+        if ($response->successful())
+        {
+            // The results can be found in the 'data' message
+            $data = $response->json()['data'];
+            return $data;
         }
+        else
+        {
+            return $response->throw();
+        }
+    }
 
-        return $response->throw();
+
+    /**
+     * Fetch the current data for the given crewmember from Rentman
+     *
+     * To call a rentman API endpoint, we must have the proper
+     * api_token that belongs to the correct account
+     *
+     * @param string $account
+     * @param array $user
+     */
+    public function sync_crew_user($account, $user)
+    {
+        Log::info("+++ sync_crew_user +++");
+
+        // initialise some variables
+        $endpoint = $user['ref'];
+        Log::info("Endpoint: $endpoint");
+
+        $data = $this->get_rentman_endpoint($account,$endpoint);
+
+        return $data;
+
+    }
+
+    /**
+     * Fetch project data from Rentman API
+     */
+    public function get_project($account, $rentman_id)
+    {
+        Log::info("+++ fetching project $rentman_id for account $account +++");
+
+        // build endpoint path
+        $endpoint = "/projects/$rentman_id";
+
+        // fetch and return project data
+        return $this->get_rentman_endpoint($account, $endpoint);
+
+
     }
 }

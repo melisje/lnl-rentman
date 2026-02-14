@@ -55,9 +55,42 @@ class ProcessWebhookRentman implements ShouldQueue
         $user = $payload['user'];
         $whc->user = $user ? $user['id'] : null;
 
-        $rentmanApiService->sync_crew_user($whc->account,$user);
+        $crewdata = $rentmanApiService->sync_crew_user($whc->account,$user);
 
-        // save model to db
+        // update or create crew model
+        $crew = Crew::upsert(
+            [
+                'account' => $whc->account,
+                'rm_id' => $whc->user,
+                'created' => $crewdata['created'],
+                'modified' => $crewdata['modified'],
+                'creator' => $crewdata['creator'],
+                'displayname' => $crewdata['displayname'],
+                'updateHash' => $crewdata['updateHash'],
+                'folder' => $crewdata['folder'],
+                'street' => $crewdata['street'],
+                'housenumber' => $crewdata['housenumber'],
+                'city' => $crewdata['city'],
+                'postal_code' => $crewdata['postal_code'],
+                'addressline2' => $crewdata['addressline2'],
+                'firstname' => $crewdata['firstname'],
+                'middle_name' => $crewdata['middle_name'],
+                'lastname' => $crewdata['lastname'],
+                'email' => $crewdata['email'],
+                'active' => $crewdata['active'],
+                'tags' => $crewdata['tags'],
+                'custom' => json_encode($crewdata['custom']),
+            ],
+            [
+                'account' => $whc->account,
+                'rm_id' => $whc->user
+            ]
+        );
+
+        Log::info("Crew $whc->id synced for account $whc->account");
+
+        // We are now sure that the user is also in the crew
+        // table and we can save the WebhookCall model to db
         $whc->save();
 
         // TODO: process - inform interested listeners about new webhook call
