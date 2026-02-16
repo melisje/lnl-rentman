@@ -13,7 +13,8 @@
                             <th role="column">edit</th>
                             <th role="column">account</th>
                             <th role="column">url</th>
-                            <th role="column">token</th>
+                            <th role="column">api token</th>
+                            <th role="column">webhook token</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,7 +27,8 @@
                             </td>
                             <td>{{ $token->account }}</td>
                             <td>{{ $token->url }}</td>
-                            <td class="text-wrap">{{ $token->token }}</td>
+                            <td class="text-wrap">{{ $token->api_token }}</td>
+                            <td class="text-wrap">{{ $token->webhook_token }}</td>
                         </tr>
                         @endforeach
                     </tbody>

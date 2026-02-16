@@ -3,10 +3,13 @@
 namespace App\Jobs;
 
 use App\Events\Rentman\WebhookReceived;
+use App\Models\Rentman\Crew;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use App\Models\Rentman\WebhookCall;
+use App\Services\Rentman\Api\RentmanApiService;
+use Illuminate\Support\Facades\Http;
 
 class ProcessWebhookRentman implements ShouldQueue
 {
@@ -27,34 +30,67 @@ class ProcessWebhookRentman implements ShouldQueue
      * 1. Store the webhook call in the database
      * 2. Notify listeners for the received events
      */
-    public function handle(): void
+    public function handle(RentmanApiService $rentmanApiService): void
     {
-        // Explode received data array
-        $payload = $this->data['payload'];
-        $headers = $this->data['headers'];
-        $rawcontent = $this->data['rawcontent'];
-        $ip = $this->data['ip'];
+        // Create a new WebhookCall instance
+        $whc = new WebhookCall;
 
-        Log::info('Processing webhook payload:', $payload);
+        // Explode received data array and store it in the model
+        $whc->headers = $this->data['headers'];
+        $whc->payload = $this->data['rawcontent'];
+        $whc->ip = $this->data['ip'];
+
+        Log::info('Processing webhook payload:', [$whc->payload]);
+
+        $payload = $this->data['payload'];
+        $whc->account = $payload['account'];
+        $whc->eventType = $payload['eventType'] ?? 'unknown';
+        $whc->itemType = $payload['itemType'] ?? 'unknown';
+        $whc->items = json_encode($payload['items']);
+        $whc->eventDate = $payload['eventDate'];
 
         // Make sure user exists in crew table from given account
-        $account = $payload['account'];
-        $user = $payload['user']['id'];
-        $this->sync_crew_user($account,$user);
+        // $whc->user = $payload['user'] ? $payload['user']['id'] : null;
+        $user = $payload['user'];
+        $whc->user = $user ? $user['id'] : null;
 
-        // store the call info in the database
-        $wbc = new WebhookCall;
-        // $wbc->payload = json_encode($payload);
-        $wbc->payload = $rawcontent;
-        $wbc->account = $account;
-        $wbc->user = $user;
-        $wbc->ip = $ip;
-        $wbc->headers = $headers;
-        $wbc->eventType = $payload['eventType'] ?? 'unknown';
-        $wbc->itemType = $payload['itemType'] ?? 'unknown';
-        $wbc->items = json_encode($payload['items']);
-        $wbc->eventDate = $payload['eventDate'];
-        $wbc->save();
+        $crewdata = $rentmanApiService->sync_crew_user($whc->account,$user);
+
+        // update or create crew model
+        $crew = Crew::upsert(
+            [
+                'account' => $whc->account,
+                'rm_id' => $whc->user,
+                'created' => $crewdata['created'],
+                'modified' => $crewdata['modified'],
+                'creator' => $crewdata['creator'],
+                'displayname' => $crewdata['displayname'],
+                'updateHash' => $crewdata['updateHash'],
+                'folder' => $crewdata['folder'],
+                'street' => $crewdata['street'],
+                'housenumber' => $crewdata['housenumber'],
+                'city' => $crewdata['city'],
+                'postal_code' => $crewdata['postal_code'],
+                'addressline2' => $crewdata['addressline2'],
+                'firstname' => $crewdata['firstname'],
+                'middle_name' => $crewdata['middle_name'],
+                'lastname' => $crewdata['lastname'],
+                'email' => $crewdata['email'],
+                'active' => $crewdata['active'],
+                'tags' => $crewdata['tags'],
+                'custom' => json_encode($crewdata['custom']),
+            ],
+            [
+                'account' => $whc->account,
+                'rm_id' => $whc->user
+            ]
+        );
+
+        Log::info("Crew $whc->id synced for account $whc->account");
+
+        // We are now sure that the user is also in the crew
+        // table and we can save the WebhookCall model to db
+        $whc->save();
 
         // TODO: process - inform interested listeners about new webhook call
         /**
@@ -65,15 +101,8 @@ class ProcessWebhookRentman implements ShouldQueue
          * This allows us to decouple the implementation of specific actions from
          * the functionality of recieving the wehbookcall.
          */
-        WebhookReceived::dispatch($wbc); // Fire event, the observer !
+        WebhookReceived::dispatch($whc); // Fire event, the observer !
     }
 
-    /**
-     * To call a rentman API endpoint, we must have the proper api key that belongs to the correct account
-     */
-    public function sync_crew_user($account,$user)
-    {
-        $rmapiurl = "";
-        $url = "$account.$rmapiurl";
-    }
+
 }

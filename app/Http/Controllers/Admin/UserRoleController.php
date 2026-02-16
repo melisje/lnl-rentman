@@ -60,23 +60,4 @@ class UserRoleController extends Controller
         return json_encode($result);
     }
 
-    public function xxx(Request $request)
-    {
-        // 1. Valideer de aanvraag (optioneel, maar aangeraden)
-        $request->validate([
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id', // Zorg ervoor dat de ID's bestaan in de 'roles' tabel
-        ]);
-
-        // 2. Rollen Synchroniseren:
-        // De attach, detach, sync methode op de many-to-many relatie
-        // zal de pivot-tabel (role_user) bijwerken.
-        // We gebruiken sync() om ervoor te zorgen dat ALLE oude rollen worden verwijderd,
-        // behalve degene die in de 'roles' array zitten.
-        $user->roles()->sync($request->roles);
-
-        // 3. Terugkeren met een succesboodschap
-        return redirect()->route('admin.users.roles.edit', $user)
-            ->with('success', "Rollen voor gebruiker **{$user->name}** succesvol bijgewerkt.");
-    }
 }

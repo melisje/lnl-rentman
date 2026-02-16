@@ -1,0 +1,5 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=2bd346f0d7c0d87f6429327e4e42c9dc6bf6bb8e79ad4ad15771b97fb097e2e10065d1a206433ecc0cb37f73318c5d4336f0308deb11fe5c316e9475afa9d32f
+
+{"account":"ledvisions","user":{"itemType":"Crew","id":33,"ref":"/crew/33"},"eventType":"delete","itemType":"Project","items":[747],"eventDate":"2026-02-12T23:20:21+01:00"}

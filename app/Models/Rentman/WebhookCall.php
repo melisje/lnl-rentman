@@ -26,5 +26,19 @@ class WebhookCall extends Model
     // protected $fillable = [
     //     ];
 
+    /**
+     * De casts die moeten worden toegepast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'eventDate' => 'datetime', // Dit cast de kolom naar Carbon
+            'created_at' => 'datetime:Y-m-d H:i', // Optioneel: direct formatteren
+            'modified_at' => 'datetime:Y-m-d H:i', // Optioneel: direct formatteren
+        ];
+    }
+
 
 }

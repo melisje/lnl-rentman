@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rentman\WebhookCall;
 use Illuminate\Http\Request;
 
 class WebhookCallController extends Controller
@@ -12,7 +13,12 @@ class WebhookCallController extends Controller
      */
     public function index()
     {
-        //
+        $items = WebhookCall::orderBy('id','desc')
+            ->paginate(25)
+        ;
+
+        return view('rentman.webhook.index',compact('items'));
+
     }
 
     /**
@@ -34,9 +40,9 @@ class WebhookCallController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(WebhookCall $webhookcall)
     {
-        //
+        return view('rentman.webhook.show', compact('webhookcall'));
     }
 
     /**

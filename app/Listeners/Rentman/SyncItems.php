@@ -31,6 +31,6 @@ class SyncItems implements ShouldQueue // make ot async!
          * + the action that needs to be processed (created, updated, deleted)
          *
          */
-        Log::info("Listeren: " . $event->webhookcall);
+        Log::info("Listener: " . $event->webhookcall);
     }
 }

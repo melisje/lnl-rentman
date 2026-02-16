@@ -31,8 +31,13 @@
             </div>
 
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="fc_token" name="token" style="height: 100px">{{ old('token', $token->token) }}</textarea>
-                <label for=" fc_token" class="form-label">API token</label>
+                <textarea class="form-control" id="fc_api token" name="api_token" style="height: 100px">{{ old('api_token', $token->api_token) }}</textarea>
+                <label for=" fc_api_token" class="form-label">API token</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="fc_webhook_token" name="webhook_token" style="height: 100px">{{ old('webhook_token', $token->webhook_token) }}</textarea>
+                <label for=" fc_webhook_token" class="form-label">Webhook token</label>
             </div>
 
             <div class="row">

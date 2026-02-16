@@ -5,7 +5,7 @@ namespace App\Console\Commands\Rentman;
 use App\Models\Rentman\Endpoint;
 use App\Models\Rentman\EndpointField;
 use App\Models\Rentman\Project;
-use App\Services\RentmanApiService;
+use App\Services\Rentman\Api\RentmanApiService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

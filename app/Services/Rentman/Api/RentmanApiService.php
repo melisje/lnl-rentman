@@ -2,20 +2,18 @@
 
 namespace App\Services\Rentman\Api;
 
-use App\Exceptions\EmergencyException;
-use App\Models\Rentman\Endpoint;
-use GuzzleHttp\Exception\ConnectException;
+use App\Models\Rentman\Account;
+use App\Models\Rentman\Crew;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-
 
 class RentmanApiService
 {
     protected PendingRequest $client;
+    protected $baseUrl;
 
     // Maximum limit per page. Rentman support often higher limits,
     // but this value is a safe standard to avoid timeouts or size limits.
@@ -26,12 +24,31 @@ class RentmanApiService
      */
     public function __construct()
     {
-        $this->client = Http::baseUrl(config('services.rentman.base_url'))
+
+        $this->baseUrl = config('services.rentman.base_url');
+        $this->client = Http::baseUrl($this->baseUrl)
             ->withHeaders([
                 'Accept' => 'application/json',
             ])
+
+            /**
+             * Since we are calling the api for multiple accounts (ledvisions
+             * and llstageservice) we need to be able to dynamically choose
+             * an apitoken based on the account. We ommit adding the token
+             * in the constructor and add it to the call
+            */
             // Gebruik de Authorization header voor het Bearer Token
-            ->withToken(config('services.rentman.token'));
+            // ->withToken(config('services.rentman.token'))
+        ;
+    }
+
+    /**
+     * Test function to check if the RentmanApiService
+     * class is injected and accessible
+     */
+    public function service_injected(string $message, string $level = 'info')
+    {
+        Log::info("RentmanApiService is injected and accessible");
     }
 
     /**
@@ -132,8 +149,6 @@ class RentmanApiService
 
         return $dataset;
     }
-
-
 
     public function getEndpointData($endpoint, array $queryParameters): array
     {
@@ -302,9 +317,101 @@ class RentmanApiService
         return $dataset;
     }
 
-
-    public function sync()
+    /**
+     * Send GET call to Rentman API for a given $account
+     * @param string $account The account to be used in the API call
+     * @param string $endpoint The endpoint path
+     * @return array the retrieved data
+     */
+    public function get_rentman_endpoint(string $account, string $endpoint)
     {
+        // build endpoint url
+        $base_url = config('services.rentman.base_url');
+        $url = $base_url . $endpoint;
 
+        // fetch the API token for the given account
+        $apiToken = Account::where('account', $account)->first();
+        $token = $apiToken->api_token;
+
+        Log::info("~~~~> Calling endpoint $url for account $account ... ");
+
+        // send get request
+        $response = Http::withHeaders(
+            [
+                'Accept' => 'application/json',
+            ]
+        )
+            ->withToken($token)
+            ->get($url);
+
+        if ($response->successful())
+        {
+            // The results can be found in the 'data' message
+            $data = $response->json()['data'];
+            return $data;
+        }
+        else
+        {
+            return $response->throw();
+        }
+    }
+
+
+    /**
+     * Fetch the current data for the given crewmember from Rentman
+     *
+     * To call a rentman API endpoint, we must have the proper
+     * api_token that belongs to the correct account
+     *
+     * @param string $account
+     * @param array $user
+     */
+    public function sync_crew_user($account, $user)
+    {
+        $userid = $user['id'];
+        Log::info("~~> fetching crew member $userid  for account $account ...");
+
+        // initialise some variables
+        $endpoint = $user['ref'];
+
+        // Fetch crew member data
+        $data = $this->get_rentman_endpoint($account,$endpoint);
+
+        return $data;
+
+    }
+
+    /**
+     * Fetch project data from Rentman API
+     */
+    public function get_project($account, $rentman_id)
+    {
+        Log::info("~~> fetching project $rentman_id for account $account ...");
+
+        // build endpoint path
+        $endpoint = "/projects/$rentman_id";
+
+        // fetch and return project data
+        return $this->get_rentman_endpoint($account, $endpoint);
+
+
+    }
+
+    /**
+     * Fetch the subprojects'data for a given $project_id
+     * from the Rentman API for a given $account
+     * @param string $account The Rentman account identifier
+     * @param string $project_id The id of the project the subprojects are fetched for
+     * @return array Data array with the subprojects
+     */
+    public function get_subprojects($account, $project_id)
+    {
+        Log::info("~~> Fetching subprojects for project $project_id for account $account");
+
+        // build endpoint path
+        $endpoint = "/projects/$project_id/subprojects";
+
+        // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account,$endpoint);
     }
 }

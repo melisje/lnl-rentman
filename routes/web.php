@@ -8,7 +8,8 @@ $moduleRoutesPath = __DIR__ . '/modules/*.php';
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home')
+;
 
 // Add auth routes
 Auth::routes();

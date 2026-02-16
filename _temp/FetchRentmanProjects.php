@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Rentman;
 
-use App\Services\RentmanApiService;
+use App\Services\Rentman\Api\RentmanApiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 Use Illuminate\Support\Facades\Log;
