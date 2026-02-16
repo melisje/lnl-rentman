@@ -62,5 +62,11 @@ class AppServiceProvider extends ServiceProvider
 
             return $user->hasAnyRole(['webhookcalls','admin']);
         });
+
+        // accounts rights
+        Gate::define('access-accounts', function (User $user) {
+
+            return $user->hasAnyRole(['accounts','admin']);
+        });
     }
 }
