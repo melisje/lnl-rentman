@@ -2,7 +2,7 @@
 
 namespace App\Services\Rentman\Api;
 
-use App\Models\Rentman\ApiToken;
+use App\Models\Rentman\Account;
 use App\Models\Rentman\Crew;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -330,7 +330,7 @@ class RentmanApiService
         $url = $base_url . $endpoint;
 
         // fetch the API token for the given account
-        $apiToken = ApiToken::where('account', $account)->first();
+        $apiToken = Account::where('account', $account)->first();
         $token = $apiToken->api_token;
 
         Log::info("~~~~> Calling endpoint $url for account $account ... ");

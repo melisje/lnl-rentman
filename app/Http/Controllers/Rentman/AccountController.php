@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Rentman;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Rentman\StoreAccountRequest;
+use App\Http\Requests\Rentman\UpdateAccountRequest;
 use App\Models\Rentman\Account;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -30,16 +31,10 @@ class AccountController extends Controller
     /**
      * Store a newly created account in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreAccountRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'account'       => 'required|string|unique:rm_accounts,account|max:255',
-            'api_token'     => 'required|string',
-            'webhook_token' => 'nullable|string',
-            'url'           => 'required|url',
-        ]);
-
-        Account::create($validated);
+        // De data is hier al gevalideerd
+        Account::create($request->validated());
 
         return redirect()->route('admin.rentman.accounts.index')
             ->with('success', __('Account created successfully.'));
@@ -65,15 +60,9 @@ class AccountController extends Controller
     /**
      * Update the specified account in storage.
      */
-    public function update(Request $request, Account $account): RedirectResponse
+    public function update(UpdateAccountRequest $request, Account $account): RedirectResponse
     {
-        $validated = $request->validate([
-            'api_token'     => 'required|string',
-            'webhook_token' => 'nullable|string',
-            'url'           => 'required|url',
-        ]);
-
-        $account->update($validated);
+        $account->update($request->validated());
 
         return redirect()->route('admin.rentman.accounts.index')
             ->with('success', __('Account updated successfully.'));
