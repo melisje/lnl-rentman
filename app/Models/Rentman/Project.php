@@ -40,6 +40,7 @@ class Project extends Model
             'planperiod_end' => 'datetime', // Dit cast de kolom naar Carbon
             'equipment_period_from' => 'datetime', // Dit cast de kolom naar Carbon
             'equipment_period_to' => 'datetime', // Dit cast de kolom naar Carbon
+            'custom' => 'array', // Dit cast de JSON-kolom naar een PHP-array
         ];
     }
 
