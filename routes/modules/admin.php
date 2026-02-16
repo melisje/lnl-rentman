@@ -4,7 +4,8 @@
     use App\Http\Controllers\Admin\AdminController;
     use App\Http\Controllers\Admin\UserRoleController;
     use App\Http\Controllers\Rentman\ApiTokenController;
-use App\Models\Rentman\ApiToken;
+    use App\Http\Controllers\Rentman\AccountController;
+    use App\Models\Rentman\ApiToken;
 
     /*
     |--------------------------------------------------------------------------
@@ -58,4 +59,23 @@ use App\Models\Rentman\ApiToken;
                 Route::resource('apitoken',ApiTokenController::class);
 
               });
-      });
+
+        /*
+          |-----------------------------------------------------------------------
+          | Admin > Rentman API Tokens Routes
+          |-----------------------------------------------------------------------
+          | Requirements:
+          | 1. Authenticated (middleware:auth)
+          | 2. Authorised (middleware:can)
+          */
+        Route::middleware(['auth', 'can:access-admin', 'can:access-accounts'])
+          // ->prefix('/apitokens')
+          ->name('rentman.')
+          ->group(function ()
+            // Route::prefix('rentman')->name('rentman.account.')->group(function ()
+        {
+          Route::resource('accounts', AccountController::class)
+            ->parameters(['accounts' => 'account'])
+          ;
+    });
+  });
