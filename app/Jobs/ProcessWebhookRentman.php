@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Events\Rentman\WebhookReceived;
-use App\Models\Rentman\ApiToken;
 use App\Models\Rentman\Crew;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
