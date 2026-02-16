@@ -9,12 +9,12 @@
         </li>
         @can('access-roles')
         <li class="">
-            <a class="dropdown-item" href="{{ route('admin.roles')}}">{{ __('roles')}}</a>
+            <a class="dropdown-item" href="{{ route('admin.roles.index')}}">{{ __('roles')}}</a>
         </li>
         @endcan
-        @can('access-apitokens')
+        @can('access-accounts')
         <li class="">
-            <a class="dropdown-item" href="{{ route('admin.apitoken.index')}}">{{ __('apitokens')}}</a>
+            <a class="dropdown-item" href="{{ route('admin.rentman.accounts.index')}}">{{ __('accounts')}}</a>
         </li>
         @endcan
     </ul>

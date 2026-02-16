@@ -18,7 +18,8 @@ class RoleSeeder extends Seeder
             'api_tokens',
             'webhookcalls',
             'status',
-            'accounts'
+            'accounts',
+            'custom_fields',
         ];
 
         foreach ($roles as $roleName) {

@@ -68,5 +68,11 @@ class AppServiceProvider extends ServiceProvider
 
             return $user->hasAnyRole(['accounts','admin']);
         });
+
+        // accounts rights
+        Gate::define('access-customfields', function (User $user) {
+
+            return $user->hasAnyRole(['customfields','admin']);
+        });
     }
 }

@@ -1,81 +1,41 @@
-    <?php
+<?php
 
-    use Illuminate\Support\Facades\Route;
-    use App\Http\Controllers\Admin\AdminController;
-    use App\Http\Controllers\Admin\UserRoleController;
-    use App\Http\Controllers\Rentman\ApiTokenController;
-    use App\Http\Controllers\Rentman\AccountController;
-    use App\Models\Rentman\ApiToken;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\Rentman\AccountController;
+use App\Http\Controllers\Rentman\CustomFieldController;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Routes
-    |--------------------------------------------------------------------------
-    | Requirements:
-    | 1. Authenticated (middleware:auth)
-    | 2. Authorised (middleware:can)
-    */
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
 
-    Route::middleware(['auth'])
-      ->prefix('admin')
-      ->name('admin.')
-      ->group(function ()
-      {
+Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function () {
+  // Admin Dashboard
+  Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
-        // Route to the admin dashboard
-        Route::middleware(['can:access-admin'])
-          ->get('/', [AdminController::class, 'dashboard'])
-          ->name('dashboard')
-          ;
+  // Admin > Roles
+  Route::middleware(['can:access-roles'])->prefix('roles')->name('roles.')->group(function () {
+    Route::get('/', [UserRoleController::class, 'index'])->name('index');
+    Route::patch('/{role}/user/{user}', [UserRoleController::class, 'update'])->name('user.toggle');
+  });
 
-        /*
-        |-----------------------------------------------------------------------
-        | Admin > Roles Routes
-        |-----------------------------------------------------------------------
-        | Requirements:
-        | 1. Authenticated (middleware:auth)
-        | 2. Authorised (middleware:can)
-        */
-        Route::middleware(['auth','can:access-admin','can:access-roles'])
-            ->prefix('/roles')
-            ->group(function()
-              {
-                  Route::get('/', [UserRoleController::class, 'index'])->name('roles');
-                  Route::patch('/{role}/user/{user}', [UserRoleController::class, 'update'])->name('roles.user.toggle');
-              });
+  // Admin > Rentman (Accounts & Custom Fields)
+  Route::prefix('rentman')->name('rentman.')->group(function () {
+    // Accounts
+    Route::middleware(['can:access-accounts'])->group(function () {
+      Route::resource('accounts', AccountController::class)
+        ->parameters(['accounts' => 'account']);
+    });
 
-        /*
-        |-----------------------------------------------------------------------
-        | Admin > Rentman API Tokens Routes
-        |-----------------------------------------------------------------------
-        | Requirements:
-        | 1. Authenticated (middleware:auth)
-        | 2. Authorised (middleware:can)
-        */
-        Route::middleware(['auth','can:access-admin','can:access-apitokens'])
-            // ->prefix('/apitokens')
-            ->group(function()
-              {
-                Route::resource('apitoken',ApiTokenController::class);
-
-              });
-
-        /*
-          |-----------------------------------------------------------------------
-          | Admin > Rentman API Tokens Routes
-          |-----------------------------------------------------------------------
-          | Requirements:
-          | 1. Authenticated (middleware:auth)
-          | 2. Authorised (middleware:can)
-          */
-        Route::middleware(['auth', 'can:access-admin', 'can:access-accounts'])
-          // ->prefix('/apitokens')
-          ->name('rentman.')
-          ->group(function ()
-            // Route::prefix('rentman')->name('rentman.account.')->group(function ()
-        {
-          Route::resource('accounts', AccountController::class)
-            ->parameters(['accounts' => 'account'])
-          ;
+    // Custom Fields
+    Route::middleware(['can:access-customfields'])->group(function () {
+      Route::resource('customfield', CustomFieldController::class)
+        ->parameters([
+          'customfield' => 'customField'
+        ]);
     });
   });
+});
