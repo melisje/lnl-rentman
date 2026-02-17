@@ -25,5 +25,7 @@ class RoleSeeder extends Seeder
         foreach ($roles as $roleName) {
             Role::updateOrCreate(['name' => $roleName]);
         }
+
+        $this->command->info('Roles successfully seeded!');
     }
 }

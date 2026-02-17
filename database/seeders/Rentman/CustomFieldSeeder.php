@@ -61,6 +61,6 @@ class CustomFieldSeeder extends Seeder
             ['name', 'belongs_to', 'type', 'hidden', 'private', 'mandatory']
         );
 
-        $this->command->info('Rentman Custom Fields succesvol geseed!');
+        $this->command->info('Rentman Custom Fields successfully seeded!');
     }
 }
