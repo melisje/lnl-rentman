@@ -416,6 +416,9 @@ class RentmanApiService
     }
 
 
+    /**
+     * Fetch statuses for a specific account.
+     */
     public function getStatuses($account): array
     {
         Log::info("~~> Fetching statuses for account $account");
