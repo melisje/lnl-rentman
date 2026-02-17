@@ -347,7 +347,7 @@ class RentmanApiService
         if ($response->successful())
         {
             // The results can be found in the 'data' message
-            $data = $response->json()['data'];
+            $data = $response->json()['data'] ?? [];
             return $data;
         }
         else
@@ -413,5 +413,18 @@ class RentmanApiService
 
         // fetch and return subprojects data
         return $this->get_rentman_endpoint($account,$endpoint);
+    }
+
+
+    public function getStatuses($account): array
+    {
+        Log::info("~~> Fetching statuses for account $account");
+
+        // build endpoint path
+        $endpoint = "/statuses";
+
+        // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account, $endpoint);
+
     }
 }
