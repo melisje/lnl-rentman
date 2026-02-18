@@ -14,7 +14,7 @@ class CustomFieldMappingSeeder extends Seeder
     {
         $fields = [
             // llstagservice data
-            ['account' => 'llstagservice', 'rm_id' => 40, 'mapping_id' => 'project_manager'],
+            ['account' => 'llstageservice', 'rm_id' => 40, 'mapping_id' => 'project_manager'],
 
             // ledvisions data
             ['account' => 'ledvisions', 'rm_id' => 12, 'mapping_id' => 'project_manager'],
