@@ -2,6 +2,8 @@
 
 namespace App\Services\Rentman\Api;
 
+use App\Models\Rentman\CustomField;
+use App\Models\Rentman\CustomFieldMapping;
 use App\Models\Rentman\Project;
 use App\Models\Rentman\SubProject;
 use Illuminate\Support\Facades\Log;
@@ -60,6 +62,25 @@ class ProjectsService
         'custom'                => json_encode($data['custom']),
       ]
     );
+
+    // Find the values for the custom_fields that are  defined in the rm_customfield_mappings table.
+    $custom = $data['custom'] ?? [];  // retrieved custom fields from Rentman API response
+
+    // the mappings that we want to store
+    $custuomfield_mappings = CustomFieldMapping::where('account', $account)->get();
+    foreach ($custuomfield_mappings as $mapping)
+    {
+      $rm_id = $mapping->rm_id; // the id of the custom field in Rentman
+      $mapping_id = 'custom_' . $rm_id;
+      $fieldname = $mapping->mapping_id;
+
+      Log:info("~~~~> mapping_id= $mapping_id, fieldname=$fieldname");
+
+      $project->$fieldname = $custom[ $mapping_id];
+    }
+
+    $project->save();
+
 
     // Now we need to fetch also the subprojects for this project.
     // Beside the subproject info, they are also needed to
