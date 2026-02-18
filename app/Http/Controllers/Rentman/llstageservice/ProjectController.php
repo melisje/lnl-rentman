@@ -61,7 +61,9 @@ class ProjectController extends Controller
         // }
 
         // Retrieve projects for the llstageservice account
-        $projects = Project::where('account', $account->account)->first();
+        $projects = Project::where('account', $account->account)
+            ->where('rm_id', 8588)
+            ->first();
 
         // Retrieve custom fields for the llstageservice account
         $customFields = CustomField::where('account', $account->account)->get();
