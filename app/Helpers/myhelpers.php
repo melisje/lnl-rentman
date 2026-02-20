@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if (!function_exists('formatDateForUser')) {
   /**
    * Format a date string for user display.
@@ -31,3 +33,18 @@ if (!function_exists('sortableLink'))
       ]);
     }
   }
+
+
+if (!function_exists('extract_id'))
+{
+  /**
+   * Zet een pad zoals /crew/33 om naar 33.
+   */
+  function extract_id(?string $path): ?string
+  {
+    if (!$path) return null;
+
+    // Trim slashes en pak alles na de laatste slash
+    return Str::afterLast(trim($path, '/'), '/');
+  }
+}
