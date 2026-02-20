@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectsService
 {
-  public function __construct(protected RentmanApiService $rentmanApiService)
+  public function __construct(protected RentmanApiService $rentmanApiService, protected CrewService $crewService)
   {
 
   }
@@ -66,20 +66,10 @@ class ProjectsService
     // Find the values for the custom_fields that are  defined in the rm_customfield_mappings table.
     $custom = $data['custom'] ?? [];  // retrieved custom fields from Rentman API response
 
-    // the mappings that we want to store
-    $custuomfield_mappings = CustomFieldMapping::where('account', $account)->get();
-    foreach ($custuomfield_mappings as $mapping)
-    {
-      $rm_id = $mapping->rm_id; // the id of the custom field in Rentman
-      $mapping_id = 'custom_' . $rm_id;
-      $fieldname = $mapping->mapping_id;
-
-      Log:info("~~~~> mapping_id= $mapping_id, fieldname=$fieldname");
-
-      $project->$fieldname = $custom[ $mapping_id];
-    }
-
-    $project->save();
+  // find the project manager in the custom fields and store the reference to the project manager in the project model
+    $project_manager_reference = $this->get_projectmanager_refrence($account, $project);
+    $project->project_manager = $project_manager_reference;
+    Log::info("+-+-+- Project manager reference for project $project->rm_id on account $account: $project_manager_reference");
 
 
     // Now we need to fetch also the subprojects for this project.
@@ -97,6 +87,9 @@ class ProjectsService
     $project->status = $project->calculated_status;
     $project->save();
     Log::info("~~> Project status for project $project->rm_id calculated on account $account: $project->status");
+
+    // Return the project model (with the updated status and custom field values) to the caller
+    return $project;
   }
 
   /**
@@ -187,5 +180,105 @@ class ProjectsService
     // Find the subproject in DB and delete it
     SubProject::where(['rm_id' => $rm_id, 'account' => $account])
       ->delete();
+  }
+
+  /**
+   * Find the custom field mappings for the given account and map
+   * the values from the $custom array to the project model
+   * step 1: find the customfields for this account
+   * step 2: fetch the values van $custom
+   * step 3: store the values in the project model and save it
+   *
+   */
+  public function process_customfields(string $account, array $custom, Project $project)
+  {
+    // step 1: find the customfields for this account
+    $customfield_mappings = CustomFieldMapping::where('account', $account)->get();
+
+    // step 2: fetch the values van $custom and store them in the project model
+    foreach ($customfield_mappings as $mapping) {
+      $custom_field_name = $mapping->rm_customfield_name;
+      $project_field_name = $mapping->project_field_name;
+
+      // check if the custom field value exists in the $custom array
+      if (isset($custom[$custom_field_name])) {
+        // store the value in the project model
+        $project->$project_field_name = $custom[$custom_field_name];
+        Log::info("Mapped custom field '$custom_field_name' to project field '$project_field_name' with value: " . $custom[$custom_field_name]);
+      } else {
+        Log::warning("Custom field '$custom_field_name' not found in Rentman API response for project ID {$project->rm_id} on account '$account'.");
+      }
+    }
+
+    // step 3: save the project model with the updated custom field values
+    $project->save();
+  }
+
+  public function get_projectmanager_refrence(string $account, Project $project) : string|null
+  {
+    $custom = json_decode($project->custom); // $custom is now an object (stdclass) where the properties are the customfield names and the values are the customfield values
+
+    // first we find the id of the customfield that belongs to project_manager in the given account.
+    // We can find this in the rm_customfield_mappings table where we have the mapping between the
+    // customfield_id (the id of the custom field in Rentman), the account and the
+    // project_field_name. Once we have the customfield_id, we can find the
+    // corresponding value in the $custom object and return it as project
+    // manager reference.
+    $custom_field_mapping = CustomFieldMapping::where('account', $account)
+      ->where('customfield_id', 'project_manager')
+      ->with('customField')
+      ->first();
+    $custom_name = $custom_field_mapping ? $custom_field_mapping->custom_name : null; // will be like custom_xx where xx is the rm_id of the custom field in Rentman
+
+    // fetch the value from the customfields as received from the Project
+    // endpoint in the Rentman API response. The $custom_name is the name
+    // of the property in the $custom object that contains the value for
+    // the project manager custom field.
+    $pm_value = data_get($custom, $custom_name);
+
+    // For account ledvisions is a simple dropdown list with mappings to fixed names
+    // We now know the received value as stored in Rentman. Now we map this on
+    // real references to crew members in our local database. For account
+    // llstageservice the project manager custom field is based on real
+    // crew member values, so we can directly use the value as reference
+    // to find the corresponding crew member in our local database.
+    // For account ledvisions they do not use real crew members
+    // references as value for the pm custom field. They should
+    // better change this like this is done in llstageservice,
+    // but for now we need to work with a fixed mapping of
+    // the dropdown values to the crew members in our
+    // local database.
+    switch ($account) {
+      case 'llstageservice':
+        // For account llstageservice the project manager custom field is based on real crew member values
+        // Make sure the crew member is synced to the local database
+        $crew = $this->crewService->sync_crew_member($account, $pm_value);
+        $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
+        break;
+
+      case 'ledvisions':
+        // ledvision does not use real crew members references as value for the reference custom field.
+        // They should better change this like this is done in llstageservice, but for now we
+        // need to work with a fixed mapping of the dropdown values to the crew members in
+        // our local database.
+        $reference = $pm_value; // this is a simple string value that we can use as is
+        switch ($pm_value) {
+          case 0:
+            $reference = '/crew/33'; // 'Nicolas Pairon';
+            break;
+          case 1:
+            $reference = '/crew/303';  //'Jasper Vanhees';
+            break;
+          case 2:
+            $reference = '/crew/294';  //Constantin (Costy) Astancai';
+            break;
+          default:
+            $reference = null; // 'Unknown';
+        }
+        break;
+    }
+
+
+    return $reference;
   }
 }
