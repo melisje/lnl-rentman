@@ -24,7 +24,7 @@ class CrewService
    */
   public function sync_crew_member(string $account, int $rm_id) : Crew|null
   {
-    Log::info("@@@ syncing crew member ...");
+    Log::info("@@@ syncing crew member $rm_id...");
 
     // build endpoint url
     $endpoint = "/crew/$rm_id";

@@ -236,47 +236,33 @@ class ProjectsService
     // the project manager custom field.
     $pm_value = data_get($custom, $custom_name);
 
-    // For account ledvisions is a simple dropdown list with mappings to fixed names
-    // We now know the received value as stored in Rentman. Now we map this on
-    // real references to crew members in our local database. For account
-    // llstageservice the project manager custom field is based on real
-    // crew member values, so we can directly use the value as reference
-    // to find the corresponding crew member in our local database.
-    // For account ledvisions they do not use real crew members
-    // references as value for the pm custom field. They should
-    // better change this like this is done in llstageservice,
-    // but for now we need to work with a fixed mapping of
-    // the dropdown values to the crew members in our
-    // local database.
+    // if account=ledvisions, the value in the customfield is the index in the dropdown list of the project manager.
+    // We have to manually map this index to the corresponding crew member's rentman id.
     switch ($account) {
       case 'llstageservice':
-        // For account llstageservice the project manager custom field is based on real crew member values
-        // Make sure the crew member is synced to the local database
-        $crew = $this->crewService->sync_crew_member($account, $pm_value);
-        $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
+        Log::info("Project manager custom field value for project $project->rm_id on account $account: $pm_value (this should be a reference to a Rentman crew member)");
         break;
-
       case 'ledvisions':
-        // ledvision does not use real crew members references as value for the reference custom field.
-        // They should better change this like this is done in llstageservice, but for now we
-        // need to work with a fixed mapping of the dropdown values to the crew members in
-        // our local database.
-        $reference = $pm_value; // this is a simple string value that we can use as is
+        Log::info("Project manager custom field value for project $project->rm_id on account $account: $pm_value (this is an index in the dropdown list of the project manager, we need to map this to a crew member reference)");
         switch ($pm_value) {
           case 0:
-            $reference = '/crew/33'; // 'Nicolas Pairon';
+            $pm_value = 33; // 'Nicolas Pairon';
             break;
           case 1:
-            $reference = '/crew/303';  //'Jasper Vanhees';
+            $pm_value = 303; //'Jasper Vanhees';
             break;
           case 2:
-            $reference = '/crew/294';  //Constantin (Costy) Astancai';
+            $pm_value = 294;  //Constantin (Costy) Astancai';
             break;
           default:
-            $reference = null; // 'Unknown';
+            $pm_value = null; // 'Unknown';
         }
         break;
     }
+
+      // Make sure the crew member is synced to the local database
+      $crew = $this->crewService->sync_crew_member($account, $pm_value);
+      $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
 
 
     return $reference;
