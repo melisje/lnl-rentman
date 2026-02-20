@@ -16,6 +16,12 @@ class ProjectController extends Controller
         $search = $request->input('search');
         $accountFilter = $request->input('account_filter'); // De waarde uit de dropdown
 
+        // Dynamische paginatie (whitelist voor veiligheid)
+        $perPage = $request->input('per_page', 15);
+        if (!in_array($perPage, [2, 10, 15, 25, 50, 100])) {
+            $perPage = 15;
+        }
+
         $projects = Project::query()
 
             // Filter op account, tenzij 'all' is gekozen of niets is ingevuld
@@ -29,10 +35,10 @@ class ProjectController extends Controller
                 ;
             })
             ->orderBy('name', 'desc')
-            ->paginate(15)
+            ->paginate($perPage)
             ->withQueryString(); // Zorgt dat de filter bewaard blijft bij het bladeren door pagina's
 
-        return view('rentman.project.index', compact('projects', 'search', 'accountFilter'));
+        return view('rentman.project.index', compact('projects', 'search', 'accountFilter', 'perPage'));
     }
 
     public function show(Project $project)

@@ -9,22 +9,34 @@
 
         <div class="card mb-4">
             <div class="card-body">
-                <form action="{{ route('rentman.projects.index') }}" method="GET" class="row g-3">
-                    <div class="col-md-3">
-                        <select name="account_filter" class="form-select" onchange="this.form.submit()">
-                            <option value="all" {{ $accountFilter=='all' ? 'selected' : '' }}>Alle accounts</option>
-                            <option value="llstageservice" {{ $accountFilter=='llstageservice' ? 'selected' : '' }}>LL Stage Service</option>
+                <form action="{{ route('rentman.projects.index') }}" method="GET" class="row g-3 align-items-end">
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Account</label>
+                        <select name="account_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="all" {{ $accountFilter=='all' ? 'selected' : '' }}>Alle</option>
+                            <option value="llstageservice" {{ $accountFilter=='llstageservice' ? 'selected' : '' }}>LL Stage</option>
                             <option value="ledvisions" {{ $accountFilter=='ledvisions' ? 'selected' : '' }}>Ledvisions</option>
                         </select>
                     </div>
 
-                    <div class="col-md-7">
-                        <input type="text" name="search" class="form-control" placeholder="Zoek op naam of nummer..." value="{{ $search }}">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Zoeken</label>
+                        <input type="text" name="search" class="form-control form-select-sm" placeholder="Naam of nummer..." value="{{ $search }}">
                     </div>
 
-                    <div class="col-md-2 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                        <a href="{{ route('rentman.projects.index') }}" class="btn btn-outline-secondary">Reset</a>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Items</label>
+                        <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                            @foreach([2, 10, 15, 25, 50, 100] as $size)
+                            <option value="{{ $size }}" {{ $perPage==$size ? 'selected' : '' }}>{{ $size }} per pag.</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex gap-1">
+                        <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+                        <a href="{{ route('rentman.projects.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>
