@@ -272,11 +272,12 @@ class ProjectsService
       {
         $crew = $this->crewService->sync_crew_member($account, $pm_value);
         $crew_id = $crew ? $crew->rm_id : null;
+        $reference = '/crew/' . $crew_id;
       } else
       {
-        $crew_id = null;
+        $reference = null;
       }
 
-    return $crew_id;
+    return $reference;
   }
 }

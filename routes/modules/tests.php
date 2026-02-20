@@ -13,7 +13,7 @@ Route::get('/test/{account}/projects/{rm_id}', function(ProjectsService $project
   $project = $projectsService->sync_projects($account, "/projects/$rm_id");
   // $reference =  $projectsService->get_projectmanager_refrence($account, $project);
 
-
+  dump($project);
 
   return "PM='$project->project_manager'";
 });
