@@ -323,7 +323,7 @@ class RentmanApiService
      * @param string $endpoint The endpoint path
      * @return array the retrieved data
      */
-    public function get_rentman_endpoint(string $account, string $endpoint)
+    public function get_rentman_endpoint(string $account, string $endpoint) : array|null
     {
         // build endpoint url
         $base_url = config('services.rentman.base_url');
@@ -366,8 +366,14 @@ class RentmanApiService
      * @param string $account
      * @param array $user
      */
-    public function sync_crew_user($account, $user)
+    public function sync_crew_user($account, $user) : array|null
     {
+        if ($user === null)
+        {
+            Log::warning("No user given !");
+            return null;
+        }
+
         $userid = $user['id'];
         Log::info("~~> fetching crew member $userid  for account $account ...");
 
@@ -384,7 +390,7 @@ class RentmanApiService
     /**
      * Fetch project data from Rentman API
      */
-    public function get_project($account, $rentman_id)
+    public function get_project($account, $rentman_id) : array|null
     {
         Log::info("~~> fetching project $rentman_id for account $account ...");
 
