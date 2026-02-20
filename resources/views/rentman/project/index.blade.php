@@ -60,7 +60,7 @@
                 <tbody>
                     @forelse($projects as $project)
                     <tr>
-                        <td>{{ $project->id }}</td>
+                        <td>{{ $project->rm_id }}</td>
                         <td>{{ $project->account }}</td>
                         <td><strong>{{ $project->number }}</strong></td>
                         <td><strong>{{ $project->name }}</strong></td>
