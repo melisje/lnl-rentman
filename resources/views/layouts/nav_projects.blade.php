@@ -5,7 +5,7 @@
     </a>
     <ul class="dropdown-menu">
         <li class="">
-            <a class="dropdown-item" href="{{ route('projects.index', ['account' => 'llstageservice']) }}">{{ __('overview')}}</a>
+            <a class="dropdown-item" href="{{ route('rentman.projects.index', ['account' => 'llstageservice']) }}">{{ __('overview')}}</a>
         </li>
     </ul>
 </li>
