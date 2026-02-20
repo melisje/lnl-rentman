@@ -214,7 +214,14 @@ class ProjectsService
     $project->save();
   }
 
-  public function get_projectmanager_refrence(string $account, Project $project) : string|null
+  /**
+   * Find the Rentman crew id for the project manager of the given project and
+   * return the reference to the crew member to be stored in the project model.
+   * @param string $account The Rentman account where the project belongs to
+   * @param Project $project The project for which we want to find the project manager reference
+   * @return string|int|null The reference to the crew member to be stored in the project model, or null if no project manager reference is found
+   */
+  public function get_projectmanager_refrence(string $account, Project $project) : string| int| null
   {
     $custom = json_decode($project->custom); // $custom is now an object (stdclass) where the properties are the customfield names and the values are the customfield values
 
@@ -264,12 +271,12 @@ class ProjectsService
       if ($pm_value)
       {
         $crew = $this->crewService->sync_crew_member($account, $pm_value);
-        $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
+        $crew_id = $crew ? $crew->rm_id : null;
       } else
       {
-        $reference = null;
+        $crew_id = null;
       }
 
-    return $reference;
+    return $crew_id;
   }
 }
