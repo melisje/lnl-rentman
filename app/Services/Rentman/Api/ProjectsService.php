@@ -261,9 +261,14 @@ class ProjectsService
     }
 
       // Make sure the crew member is synced to the local database
-      $crew = $this->crewService->sync_crew_member($account, $pm_value);
-      $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
-
+      if ($pm_value)
+      {
+        $crew = $this->crewService->sync_crew_member($account, $pm_value);
+        $reference = "/crew/" . $crew->rm_id; // we can use the displayname of the crew member as project manager name
+      } else
+      {
+        $reference = null;
+      }
 
     return $reference;
   }
