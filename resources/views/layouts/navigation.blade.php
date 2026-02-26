@@ -29,6 +29,7 @@
 
                 {{-- Add admin menu items --}}
                 @include('layouts.nav_admin')
+                @include('layouts.nav_account')
                 @include('layouts.nav_locale')
 
 

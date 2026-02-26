@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Rentman\Account;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+
+        // Bind de data aan je navigatie-view (pas het pad aan naar jouw navbar blade file)
+        View::composer('layouts.app', function ($view) {
+            $current_account = session('current_account', null);
+            $view->with('current_account', $current_account)->with('globalAccounts', Account::all());
+        });
 
         // Definieer de macro
         Blueprint::macro('dbTimestamps', function () {
