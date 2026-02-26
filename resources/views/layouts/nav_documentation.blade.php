@@ -18,6 +18,14 @@
 
         <li class="dropdown-divider"></li>
         <li>
+            <h6 class="dropdown-header">JS Libs</h6>
+        </li>
+        <li class="px-3">
+            <a class="dropdown-item" href="https://tabulator.info/docs/6.3" target="_blank">Tabular</a>
+            <a class="dropdown-item" href="https://datatables.net/manual" target="_blank">Datatables</a>
+        </li>
+
+        <li>
             <h6 class="dropdown-header">Free Images</h6>
         </li>
         <li class="px-3">
