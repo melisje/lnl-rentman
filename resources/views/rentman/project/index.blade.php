@@ -1,88 +1,142 @@
-@extends('layouts.app') {{-- Pas dit aan naar jouw base template --}}
+-- Active: 1762257673818@@127.0.0.1@3306@rentman
+@extends('layouts.app')
+
+@push('styles')
+{{--
+<link href="https://unpkg.com/tabulator-tables@6.0.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet"> --}}
+@endpush
 
 @section('content')
-<div class="container-fluid mt-1">
-    <div class="p-5 mb-4 bg-body-secondary rounded-3 ">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>{{ __('projects') }} </h2>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <form action="{{ route('rentman.projects.index') }}" method="GET" class="row g-3 align-items-end">
-
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold">Account</label>
-                        <select name="account_filter" class="form-select form-select-sm" onchange="this.form.submit()">
-                            <option value="all" {{ $accountFilter=='all' ? 'selected' : '' }}>Alle</option>
-                            <option value="llstageservice" {{ $accountFilter=='llstageservice' ? 'selected' : '' }}>LL Stage</option>
-                            <option value="ledvisions" {{ $accountFilter=='ledvisions' ? 'selected' : '' }}>Ledvisions</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">Zoeken</label>
-                        <input type="text" name="search" class="form-control form-select-sm" placeholder="Naam of nummer..." value="{{ $search }}">
-                    </div>
-
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold">Items</label>
-                        <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
-                            @foreach([2, 10, 15, 25, 50, 100] as $size)
-                            <option value="{{ $size }}" {{ $perPage==$size ? 'selected' : '' }}>{{ $size }} per pag.</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 d-flex gap-1">
-                        <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
-                        <a href="{{ route('rentman.projects.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
-                    </div>
-                </form>
+<div class="container-fluid mt-2">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Projectenbeheer</h5>
+            <div class="input-group w-25">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" id="search-input" class="form-control form-control-sm" placeholder="Zoeken...">
             </div>
         </div>
-
-        <div class="table-responsive rounded-3">
-            <table class="table table-striped table-hover border ">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Account</th>
-                        <th>Number</th>
-                        <th>Naam</th>
-                        <th>Status</th>
-                        <th>AM</th>
-                        <th>PM</th>
-                        <th>Aangemaakt op</th>
-                        <th class="text-end">Acties</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($projects as $project)
-                    <tr>
-                        <td>{{ $project->rm_id }}</td>
-                        <td>{{ $project->account }}</td>
-                        <td><strong>{{ $project->number }}</strong></td>
-                        <td><strong>{{ $project->name }}</strong></td>
-                        <td><strong>{{ $project->status_name }}</strong></td>
-                        <td><strong>{{ $project->am_name }}</strong></td>
-                        <td><strong>{{ $project->pm_name }}</strong></td>
-                        <td>{{ $project->created_at->format('d-m-Y') }}</td>
-                        <td class="text-end">
-                            <a href="{{ route('rentman.projects.show', $project->id) }}" class="btn btn-sm btn-info">Bekijk</a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">Geen projecten gevonden.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="d-flex justify-content-center mt-4">
-            {{ $projects->links() }}
+        <div class="card-body p-0">
+            <div id="projects-table"></div>
         </div>
     </div>
-    @endsection
+</div>
+
+<script type="module">
+    document.addEventListener("DOMContentLoaded", function() {
+        const tableData = @json($projects);
+
+        const table = new window.Tabulator("#projects-table", {
+            data: tableData,
+            // maxHeight:"100%", //do not let table get bigger than the height of its parent element
+            // height: "500px", // Voeg dit toe! Zonder hoogte kan de layout soms breken
+            // rowHeight:30,
+
+            dataTree: true,
+            dataTreeChildField: "subprojects",
+            dataTreeChildIndent: 20,
+
+            // Bootstrap-specifieke instellingen
+            // layout: "fitColumns", // Zorgt dat kolommen de breedte vullen
+            // layout: "fitDataFill", // Zorgt dat kolommen de breedte vullen
+
+            responsiveLayout: "collapse",
+
+            columns: [
+                {title: "Account", field: "account", widthGrow: 3},
+                {title: "Nummer", field: "number", hozAlign: "center"},
+                {title: "Project / Sub", field: "displayname", widthGrow: 3},
+                {title: "Subprojecten #", field: "nr_of_subprojects", widthGrow: 3},
+                {title: "Status", field: "status_name", formatter: function(cell) {
+                    const val = cell.getValue();
+                    // Gebruik Bootstrap Badge classes
+                    let badgeClass = "bg-secondary";
+                    if(val === "Aanvraag") badgeClass = "bg-primary";
+                    if(val === "Optie") badgeClass = "bg-info text-dark";
+                    if(val === "Bevestigd") badgeClass = "bg-success text-light";
+                    if(val === "Gevarieerd") badgeClass = "bg-warning text-dark";
+                    if(val === "Geannuleerd") badgeClass = "bg-danger text-light";
+                    if(val === "Op locatie") badgeClass = "bg-location text-light";
+
+                    return `<span class="badge ${badgeClass}">${val || 'N/B'}</span>`;
+                }},
+                {title: "AM", field: "am_name", hozAlign: "center"},
+                {title: "PM", field: "pm_name", hozAlign: "center"},
+
+                {title: "Start", field: "usageperiod_start", hozAlign: "center",
+                    formatter: function(cell)
+                    {
+                        const value = cell.getValue();
+                        if (!value) return "-";
+
+                        const date = new Date(value);
+
+                        // Formateer naar Nederlands/Belgisch formaat: DD/MM/YYYY
+                        return date.toLocaleDateString('nl-BE',
+                        {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                    }
+                },
+
+                {title: "Einde", field: "usageperiod_end", hozAlign: "center",
+                    formatter: function(cell)
+                    {
+                        const value = cell.getValue();
+                        if (!value) return "-";
+
+                        const date = new Date(value);
+
+                        // Formateer naar Nederlands/Belgisch formaat: DD/MM/YYYY
+                        return date.toLocaleDateString('nl-BE',
+                        {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                    }
+                },
+
+                {title: "Updated", field: "updated_at", hozAlign: "center",
+                    formatter: function(cell)
+                    {
+                        const value = cell.getValue();
+                        if (!value) return "-";
+
+                        const date = new Date(value);
+
+                        // Formateer naar Nederlands/Belgisch formaat: DD/MM/YYYY
+                        const datum = date.toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                        const tijd = date.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+                        return `<div>${datum}</div>
+                        <div class="text-muted small" style="font-size: 0.8em;">${tijd} uur</div>`;
+                    }
+                },
+
+                // {title: "Totaal", field: "project_total_price", formatter: "money", formatterParams: {
+                //     symbol: "€ ", thousand: ".", decimal: ","
+                // }},
+                {
+                    title: "Acties",
+                    headerSort: false,
+                    formatter: function(cell) {
+                        // Voeg een Bootstrap button toe in de tabel
+                        return `<button class="btn btn-xs btn-outline-primary py-0 px-2">Details</button>`;
+                    }
+                }
+            ],
+        });
+
+        // Filter koppelen aan het Bootstrap input veld
+        document.getElementById("search-input").addEventListener("keyup", function(e){
+            table.setFilter("displayname", "like", e.target.value);
+        });
+    });
+</script>
+@endsection
+
+@push('scripts')
+@endpush

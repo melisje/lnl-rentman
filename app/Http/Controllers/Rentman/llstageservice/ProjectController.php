@@ -11,34 +11,20 @@ use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    /**
+     * Display an overview of the projects
+      *
+      * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $accountFilter = $request->input('account_filter'); // De waarde uit de dropdown
+        // Fetch projects for current account, including their subprojects
+        $projects = Project::where('account', session('current_account'))
+            ->with('subprojects')
+            ->get();
 
-        // Dynamische paginatie (whitelist voor veiligheid)
-        $perPage = $request->input('per_page', 15);
-        if (!in_array($perPage, [2, 10, 15, 25, 50, 100])) {
-            $perPage = 15;
-        }
-
-        $projects = Project::query()
-
-            // Filter op account, tenzij 'all' is gekozen of niets is ingevuld
-            ->when($accountFilter && $accountFilter !== 'all', function ($query) use ($accountFilter) {
-                $query->where('account', $accountFilter);
-            })
-
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'LIKE', "%{$search}%")
-                ->orWhere('number', 'LIKE', "%{$search}%")
-                ;
-            })
-            ->orderBy('name', 'desc')
-            ->paginate($perPage)
-            ->withQueryString(); // Zorgt dat de filter bewaard blijft bij het bladeren door pagina's
-
-        return view('rentman.project.index', compact('projects', 'search', 'accountFilter', 'perPage'));
+        // return project data to view ;
+        return view('rentman.project.index', compact('projects'));
     }
 
     public function show(Project $project)

@@ -16,5 +16,8 @@ $theme-colors: map-merge($theme-colors,
     ("primary": $primary,
       "success": $success,
       "danger": $danger,
-      "tertiary": $tertiary // Dit voegt 'tertiary' toe als een nieuwe utility class
+      "tertiary": $tertiary, // Dit voegt 'tertiary' toe als een nieuwe utility class
+      "location": $orange-700, // Dit voegt 'location' toe als een nieuwe utility class
+      // "request": $request, // Dit voegt 'request' toe als een nieuwe utility class
+      // "retour": $retour // Dit voegt 'retour' toe als een nieuwe utility class
     ));
