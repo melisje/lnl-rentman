@@ -13,7 +13,7 @@ class Project extends Model
     protected $primaryKey = 'id';
     // public $incrementing = true;
 
-    protected $appends = ['calculated_status', 'status_name', 'pm_name', 'am_name'];
+    protected $appends = ['calculated_status', 'status_name', 'pm_name', 'am_name', 'nr_of_subprojects'];
 
     /**
      * The attributes that aren't mass assignable.
@@ -51,6 +51,16 @@ class Project extends Model
     public function subprojects(): HasMany
     {
         return $this->hasMany(SubProject::class,'projects_id','id');
+    }
+
+    /**
+     * Calculate the number of subprojects for this project
+     */
+    public function nrOfSubprojects(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->subprojects()->count(),
+        );
     }
 
     /**
