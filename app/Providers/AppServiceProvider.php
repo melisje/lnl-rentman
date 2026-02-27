@@ -82,5 +82,10 @@ class AppServiceProvider extends ServiceProvider
 
             return $user->hasAnyRole(['customfields','admin']);
         });
+        // purchase rights
+        Gate::define('access-purchase', function (User $user) {
+
+            return $user->hasAnyRole(['purchase','admin']);
+        });
     }
 }
