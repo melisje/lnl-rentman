@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('po_goods_receipt_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('po_goods_receipt_id')->constrained('po_goods_receipts')->onDelete('cascade');
+            $table->foreignId('goods_receipt_id')->constrained('po_goods_receipts')->onDelete('cascade');
             $table->foreignId('po_line_id')->constrained('po_purchase_order_lines');
             $table->decimal('received_quantity', 15, 2);
             $table->timestamps();

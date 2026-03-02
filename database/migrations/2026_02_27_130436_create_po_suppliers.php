@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('vat_number')->nullable(); // Belangrijk voor BE (bv. BE0123.456.789)
             $table->string('email');
+            $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->boolean('is_active')->default(true);
             $table->dbTimestamps();

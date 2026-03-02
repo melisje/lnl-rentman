@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('po_goods_receipts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('po_purchase_order_id')->constrained('po_purchase_orders');
+            $table->foreignId('purchase_order_id')->constrained('po_purchase_orders');
             $table->date('receipt_date');
             $table->string('delivery_note_number')->nullable(); // Nummer op de papieren pakbon
             $table->string('status')->default('received'); // bijv. received, inspected, returned

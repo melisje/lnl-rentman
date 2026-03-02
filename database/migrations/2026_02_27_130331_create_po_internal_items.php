@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('po_internal_items', function (Blueprint $table) {
             $table->id();
-            $table->string('internal_reference')->unique();
+            $table->string('reference')->unique();
             $table->string('description');
             $table->string('base_unit')->default('pcs'); // Standaard eenheid
             $table->boolean('is_active')->default(true);

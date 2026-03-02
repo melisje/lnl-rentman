@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('po_supplier_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('po_supplier_id')->constrained();
-            $table->foreignId('po_internal_item_id')->constrained();
-            $table->string('supplier_reference');
+            $table->foreignId('supplier_id')->constrained('po_suppliers');
+            $table->foreignId('internal_item_id')->constrained('po_internal_items');
+            $table->string('reference');
             $table->decimal('unit_price', 15, 4);
             $table->string('currency', 3)->default('EUR');
             $table->integer('lead_time_days')->default(0);

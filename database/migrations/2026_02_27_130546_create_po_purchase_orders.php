@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('po_purchase_orders', function (Blueprint $table) {
             $table->id();
             $table->string('po_number')->unique();
-            $table->foreignId('po_supplier_id')->constrained();
+            $table->foreignId('supplier_id')->constrained('po_suppliers');
             $table->date('order_date');
             $table->enum('status', ['draft', 'sent', 'partial', 'received', 'invoiced', 'cancelled']);
             $table->string('currency', 3)->default('EUR');

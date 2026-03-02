@@ -2,11 +2,15 @@
 
 namespace App\Models\Purchase;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Testing\Fluent\Concerns\Has;
+
 
 class InternalItem extends Model
 {
+    use HasFactory;
     protected $table = 'po_internal_items';
     protected $fillable = ['internal_reference', 'description', 'base_unit', 'is_active'];
 
