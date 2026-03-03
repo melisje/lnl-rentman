@@ -17,6 +17,7 @@ class Account extends Model
         'api_token',
         'webhook_token',
         'url',
+        'project_update_email'
     ];
 
     /**
