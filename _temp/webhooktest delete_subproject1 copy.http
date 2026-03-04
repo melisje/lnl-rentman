@@ -1,0 +1,17 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=d93569078506c9a918991e4b8d1bdbdb102d5b85e36c8a214ffb9e771e74de8228e833543c30af691076a87bbec8a97586974480e87fe1ea6927201cd616b91a
+
+{
+  "account":"llstageservice",
+  "user":
+  {
+    "itemType":"Crew",
+    "id":33,
+    "ref":"/crew/33"
+  },
+  "eventType":"delete",
+  "itemType":"Subproject",
+  "items":[999999],
+  "eventDate":"2026-02-14T19:41:48+01:00"
+}
