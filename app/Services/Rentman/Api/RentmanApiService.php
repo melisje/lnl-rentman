@@ -404,6 +404,22 @@ class RentmanApiService
     }
 
     /**
+     * Fetch subproject data from Rentman API
+     */
+    public function get_subproject($account, $rentman_id) : array|null
+    {
+        Log::info("~~> fetching subproject $rentman_id for account $account ...");
+
+        // build endpoint path
+        $endpoint = "/subprojects/$rentman_id";
+
+        // fetch and return project data
+        return $this->get_rentman_endpoint($account, $endpoint);
+
+
+    }
+
+    /**
      * Fetch the subprojects'data for a given $project_id
      * from the Rentman API for a given $account
      * @param string $account The Rentman account identifier
