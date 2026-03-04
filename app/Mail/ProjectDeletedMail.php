@@ -32,7 +32,7 @@ class ProjectDeletedMail extends Mailable
     {
         return new Envelope(
             // from: new Address('no-reply@llstageservice.be', 'L&L Tools'),
-            subject: 'L&L Tools - Rentman (sub)project cancelled or deleted',
+            subject: 'L&L Tools - Rentman (sub)project status updated',
         );
     }
 
