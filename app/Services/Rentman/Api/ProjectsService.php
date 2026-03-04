@@ -2,11 +2,15 @@
 
 namespace App\Services\Rentman\Api;
 
+use App\Mail\ProjectDeletedMail;
+use App\Models\Rentman\Account;
 use App\Models\Rentman\CustomField;
 use App\Models\Rentman\CustomFieldMapping;
 use App\Models\Rentman\Project;
+use App\Models\Rentman\Status;
 use App\Models\Rentman\SubProject;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectsService
 {
@@ -163,9 +167,19 @@ class ProjectsService
   {
     Log::info("@@@ Deleting project $rm_id +++");
 
-    // find project in DB and delete it
-    Project::where(['rm_id' => $rm_id, 'account' => $account])
-      ->delete();
+    // find project in DB
+    $projects = Project::where(['rm_id' => $rm_id, 'account' => $account])->get();
+
+    // Send email notification
+    foreach($projects as $project)
+    {
+        // send notification if email is set for this account
+        $this->send_project_update_notificaction($account, $project);
+
+        // Delete project
+        $project->delete();
+    }
+
   }
 
   /**
@@ -178,8 +192,21 @@ class ProjectsService
     Log::info("@@@ Deleting subproject $rm_id +++");
 
     // Find the subproject in DB and delete it
-    SubProject::where(['rm_id' => $rm_id, 'account' => $account])
-      ->delete();
+    $subprojects = SubProject::where(['rm_id' => $rm_id, 'account' => $account])
+      ->with('parent_project')
+      ->get();
+
+    // dump($rm_id);
+    // dump($subprojects);
+
+    foreach ($subprojects as $subproject)
+    {
+      // send notification if email is set for this account
+      $this->send_project_update_notificaction($account, $subproject);
+
+      // delete subproject
+      $subproject->delete();
+    }
   }
 
   /**
@@ -280,4 +307,64 @@ class ProjectsService
 
     return $reference;
   }
+
+
+
+  /**
+   * Check if the update_project_email property is set for the given account.
+   * If so, send a notification to this email about the updated project.
+   */
+  public function send_project_update_notificaction($account, Project|SubProject $item)
+  {
+    // Check if project updates should be notifified by email.
+    // For this we have the field project_update_email in the rm_accounts table
+    $account = Account::find($account);
+    $to_email = $account->project_update_email;
+
+    if ($to_email) {
+      Log::info("~~~> Sending notification email to $to_email");
+      Mail::to($to_email)->send(new ProjectDeletedMail($item));
+    }
+  }
+
+
+  /**
+   * Check if the status of a subproject is changed and a notification should be sent.
+   * @param $account - the account that should be used
+   * @param $item - the subproject
+   */
+  public function check_subproject_status_change($account, $rm_id)
+  {
+    //  find the subproject in the db
+    $local_subproject = SubProject::firstWhere([
+      'account' => $account,
+      'rm_id' => $rm_id
+    ]);
+
+    // old status
+    $old_status = basename($local_subproject->status); // /statuses/6 -> 6
+
+    // Fetch the subproject from Rentman and find the new status
+    $rentman_subproject = (object) $this->rentmanApiService->get_subproject($account, $rm_id);
+    $new_status = basename($rentman_subproject->status);  // /statuses/6 -> 6
+
+    // Check if the status is changed
+    if ($old_status != $new_status)
+    {
+      //Find the Status object for the fetched subproject
+      $status = Status::firstWhere([
+        'account' => $account,
+        'rm_id' => $new_status
+      ]);
+
+      Log::info("~~~> The new status of subproject $local_subproject->name is " . __($status->name));
+
+      // We mark the statuses in the DB that should send a notification
+      if ($status->notify)
+      {
+        $this->send_project_update_notificaction($account, $local_subproject);
+      }
+    }
+  }
+
 }

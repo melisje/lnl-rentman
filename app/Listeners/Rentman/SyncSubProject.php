@@ -63,6 +63,13 @@ class SyncSubProject implements ShouldQueue
                 case 'create':
                 case 'update':
                     Log::info("@@ SyncSubProject listener - create/update");
+
+                    foreach( $items as $item)
+                    {
+                        // check if status is changed and if notification should be sent
+                        $this->projectService->check_subproject_status_change($account, $item->id);
+                    }
+
                     // Sync the parent projects
                     $this->sync_parent_project($account, $parentIds);
                     break;
