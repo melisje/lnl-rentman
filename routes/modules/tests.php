@@ -5,6 +5,7 @@ use App\Models\Rentman\Project;
 use App\Services\Rentman\Api\CrewService;
 use App\Services\Rentman\Api\ProjectsService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Test\WebhookTestController;
 
 
 
@@ -19,3 +20,11 @@ Route::get('/test/{account}/projects/{rm_id}', function(ProjectsService $project
 });
 
 
+
+// De pagina met het Bootstrap formulier
+Route::get('/test/webhook-tester', [WebhookTestController::class, 'showForm'])
+  ->name('test.webhook.form');
+
+// De route die de JSON verwerkt
+Route::post('/test/webhook-tester', [WebhookTestController::class, 'handleTestWebhook'])
+  ->name('test.webhook.submit');
