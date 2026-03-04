@@ -84,6 +84,23 @@
             border: 0;
             border-top: 1px solid #edf2f7;
             margin: 25px 0;
+
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            border: 1px solid #bee3f8;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-label {
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -97,7 +114,7 @@
 
             <div class="content">
                 @if(isset($item->parent_project))
-                <p>Het volgende <strong>subproject</strong> is verwijderd of geannuleerd:</p>
+                <p>Het volgende <strong>subproject</strong> is gewijzigd:</p>
                 <div class="project-box">
                     <div class="label">Hoofdproject</div>
                     <div class="project-name">{{ $item->parent_project->number }} - {{ $item->parent_project->name }}</div>
@@ -107,10 +124,15 @@
                     </div>
 
                     <div class="label">Subproject</div>
-                    <div class="project-name" style="color: #e3342f;">{{ $item->name }}</div>
+                    <div class="project-name" style="color: #e3342f;">{{ $item->name }} </div>
+                    <div class="label">Nieuwe status</div>
+                    <div class="status-badge">
+                        {{ $status->name }}
+                    </div>
+
                 </div>
                 @else
-                <p>Het volgende <strong>hoofdproject</strong> is verwijderd of geannuleerd:</p>
+                <p>Het volgende <strong>subproject</strong> is verwijderd of geannuleerd:</p>
                 <div class="project-box">
                     <div class="label">Projectdetails</div>
                     <div class="project-name" style="color: #e3342f;">

@@ -314,7 +314,7 @@ class ProjectsService
    * Check if the update_project_email property is set for the given account.
    * If so, send a notification to this email about the updated project.
    */
-  public function send_project_update_notificaction($account, Project|SubProject $item)
+  public function send_project_update_notificaction($account, Project|SubProject $item, Status $status)
   {
     // Check if project updates should be notifified by email.
     // For this we have the field project_update_email in the rm_accounts table
@@ -323,7 +323,7 @@ class ProjectsService
 
     if ($to_email) {
       Log::info("~~~> Sending notification email to $to_email");
-      Mail::to($to_email)->send(new ProjectDeletedMail($item));
+      Mail::to($to_email)->send(new ProjectDeletedMail($item, $status));
     }
   }
 
@@ -341,12 +341,17 @@ class ProjectsService
       'rm_id' => $rm_id
     ]);
 
+    dump($local_subproject);
+
     // old status
     $old_status = basename($local_subproject->status); // /statuses/6 -> 6
+    Log::info("%%% The old status is: $old_status");
+
 
     // Fetch the subproject from Rentman and find the new status
     $rentman_subproject = (object) $this->rentmanApiService->get_subproject($account, $rm_id);
     $new_status = basename($rentman_subproject->status);  // /statuses/6 -> 6
+    Log::info("%%% The new status is: $new_status");
 
     // Check if the status is changed
     if ($old_status != $new_status)
@@ -362,7 +367,7 @@ class ProjectsService
       // We mark the statuses in the DB that should send a notification
       if ($status->notify)
       {
-        $this->send_project_update_notificaction($account, $local_subproject);
+        $this->send_project_update_notificaction($account, $local_subproject,$status );
       }
     }
   }

@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Rentman\Project;
+use App\Models\Rentman\Status;
 use App\Models\Rentman\SubProject;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,7 +20,7 @@ class ProjectDeletedMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Project|SubProject $item)
+    public function __construct(public Project|SubProject $item, public Status $status)
     {
 
     }
