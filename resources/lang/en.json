@@ -27,6 +27,15 @@
   "customfields": "Custom Fields",
   "ledvisions": "LED Visions",
   "llstageservice": "L&L",
+  "Aanvraag": "Request",
+  "Bevestigd": "Confirmed",
+  "Concept": "Draft",
+  "Geannuleerd": "Cancelled",
+  "Gevarieerd": "Modified",
+  "Klaargezet": "Staged",
+  "Op locatie": "On location",
+  "Optie": "Option",
+  "Retour": "Returned",
   "": "",
   "zzzz": ""
 }
