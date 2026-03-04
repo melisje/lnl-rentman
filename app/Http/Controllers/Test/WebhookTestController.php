@@ -57,10 +57,13 @@ class WebhookTestController extends Controller
         // $eventType = $payload->eventType;  // create, update, delete
         $items = $payload->items; // the affected items in array
 
+        // dd($items);
+        // dump($items);
+
         foreach($items as $item)
         {
             // check if status is changed and if notification should be sent
-            $this->projectservice->check_subproject_status_change($account,$item->id);
+            $this->projectservice->check_subproject_status_change($account,$item);
         }
 
         return view('test.webhook-test')
