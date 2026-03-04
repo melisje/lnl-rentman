@@ -20,7 +20,7 @@ class ProjectDeletedMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Project|SubProject $item, public Status $status)
+    public function __construct(public Project|SubProject $item, public ?Status $status=null)
     {
 
     }

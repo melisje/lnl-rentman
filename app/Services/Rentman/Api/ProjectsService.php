@@ -174,7 +174,7 @@ class ProjectsService
     foreach($projects as $project)
     {
         // send notification if email is set for this account
-        $this->send_project_update_notificaction($account, $project);
+        $this->send_project_update_notificaction($account, $project, null);
 
         // Delete project
         $project->delete();
@@ -202,7 +202,7 @@ class ProjectsService
     foreach ($subprojects as $subproject)
     {
       // send notification if email is set for this account
-      $this->send_project_update_notificaction($account, $subproject);
+      $this->send_project_update_notificaction($account, $subproject, null);
 
       // delete subproject
       $subproject->delete();
@@ -314,7 +314,7 @@ class ProjectsService
    * Check if the update_project_email property is set for the given account.
    * If so, send a notification to this email about the updated project.
    */
-  public function send_project_update_notificaction($account, Project|SubProject $item, Status $status)
+  public function send_project_update_notificaction($account, Project|SubProject $item, ?Status $status = null)
   {
     // Check if project updates should be notifified by email.
     // For this we have the field project_update_email in the rm_accounts table
@@ -335,6 +335,7 @@ class ProjectsService
    */
   public function check_subproject_status_change($account, $rm_id)
   {
+    Log::info("Checking status change for subproject rm_id=$rm_id");
     //  find the subproject in the db
     $local_subproject = SubProject::firstWhere([
       'account' => $account,
@@ -343,32 +344,39 @@ class ProjectsService
 
     dump($local_subproject);
 
-    // old status
-    $old_status = basename($local_subproject->status); // /statuses/6 -> 6
-    Log::info("%%% The old status is: $old_status");
-
-
-    // Fetch the subproject from Rentman and find the new status
-    $rentman_subproject = (object) $this->rentmanApiService->get_subproject($account, $rm_id);
-    $new_status = basename($rentman_subproject->status);  // /statuses/6 -> 6
-    Log::info("%%% The new status is: $new_status");
-
-    // Check if the status is changed
-    if ($old_status != $new_status)
+    if ($local_subproject)
     {
-      //Find the Status object for the fetched subproject
-      $status = Status::firstWhere([
-        'account' => $account,
-        'rm_id' => $new_status
-      ]);
+      // old status
+      $old_status = basename($local_subproject->status); // /statuses/6 -> 6
+      Log::info("%%% The old status is: $old_status");
 
-      Log::info("~~~> The new status of subproject $local_subproject->name is " . __($status->name));
 
-      // We mark the statuses in the DB that should send a notification
-      if ($status->notify)
+      // Fetch the subproject from Rentman and find the new status
+      $rentman_subproject = (object) $this->rentmanApiService->get_subproject($account, $rm_id);
+      $new_status = basename($rentman_subproject->status);  // /statuses/6 -> 6
+      Log::info("%%% The new status is: $new_status");
+
+      // Check if the status is changed
+      if ($old_status != $new_status)
       {
-        $this->send_project_update_notificaction($account, $local_subproject,$status );
+        //Find the Status object for the fetched subproject
+        $status = Status::firstWhere([
+          'account' => $account,
+          'rm_id' => $new_status
+        ]);
+
+        Log::info("~~~> The new status of subproject $local_subproject->name is " . __($status->name));
+
+        // We mark the statuses in the DB that should send a notification
+        if ($status->notify)
+        {
+          $this->send_project_update_notificaction($account, $local_subproject,$status );
+        }
       }
+    }
+    else
+    {
+      Log::info("**** Subproject with rm_id=$rm_id not found in databaase");
     }
   }
 

@@ -127,7 +127,7 @@
                     <div class="project-name" style="color: #e3342f;">{{ $item->name }} </div>
                     <div class="label">Nieuwe status</div>
                     <div class="status-badge">
-                        {{ $status->name }}
+                        {{ $status ? $status->name : "Deleted" }}
                     </div>
 
                 </div>
