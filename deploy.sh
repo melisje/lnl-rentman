@@ -21,7 +21,7 @@ set -e # Stop het script direct als er iets fout gaat
 echo "🚀 Start deployment..."
 
 # 1. Zet de applicatie in onderhoudsmodus
-php artisan down || true
+# php artisan down || true
 
 # 2. Haal de laatste code op
 # git pull origin main
@@ -49,6 +49,6 @@ php artisan view:cache
 php artisan queue:restart
 
 # 8. Weer online zetten
-php artisan up
+# php artisan up
 
 echo "✅ Deployment succesvol afgerond!"
