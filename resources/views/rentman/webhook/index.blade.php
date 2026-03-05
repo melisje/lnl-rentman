@@ -21,7 +21,6 @@
                                 <th>User</th>
                                 <th>Event</th>
                                 <th>Item Type</th>
-                                <th>Created at</th>
                                 <th>EventDate</th>
                                 <th width="80px">Actie</th>
                             </tr>
@@ -50,16 +49,16 @@
         ajax: "{{ route('webhookcall.index') }}",
         order: [[0, "desc"]], // Nieuwste webhooks bovenaan
         columns: [
-            { data: 'id', name: 'id' },
+            { data: 'id', name: 'rm_webhook_calls.id' },
             { data: 'account', name: 'account' },
-            { data: 'ip', name: 'ip' },
-            { data: 'user_name', name: 'user_name' },
-            { data: 'eventType', name: 'eventType' },
-            { data: 'itemType', name: 'itemType' },
-            { data: 'created_at', name: 'created_at' },
-            { data: 'eventDate', name: 'eventDate' },
+            { data: 'ip', name: 'rm_webhook_calls.ip' },
+            { data: 'user_name', name: 'rm_crew.displayname' },
+            { data: 'eventType', name: 'rm_webhook_calls.eventType' },
+            { data: 'itemType', name: 'rm_webhook_calls.itemType' },
+            { data: 'eventDate', name: 'rm_webhook_calls.eventDate' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
+
         language:
         {
             url: '/vendor/datatables/nl-NL.json'
