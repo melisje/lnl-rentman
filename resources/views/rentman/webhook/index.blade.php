@@ -21,6 +21,7 @@
                                 <th>User</th>
                                 <th>Event</th>
                                 <th>Item Type</th>
+                                <th>Items</th>
                                 <th>EventDate</th>
                                 <th width="80px">Actie</th>
                             </tr>
@@ -55,6 +56,7 @@
             { data: 'user_name', name: 'rm_crew.displayname' },
             { data: 'eventType', name: 'rm_webhook_calls.eventType' },
             { data: 'itemType', name: 'rm_webhook_calls.itemType' },
+            { data: 'items', name: 'rm_webhook_calls.items' },
             { data: 'eventDate', name: 'rm_webhook_calls.eventDate' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
