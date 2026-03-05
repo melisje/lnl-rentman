@@ -19,6 +19,9 @@
     },
     "dependencies": {
         "bootstrap-icons": "^1.13.1",
+        "datatables.net-bs5": "^2.3.7",
+        "datatables.net-plugins": "^2.3.6",
+        "jquery": "^4.0.0",
         "tabulator-tables": "^6.3.1"
     }
 }

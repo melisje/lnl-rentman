@@ -1,0 +1,15 @@
+{
+  "sProcessing": "Bezig...",
+  "sLengthMenu": "_MENU_ resultaten weergeven",
+  "sZeroRecords": "Geen resultaten gevonden",
+  "sInfo": "_START_ tot _END_ van _TOTAL_ resultaten",
+  "sSearch": "Zoeken:",
+  "sEmptyTable": "Geen data beschikbaar in tabel",
+  "sInfoEmpty": "0 tot 0 van 0 resultaten",
+  "sPaginate": {
+    "sFirst": "Eerste",
+    "sPrevious": "Vorige",
+    "sNext": "Volgende",
+    "sLast": "Laatste"
+  }
+}

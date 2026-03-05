@@ -8,12 +8,20 @@
 // Variables
 @import 'variables';
 
-@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+
+/* resources/css/app.css */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
 // Tablulator with bootstrap 5 theme
 @import "tabulator-tables/dist/css/tabulator_bootstrap5.min.css";
 
+/* Customize tabulator styling */
 @import 'tabulator';
