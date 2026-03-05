@@ -8,8 +8,10 @@ $moduleRoutesPath = __DIR__ . '/modules/*.php';
 
 Route::get('/', function () {
     return view('welcome');
-})->name('home')
+})->name('root')
 ;
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Add auth routes
 Auth::routes();
@@ -26,4 +28,3 @@ foreach (glob($moduleRoutesPath) as $filename) {
 }
 
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
