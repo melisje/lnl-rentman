@@ -13,8 +13,8 @@ class StatusSeeder extends Seeder
     public function run(): void
     {
         $fields = [
-            ['account'  => 'llstageservice', 'name' => 'Gevarieerd', 'rm_id' => 'gevarieerd'],
-            ['account'  => 'ledvisions', 'name' => 'Gevarieerd', 'rm_id' => 'gevarieerd'],
+            ['account'  => 'llstageservice', 'name' => 'Verwijderd', 'rm_id' => 99],
+            ['account'  => 'ledvisions', 'name' => 'Verwijderd', 'rm_id' => 99],
         ];
 
         // Gebruik upsert om dubbelingen te voorkomen op basis van id
