@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <div class="mx-2 p-3 bg-light rounded-3">
         <H1>{{ __('webhookcalls')}}</H1>
 
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Webhook Logs</h5>
+                <h5 class="mb-0">Webhook Log</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -43,6 +43,8 @@
     $('#webhook-table').DataTable({
         processing: true,
         serverSide: true,
+        pageLength: 25, // Zet de standaard op 25
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]], // Opties in de dropdown
         ajax: "{{ route('webhookcall.index') }}",
         order: [[0, "desc"]], // Nieuwste webhooks bovenaan
         columns: [
