@@ -22,7 +22,7 @@ class PurchaseSeeder extends Seeder
 
         $this->call(
             [
-                // SupplierSeeder::class,
+                SupplierSeeder::class,
                 InternalItemSeeder::class,
             ]
         );
