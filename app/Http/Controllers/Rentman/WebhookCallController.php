@@ -64,7 +64,7 @@ class WebhookCallController extends Controller
                 ->addColumn('action', function ($row)
                 {
                     $url = route('webhookcall.show',$row->id);
-                    return '<a href="'. $url . '" class="btn btn-sm btn-info text-white shadow-sm"><i class="bi bi-search"></i></a>';
+                    return '<a href="'. $url . '" class="btn btn-sm btn-info text-white shadow-sm" target="_new"><i class="bi bi-search"></i></a>';
                 })
                 ->rawColumns(['action']) // Zorg dat HTML gerenderd wordt
                 ->make(true);
