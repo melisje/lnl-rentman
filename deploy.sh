@@ -1,21 +1,4 @@
 #!/bin/bash
-
-# git pull
-
-# composer install
-# npm install
-# npm run build
-
-# composer dump-autoload
-# php artisan migrate
-# php artisan db:seed --class=RentmanSeeder
-
-
-php artisan queue:restart
-
----
-
-#!/bin/bash
 set -e # Stop het script direct als er iets fout gaat
 
 echo "🚀 Start deployment..."
