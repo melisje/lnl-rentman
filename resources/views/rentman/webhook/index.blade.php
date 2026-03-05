@@ -5,48 +5,61 @@
     <div class="mx-2 p-3 bg-light rounded-3">
         <H1>{{ __('webhookcalls')}}</H1>
 
-        <div class="table-responsive">
-            <table class="table table-sm table-bordered table-hover table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" class="text-center">{{__('edit')}}</th>
-                        <th scope="col" class="text-center">{{__('id')}}</th>
-                        <th scope="col" class="text-center">{{__('account')}}</th>
-                        <th scope="col" class="text-center">{{__('ip')}}</th>
-                        <th scope="col" class="text-center">{{__('user')}}</th>
-                        <th scope="col" class="text-center">{{__('eventtype')}}</th>
-                        <th scope="col" class="text-center">{{__('itemtype')}}</th>
-                        <th scope="col" class="text-center">{{__('eventdate')}}</th>
-                    </tr>
-                </thead>
-                <tbody id="webhook-table-body">
-                    @foreach($items as $key => $whc)
-                    <tr id="row-{{ $whc->id }}">
-                        <td class="text-center">
-                            <a href="{{ route('webhookcall.show', $whc->id) }}">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">{{ $whc->id }} </td>
-                        <td>{{ $whc->account }} </td>
-                        <td>{{ $whc->ip }} </td>
-                        <td>{{ $whc->user }} </td>
-                        <td>{{ $whc->eventType }} </td>
-                        <td>{{ $whc->itemType }} </td>
-                        <td>{{ $whc->eventDate?->diffForHumans() }} </td>
-                        <td>{{ $whc->eventDate }} </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Webhook Logs</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="webhook-table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Account</th>
+                                <th>IP</th>
+                                <th>User</th>
+                                <th>Event</th>
+                                <th>Item Type</th>
+                                <th>Created at</th>
+                                <th width="80px">Actie</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="mt-4">
-            {{ $items->links() }}
-        </div>
+
+        <hr>
+
+
     </div>
 </div>
 @endsection
 
 @push('scripts')
-
+<script type="module">
+    // import nlLocale from 'datatables.net-plugins/i18n/nl-NL.json' assert { type: 'json' };
+    $(document).ready(function() {
+    $('#webhook-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('webhookcall.index') }}",
+        order: [[0, "desc"]], // Nieuwste webhooks bovenaan
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'account', name: 'account' },
+            { data: 'ip', name: 'ip' },
+            { data: 'user', name: 'user' },
+            { data: 'eventType', name: 'eventType' },
+            { data: 'itemType', name: 'itemType' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ],
+        language:
+        {
+            url: '/vendor/datatables/nl-NL.json'
+        }
+    });
+});
+</script>
 @endpush
