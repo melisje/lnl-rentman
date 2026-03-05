@@ -75,7 +75,7 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">{{ __('payload')}}</span>
             <div class="form-control">
-                @json($webhookcall->payload)
+                {{ ($webhookcall->payload) }}
             </div>
         </div>
 
@@ -83,7 +83,7 @@
             <span class="input-group-text" id="basic-addon1">{{ __('headers')}}</span>
             <div class="form-control">
                 @if($webhookcall->headers)
-                @foreach($webhookcall->headers as $key => $header)
+                @foreach(json_decode($webhookcall->headers) as $key => $header)
                 <div class="row">
                     <div class="col-2">{{ $key}} </div>
                     <div class="col"> {{ $header[0] }}
@@ -98,7 +98,7 @@
             <span class="input-group-text" id="basic-addon1">{{ __('items')}}</span>
             <div class="form-control">
                 @if($webhookcall->items)
-                @foreach($webhookcall->items as $key => $item)
+                @foreach(json_decode($webhookcall->items) as $key => $item)
                 <div>{{ json_encode($item) }}</div>
                 @endforeach
                 @endif
