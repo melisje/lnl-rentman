@@ -33,7 +33,6 @@ class WebhookCallController extends Controller
                     $join->on('rm_webhook_calls.user', '=', 'rm_crew.rm_id')
                         ->on('rm_webhook_calls.account', '=', 'rm_crew.account');
                 })
-                ->where('rm_webhook_calls.account', session('current_account'))
                 ->select([
                     'rm_webhook_calls.id',
                     'rm_webhook_calls.account',
@@ -47,12 +46,20 @@ class WebhookCallController extends Controller
                     'rm_crew.displayname as user_name' // Dit wordt direct 'user_name' in je JSON
                 ]);
 
+
+            // Check if session contains a value for the account to be used.
+            // If so, filter the webhooks for this account.
+            if (session('current_account'))
+            {
+                $model->where('rm_webhook_calls.account', session('current_account'));
+            }
+
             return DataTables::of($model)
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('d-m-Y H:i');
                 })
                 ->editColumn('eventDate', function ($row) {
-                    return $row->eventDate->format('d-m-Y H:i:s');
+                    return $row->eventDate ? $row->eventDate->format('d-m-Y H:i:s'): "-";
                 })
                 ->addColumn('action', function ($row)
                 {
