@@ -27,7 +27,9 @@ class WebhookCallController extends Controller
     {
         if ($request->ajax()) {
             // Gebruik select() om niet de zware 'payload' kolom op te halen als dat niet nodig is
-            $model = WebhookCall::select(['id', 'account', 'ip', 'user', 'itemType','eventType', 'eventDate', 'created_at']);
+            $model = WebhookCall::where('account', session('current_account'))
+                ->select(['id', 'account', 'ip', 'user', 'itemType', 'eventType', 'eventDate','items', 'created_at'])
+            ;
 
             return DataTables::of($model)
                 ->editColumn('created_at', function ($row) {
@@ -37,17 +39,20 @@ class WebhookCallController extends Controller
                     $class = $row->status == 'success' ? 'badge bg-success' : 'badge bg-danger';
                     return '<span class="' . $class . '">' . $row->status . '</span>';
                 })
-                ->addColumn('action', function ($row) {
-                    return '<button class="btn btn-sm btn-info text-white shadow-sm">Details</button>';
+                ->addColumn('action', function ($row)
+                {
+                    $url = route('webhookcall.show',$row->id);
+                    return '<a href="'. $url . '" class="btn btn-sm btn-info text-white shadow-sm"><i class="bi bi-search"></i></a>';
                 })
                 ->rawColumns(['status', 'action']) // Zorg dat HTML gerenderd wordt
                 ->make(true);
         }
+        else
+        {
+            // Dit is de view die geopend wordt bij de start.
+            return view('rentman.webhook.index');
+        }
 
-        $items = WebhookCall::orderBy('id', 'desc')
-            ->paginate(25);
-
-        return view('rentman.webhook.index', compact('items'));
 
     }
 
