@@ -25,26 +25,41 @@ class WebhookCallController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->ajax()) {
+            if ($request->ajax()) {
             // Gebruik select() om niet de zware 'payload' kolom op te halen als dat niet nodig is
-            $model = WebhookCall::where('account', session('current_account'))
-                ->select(['id', 'account', 'ip', 'user', 'itemType', 'eventType', 'eventDate','items', 'created_at'])
-            ;
+
+            $model = WebhookCall::query()
+                ->leftJoin('rm_crew', function ($join) {
+                    $join->on('rm_webhook_calls.user', '=', 'rm_crew.rm_id')
+                        ->on('rm_webhook_calls.account', '=', 'rm_crew.account');
+                })
+                ->where('rm_webhook_calls.account', session('current_account'))
+                ->select([
+                    'rm_webhook_calls.id',
+                    'rm_webhook_calls.account',
+                    'rm_webhook_calls.ip',
+                    'rm_webhook_calls.user',
+                    'rm_webhook_calls.itemType',
+                    'rm_webhook_calls.eventType',
+                    'rm_webhook_calls.eventDate',
+                    'rm_webhook_calls.created_at',
+                    'rm_webhook_calls.items',
+                    'rm_crew.displayname as user_name' // Dit wordt direct 'user_name' in je JSON
+                ]);
 
             return DataTables::of($model)
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('d-m-Y H:i');
                 })
-                ->editColumn('status', function ($row) {
-                    $class = $row->status == 'success' ? 'badge bg-success' : 'badge bg-danger';
-                    return '<span class="' . $class . '">' . $row->status . '</span>';
+                ->editColumn('eventDate', function ($row) {
+                    return $row->eventDate->format('d-m-Y H:i:s');
                 })
                 ->addColumn('action', function ($row)
                 {
                     $url = route('webhookcall.show',$row->id);
                     return '<a href="'. $url . '" class="btn btn-sm btn-info text-white shadow-sm"><i class="bi bi-search"></i></a>';
                 })
-                ->rawColumns(['status', 'action']) // Zorg dat HTML gerenderd wordt
+                ->rawColumns(['action']) // Zorg dat HTML gerenderd wordt
                 ->make(true);
         }
         else

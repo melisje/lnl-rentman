@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container-fluid">
     <div class="mx-2 p-3 bg-light rounded-3">
         <H1>{{ __('webhookcalls')}}</H1>
@@ -21,6 +22,7 @@
                                 <th>Event</th>
                                 <th>Item Type</th>
                                 <th>Created at</th>
+                                <th>EventDate</th>
                                 <th width="80px">Actie</th>
                             </tr>
                         </thead>
@@ -51,10 +53,11 @@
             { data: 'id', name: 'id' },
             { data: 'account', name: 'account' },
             { data: 'ip', name: 'ip' },
-            { data: 'user', name: 'user' },
+            { data: 'user_name', name: 'user_name' },
             { data: 'eventType', name: 'eventType' },
             { data: 'itemType', name: 'itemType' },
             { data: 'created_at', name: 'created_at' },
+            { data: 'eventDate', name: 'eventDate' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
         language:
