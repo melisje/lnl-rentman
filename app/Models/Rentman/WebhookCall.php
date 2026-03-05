@@ -2,43 +2,52 @@
 
 namespace App\Models\Rentman;
 
+use App\Models\Crew; // Pas de namespace aan indien nodig
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WebhookCall extends Model
 {
+    /**
+     * De tabel die bij dit model hoort.
+     */
     protected $table = 'rm_webhook_calls';
-    protected $primaryKey = 'id';
-    public $incrementing = true;
 
     /**
-     * The attributes that aren't mass assignable.
-     * An empty list means that all fields are mass assignable
-     *
-     * @var array<string>|bool
+     * De attributen die massaal toegewezen kunnen worden.
+     * Gezien je tabelstructuur is dit een veilige lijst.
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'payload',
+        'headers',
+        'ip',
+        'account',
+        'user',
+        'eventType',
+        'itemType',
+        'items',
+        'eventDate',
+    ];
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>|bool
+     * Definieer de relatie naar Crew.
+     * We koppelen de 'user' kolom van deze tabel aan de 'id' van de Crew.
      */
-    // protected $fillable = [
-    //     ];
+    public function crew(): BelongsTo
+    {
+        return $this->belongsTo(Crew::class, 'user', 'id');
+    }
 
     /**
      * De casts die moeten worden toegepast.
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
-            'eventDate' => 'datetime', // Dit cast de kolom naar Carbon
-            'created_at' => 'datetime:Y-m-d H:i', // Optioneel: direct formatteren
-            'modified_at' => 'datetime:Y-m-d H:i', // Optioneel: direct formatteren
+            'payload'   => 'array',    // Handig: zet de JSON payload direct om naar een array
+            'headers'   => 'array',    // Idem voor headers
+            'items'     => 'array',    // Idem voor items
+            'eventDate' => 'datetime',
         ];
     }
-
-
 }
