@@ -3,10 +3,13 @@
 namespace App\Services\Rentman\Api;
 
 use App\Mail\ProjectDeletedMail;
+use App\Models\Rentman\ProjectCrew;
 use App\Models\Rentman\Account;
+use App\Models\Rentman\Crew;
 use App\Models\Rentman\CustomField;
 use App\Models\Rentman\CustomFieldMapping;
 use App\Models\Rentman\Project;
+use App\Models\Rentman\ProjectFunction;
 use App\Models\Rentman\Status;
 use App\Models\Rentman\SubProject;
 use Illuminate\Support\Facades\Log;
@@ -155,6 +158,71 @@ class ProjectsService
         ]
       );
       Log::info("~~~ SubProject model $model->rm_id created or updated: id=$model->id");
+    }
+  }
+
+  /**
+   * Sync the subprojectcrew linked to the given $subproject to the DB
+   */
+  public function syncProjectCrew(string $account, SubProject $subproject)
+  {
+    $projectcrew = $this->rentmanApiService->getSubprojectsCrew($account, $subproject->rm_id);
+
+    dump($projectcrew);
+
+    // loop through the subprojects
+    foreach ($projectcrew as $item) {
+      Log::debug("ProjectCrew item data: " . json_encode($item));
+
+      dump($item);
+      $item = (object) $item;
+
+      // dump($item->crewmember);
+      $crew_id = basename($item->crewmember);
+      // dump($crew_id);
+      $crew = $this->crewService->sync_crew_member($account, $crew_id);
+      // dump($crew);
+
+      $model = ProjectCrew::updateOrCreate(
+        [
+          'account' => $account,
+          'rm_id'   => $subproject->id, // 'item' is hier de array uit je JSON
+        ],
+        [
+          'subproject_id'           => $subproject->id,
+          'created'                 => $item->created,
+          'modified'                => $item->modified,
+          'creator'                 => $item->creator,
+          'displayname'             => $item->displayname,
+          'cost_rate'               => $item->cost_rate,
+          'cost_accommodation'      => $item->cost_accommodation,
+          'cost_catering'           => $item->cost_catering,
+          'cost_travel'             => $item->cost_travel,
+          'cost_other'              => $item->cost_other,
+          'function'                => $item->function,
+          'crewmember'              => $item->crewmember,
+          'crew_id'                 => $crew->id,
+          'visible'                 => $item->visible,
+          'planperiod_start'        => $item->planperiod_start,
+          'planperiod_end'          => $item->planperiod_end,
+          'transport'               => $item->transport,
+          'remark'                  => $item->remark,
+          'remark_planner'          => $item->remark_planner,
+          'invoice_reference'       => $item->invoice_reference,
+          'project_leader'          => $item->project_leader,
+          'is_visible_on_dashboard' => $item->is_visible_on_dashboard,
+          'costs'                   => $item->costs,
+          'cost_actual'             => $item->cost_actual,
+          'hours_registered'        => $item->hours_registered,
+          'hours_planned'           => $item->hours_planned,
+          'cost_planned'            => $item->cost_planned,
+          'diff_cost'               => $item->diff_cost,
+          'diff_hours'              => $item->diff_hours,
+          'activity_status'         => $item->activity_status,
+          'updateHash'              => $item->updateHash,
+          'custom'                  => json_encode($item->custom),
+        ]
+      );
     }
   }
 
@@ -378,6 +446,75 @@ class ProjectsService
     {
       Log::info("**** Subproject with rm_id=$rm_id not found in databaase");
     }
+  }
+
+  public function syncSubProjectFunctions($account, SubProject $subproject)
+  {
+    // fetch the Subproject's functions
+    $functions = $this->rentmanApiService->getSubProjectFunctions($account,$subproject->rm_id);
+    // Log::info(json_encode($functions));
+
+    foreach ($functions as $item)
+    {
+      ProjectFunction::updateOrCreate(
+        [
+          'account' => $account,
+          'rm_id'   => $item['id'], // Rentman's 'id' wordt onze 'rm_id'
+        ],
+        [
+          'displayname'         => $item['displayname'],
+          'name'                => $item['name'],
+          'name_external'       => $item['name_external'],
+          'type'                => $item['type'],
+
+          // Relatie-paden
+          'creator'             => $item['creator'],
+          'project'             => $item['project'],
+          'subproject'          => $item['subproject'],
+          'group'               => $item['group'],
+          'taxclass'            => $item['taxclass'],
+          'ledger'              => $item['ledger'],
+
+          // Periodes
+          'usageperiod_start'   => $item['usageperiod_start'],
+          'usageperiod_end'     => $item['usageperiod_end'],
+          'planperiod_start'    => $item['planperiod_start'],
+          'planperiod_end'      => $item['planperiod_end'],
+          'duration'            => $item['duration'],
+          'break'               => $item['break'],
+          'travel_time_before'  => $item['travel_time_before'],
+          'travel_time_after'   => $item['travel_time_after'],
+
+          // Financiële data
+          'price_fixed'         => $item['price_fixed'],
+          'price_variable'      => $item['price_variable'],
+          'price_total'         => $item['price_total'],
+          'costs_fixed'         => $item['costs_fixed'],
+          'costs_variable'      => $item['costs_variable'],
+          'costs_total'         => $item['costs_total'],
+
+          // Booleans en status
+          'amount'              => $item['amount'],
+          'is_template'         => $item['is_template'],
+          'in_financial'        => $item['in_financial'],
+          'in_planning'         => $item['in_planning'],
+          'is_plannable'        => $item['is_plannable'],
+          'remark_crew'         => $item['remark_crew'],
+          'update_hash'         => $item['updateHash'],
+
+          // Timestamps van Rentman
+          'rm_created'          => $item['created'],
+          'rm_modified'         => $item['modified'],
+        ]
+      );
+    }
+
+    $functions = ProjectFunction::where('account', $account)
+      ->where('subproject', "/subprojects/{$subproject->rm_id}")
+      ->get()
+      ;
+
+    return $functions;
   }
 
 }
