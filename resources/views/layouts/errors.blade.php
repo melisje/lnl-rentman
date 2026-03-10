@@ -7,3 +7,10 @@
   </ul>
 </div>
 @endif
+
+{{-- Handmatige foutmeldingen (bijv. uit je try-catch) --}}
+@if (session('error'))
+<div class="alert alert-danger">
+  {{ session('error') }}
+</div>
+@endif
