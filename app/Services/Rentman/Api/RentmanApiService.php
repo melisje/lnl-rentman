@@ -437,6 +437,24 @@ class RentmanApiService
         return $this->get_rentman_endpoint($account,$endpoint);
     }
 
+    /**
+     * Fetch the subproject's crew data for a given $rm_id
+     * from the Rentman API for a given $account
+     * @param string $account The Rentman account identifier
+     * @param string $rm_id The id of the project the subprojects are fetched for
+     * @return array Data array with the subprojectcrew items
+     */
+    public function getSubprojectsCrew($account, $rm_id)
+    {
+        Log::info("~~> Fetching crew for subproject $rm_id for account $account");
+
+        // build endpoint path
+        $endpoint = "/subprojects/$rm_id/projectcrew";
+
+        // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account,$endpoint);
+    }
+
 
     /**
      * Fetch statuses for a specific account.
@@ -451,5 +469,22 @@ class RentmanApiService
         // fetch and return subprojects data
         return $this->get_rentman_endpoint($account, $endpoint);
 
+    }
+
+    /**
+     * Fetch functions linked to a given subproject for a given account
+     * @param $account - the Rentman account
+     * @param $subprojectid - the Rentman id for the subproject
+     * @return
+     */
+    public function getSubProjectFunctions($account, $subprojectid)
+    {
+        Log::info("~~> Fetching functions for subproject $subprojectid for account $account");
+
+        // build endpoint path
+        $endpoint = "/projectfunctions?subproject=$subprojectid";
+
+        // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account, $endpoint);
     }
 }
