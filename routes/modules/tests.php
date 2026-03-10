@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Test\TestController;
 use App\Models\Rentman\CustomFieldMapping;
 use App\Models\Rentman\Project;
 use App\Services\Rentman\Api\CrewService;
@@ -28,3 +29,8 @@ Route::get('/test/webhook-tester', [WebhookTestController::class, 'showForm'])
 // De route die de JSON verwerkt
 Route::post('/test/webhook-tester', [WebhookTestController::class, 'handleTestWebhook'])
   ->name('test.webhook.submit');
+
+
+Route::get('/test/sync-crew', [TestController::class, 'showTestForm'])->name('test.projectcrew.form');
+Route::post('/test/sync-crew', [TestController::class, 'runSync'])->name('test.projectcrew.run');
+
