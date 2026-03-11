@@ -51,6 +51,15 @@ class CreateClockifyProjects extends Command
                 $this->line("<info>✔ SUCCESS</info> | Project: {$result['name']}");
 
                 $summary[] = [$project->rm_id, $result['name'], 'Created'];
+
+                // create tasks for this project
+                $clockify_projectid = $result['id'];
+                $clockify->addTaskToProject($clockify_projectid,"PM");
+                $clockify->addTaskToProject($clockify_projectid,"Light");
+                $clockify->addTaskToProject($clockify_projectid,"Sound");
+                $clockify->addTaskToProject($clockify_projectid,"Rigging");
+
+
             } catch (Exception $e) {
                 // <fg=red> is red text, </> closes it.
                 $this->line("<fg=red>✘ FAILED </fg=red> | Project: {$project->displayname} | Error: {$e->getMessage()}");

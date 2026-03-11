@@ -112,4 +112,39 @@ class ClockifyApiService
 
         throw new Exception("Could not delete project {$id}: " . $deleteResponse->json('message'));
     }
+
+    /**
+     * Add a task to a specific Clockify project.
+     * @param string $projectId The Clockify internal Project ID
+     * @param string $taskName  The name of the task to create
+     * @return array
+     * @throws Exception
+     */
+    public function addTaskToProject(string $projectId, string $taskName): array
+    {
+        $url = "{$this->baseUrl}/workspaces/{$this->workspaceId}/projects/{$projectId}/tasks";
+
+        Log::info("Clockify API: Adding task '{$taskName}' to project ID: {$projectId}");
+
+        $response = Http::withHeaders([
+            'X-Api-Key' => $this->apiKey,
+        ])->post($url, [
+            'name' => $taskName,
+            'status' => 'ACTIVE' // Tasks can be ACTIVE or DONE
+        ]);
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+
+        $errorMessage = $response->json('message') ?? 'Unknown error creating task';
+        $errorCode = $response->status();
+
+        Log::error("Clockify API Task Failure: {$errorMessage}", [
+            'status' => $errorCode,
+            'project_id' => $projectId
+        ]);
+
+        throw new Exception("Clockify Task Error ({$errorCode}): {$errorMessage}");
+    }
 }
