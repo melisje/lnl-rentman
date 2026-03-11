@@ -17,7 +17,7 @@ class DeleteClockifyProjects extends Command
         $projects = $clockify->getAllProjects();
 
         if (empty($projects)) {
-            $this->info("No projects found to delete.");
+            $this->info("No Clockify projects found to delete.");
             return;
         }
 
