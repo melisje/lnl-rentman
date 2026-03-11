@@ -39,6 +39,12 @@ return [
         'base_url' => env('RENTMAN_API_URL', 'https://api.rentman.net/'),
         'token' => trim(env('RENTMAN_API_TOKEN', '*** Add token in .env as RENTMAN_BEARER_TOKEN ***')),
         'page_limit' => env('RENTMAN_PAGE_LIMIT',100),
-    ]
+    ],
+
+    'clockify' => [
+        'key' => env('CLOCKIFY_KEY'),
+        'workspace_id' => env('CLOCKIFY_WORKSPACE_ID'),
+        'base_url' => env('CLOCKIFY_BASE_URL', 'https://api.clockify.me/api/v1'),
+    ],
 
 ];
