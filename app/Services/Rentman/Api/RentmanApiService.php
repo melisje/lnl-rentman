@@ -4,6 +4,8 @@ namespace App\Services\Rentman\Api;
 
 use App\Models\Rentman\Account;
 use App\Models\Rentman\Crew;
+use App\Models\Rentman\Project;
+use App\Models\Rentman\SubProject;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\PendingRequest;
@@ -485,6 +487,24 @@ class RentmanApiService
         $endpoint = "/projectfunctions?subproject=$subprojectid";
 
         // fetch and return subprojects data
+        return $this->get_rentman_endpoint($account, $endpoint);
+    }
+
+    /**
+     * Fetch project functions with dynamic query filtering.
+     * @param string $account
+     * @param array $queryParameters
+     * @return array|null
+     */
+    public function getProjectFunctions(string $account, array $queryParameters): array|null
+    {
+        // Build the query string from the array (e.g., ['limit' => 100] becomes "limit=100")
+        $queryString = http_build_query($queryParameters);
+
+        // Build the endpoint. Use a ternary to handle cases where $queryParameters might be empty.
+        $endpoint = "/projectfunctions" . ($queryString ? '?' . $queryString : '');
+
+        // Reuse your existing base method for the API call
         return $this->get_rentman_endpoint($account, $endpoint);
     }
 }

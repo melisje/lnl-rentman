@@ -27,7 +27,7 @@ return new class extends Migration
             // Relaties (gebaseerd op de URL-strings in de JSON)
             $table->string('cost_rate')->nullable(); // Slaat bijv. "/rates/66083" op
             $table->string('function')->nullable();  // Slaat bijv. "/projectfunctions/27684" op
-            $table->foreignId('function_id')->nullable()->constrained('rm_functions');
+            $table->foreignId('function_id')->nullable()->constrained('rm_project_functions');
             $table->string('crewmember')->nullable(); // Slaat bijv. "/crew/257" op
             $table->foreignId('crew_id')->constrained('rm_crew')->onUpdate('cascade'); //FK naar rm_crew
             $table->foreignId('subproject_id')->constrained('rm_subprojects')->onUpdate('cascade')->onDelete('cascade'); //FK naar rm_subprojects
