@@ -79,7 +79,7 @@ abstract class AbstractRentmanFetcher implements DataProcessor
 
             // Optional external callback
             if ($onPageFetched) {
-                $onPageFetched($items, "     |  +-> Processing $endpoint page $page ($cntOfItems items)");
+                $onPageFetched($items, "     |  +-> Processing $endpoint chunk page $page ($cntOfItems items)");
             }
 
             // Process the items received for this page
