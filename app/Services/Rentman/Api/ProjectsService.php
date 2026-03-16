@@ -261,7 +261,7 @@ class ProjectsService
 
     // Find the subproject in DB and delete it
     $subprojects = SubProject::where(['rm_id' => $rm_id, 'account' => $account])
-      ->with('parent_project')
+      ->with('parentProject')
       ->get();
 
     // dump($rm_id);

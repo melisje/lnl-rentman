@@ -113,11 +113,11 @@
             </div>
 
             <div class="content">
-                @if(isset($item->parent_project))
+                @if(isset($item->parentProject))
                 <p>Het volgende <strong>subproject</strong> is gewijzigd:</p>
                 <div class="project-box">
                     <div class="label">Hoofdproject</div>
-                    <div class="project-name">{{ $item->parent_project->number }} - {{ $item->parent_project->name }}</div>
+                    <div class="project-name">{{ $item->parentProject->number }} - {{ $item->parentProject->name }}</div>
 
                     <div style="margin: 15px 0; text-align: center;">
                         <span class="subproject-arrow">▼</span>

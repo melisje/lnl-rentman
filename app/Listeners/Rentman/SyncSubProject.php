@@ -71,7 +71,7 @@ class SyncSubProject implements ShouldQueue
                     }
 
                     // Sync the parent projects
-                    $this->sync_parent_project($account, $parentIds);
+                    $this->syncParentProject($account, $parentIds);
                     break;
                 case 'delete':
                     Log::info("@@ SyncSubProject listener - delete");
@@ -91,13 +91,13 @@ class SyncSubProject implements ShouldQueue
                         );
 
                         // if the subproject is found, fetch the parent projects rm_id value
-                        $parentids = $subproject ? [$subproject->parent_project->rm_id] : [];
+                        $parentids = $subproject ? [$subproject->parentProject->rm_id] : [];
 
                         // delete the subproject
                         $this->projectService->delete_subproject($account,$rm_id);
                     }
                     // Sync the parent project and update the project status
-                    $this->sync_parent_project($account,$parentids);
+                    $this->syncParentProject($account,$parentids);
                     break;
                 default:
                     Log::warning("?? SyncSubProject listener - unknown eventType: $eventType");
@@ -108,7 +108,7 @@ class SyncSubProject implements ShouldQueue
         }
     }
 
-    public function sync_parent_project(string $account,array $parentIds)
+    public function syncParentProject(string $account,array $parentIds)
     {
         foreach ($parentIds as $parentid) {
             // build the endpoint reference for the parent project
