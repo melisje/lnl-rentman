@@ -15,7 +15,7 @@ return new class extends Migration
         {
             $table->id(); // Interne autonumbering ID
             $table->string('account')->index(); // Voor multi-tenant filtering
-            $table->unsignedBigInteger('rm_id')->unique(); // Rentman ID
+            $table->unsignedBigInteger('rm_id'); // Rentman ID
 
             // Basis informatie
             $table->string('displayname')->nullable();
@@ -104,7 +104,7 @@ return new class extends Migration
             $table->dateTime('created')->nullable();
             $table->dateTime('modified')->nullable();
 
-            $table->string('update_hash')->nullable();
+            $table->string('updateHash')->nullable();
             $table->dbTimestamps();
 
             // Indices

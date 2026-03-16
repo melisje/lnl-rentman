@@ -30,7 +30,6 @@ return new class extends Migration
             $table->foreignId('function_id')->nullable()->constrained('rm_project_functions');
             $table->string('crewmember')->nullable(); // Slaat bijv. "/crew/257" op
             $table->foreignId('crew_id')->constrained('rm_crew')->onUpdate('cascade'); //FK naar rm_crew
-            $table->foreignId('subproject_id')->constrained('rm_subprojects')->onUpdate('cascade')->onDelete('cascade'); //FK naar rm_subprojects
 
             // Financiële data (Decimals voor precisie bij geldzaken)
             $table->decimal('cost_accommodation', 10, 2)->default(0);

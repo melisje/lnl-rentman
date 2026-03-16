@@ -9,29 +9,25 @@ use App\Services\Rentman\Api\CrewFetcher;
 use App\Services\Rentman\Api\ProjectFetcher;
 use Carbon\Carbon;
 
-class SyncProjects extends Command
+class SyncCrew extends Command
 {
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'rentman:sync-projects {account? : The specific account name to sync}';
+    protected $signature = 'rentman:sync-crew {account? : The specific account name to sync}';
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
     /**
      * The console command description.
      */
-    protected $description = 'Sync Rentman projects for all accounts within a 5-week window';
+    protected $description = 'Sync Rentman crew for all accounts';
 
-    public function handle(ProjectFetcher $fetcher)
+    public function handle(CrewFetcher $fetcher)
     {
         $accountName = $this->argument('account');
 
-        // 1. Determine time window (current week start to +6 weeks end)
-        $start = Carbon::now()->startOfWeek()->toIso8601String();
-        $end = Carbon::now()->addWeeks(6)->endOfWeek()->toIso8601String();
-
-        // 2. Get accounts
+        // Get accounts
         // De when methode voert de where clausule alleen uit als $accountName een waarde heeft (niet null of false is).
         // * Als je php artisan rentman:sync-functions typt (zonder argument), haalt hij alle accounts op.
         // * Als je php artisan rentman:sync-functions mijn-account typt, haalt hij alleen dat account op.
@@ -43,65 +39,77 @@ class SyncProjects extends Command
         }
 
         foreach ($accounts as $account) {
-            $this->info("\n~~~> Processing account: {$account->account}");
+            $this->info("\n~~~> Syncing Crew for account: {$account->account}");
 
+            $this->nrOfItems = 0;
             $hasMore = true;
 
             // required fields
             $requiredFields = [
+                // general fields
                 'created',
                 'modified',
                 'creator',
-                'updateHash',
                 'displayname',
-                'name',
-                'reference',
-                'number',
-                'planperiod_start',
-                'planperiod_end',
-                'usageperiod_start',
-                'usageperiod_end',
-                'equipment_period_from',
-                'equipment_period_to',
-                'account_manager',
-                'customer',
-                'cust_contact',
-                'loc_contact',
-                'project_total_price',
+                'updateHash',
+
+                // specific fields
+                'folder',
+                'street',
+                'housenumber',
+                'city',
+                'postal_code',
+                'addressline2',
+                'state',
+                'country',
+                'birthdate',
+                'passport_number',
+                'emergency_contact',
+                'remark',
+                'driving_license',
+                'contract',
+                'bank',
+                'contract_date',
+                'company_name',
+                'vat_code',
+                'coc_code',
+
+                // custom fields
                 'custom',
-                'project_type',
-                'location',
-                'tags',
             ];
 
-            // 3. Build query parameters with API-side filtering
+            // Build query parameters with API-side filtering
             $queryParams = [
                 'limit' => config('services.rentman.page_limit'),
                 'offset' => 0,
-                // 'created[gte]' => '2026-01-01',
-                'modified[gte]' => '2026-01-01',
+                // 'modified[gte]' => '2026-03-01' ,
             ];
 
             // If required fields are defined, put them in the queryparamets array
-            if ($requiredFields && !empty($requiredFields)) {
+            if ($requiredFields && !empty($requiredFields)){
                 $queryParams['fields'] = implode(',', $requiredFields);
             }
 
-            // Define endpoint
-            $endpoint = "projects" ;
+            // define endpoint
+            $endpoint = "crew" ;
 
             // Fetch data via your existing service
             $fetcher->fetchAll($account,$endpoint,$queryParams, $requiredFields, [$this,'myCallable'] );
 
-            $this->info(".    +--> Project synchronisation process finished. We created or updated {$this->nrOfItems} projects for account '{$account->account}'.");
-
+            $this->info(".    +--> Crew syncing process finished. We created or updated {$this->nrOfItems} crew members for account '{$account->account}'.");
+            // ✅
 
         }
 
-        $this->info("\n✅ Project synchronisation process finished. We created or updated {$this->totalItems} projects over all accounts.");
+        $this->info("\n✅ Crew syncing process finished. We created or updated {$this->totalItems} crew members over all accounts.");
         return Command::SUCCESS;
     }
 
+    /**
+     * A command specific callable function that is given to the service class
+     * @param array $items - an array with items
+     * @param string $msg - optional, a message to be shown, if given
+     */
     public function myCallable(array $items, ?string $msg = null){
         if ($msg){
             $this->info($msg);
