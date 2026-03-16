@@ -5,6 +5,7 @@ namespace App\Models\Rentman;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 class Project extends Model
@@ -12,8 +13,6 @@ class Project extends Model
     protected $table = 'rm_projects';
     protected $primaryKey = 'id';
     // public $incrementing = true;
-
-    protected $appends = ['calculated_status', 'status_name', 'pm_name', 'am_name', 'nr_of_subprojects'];
 
     /**
      * The attributes that aren't mass assignable.
@@ -54,6 +53,26 @@ class Project extends Model
     }
 
     /**
+     * Haal alle geplande crew op voor het gehele project (over alle subprojecten heen)
+     */
+    public function projectFunctions(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ProjectFunction::class,   // Het doel
+            SubProject::class,    // De eerste tussenstap
+            'projects_id',        // Foreign key op SubProject tabel (naar Project)
+            'subproject_id',      // Foreign key op ProjectCrew tabel (naar SubProject)
+            'id',                 // Local key op Project tabel
+            'id'                  // Local key op SubProject tabel
+        );
+    }
+
+    public function projectCrewUnique()
+    {
+        return $this->subprojects->flatMap->projectFunctions->flatMap->projectCrew->map->member->unique('id');
+    }
+
+    /**
      * Calculate the number of subprojects for this project
      */
     public function nrOfSubprojects(): Attribute
@@ -71,7 +90,7 @@ class Project extends Model
         return Attribute::make(
             get: function () {
                 // 1. Haal alle unieke statussen van de subprojecten op
-                $uniqueStatuses = $this->subprojects->pluck('status')->unique();
+                $uniqueStatuses = $this->subprojects->pluck('status')->filter()->unique();
 
                 // 2. Als er geen subprojecten zijn
                 if ($uniqueStatuses->isEmpty()) {
@@ -84,11 +103,10 @@ class Project extends Model
                 }
 
                 // 4. In alle andere gevallen zijn de statussen verschillend
-                return 'gevarieerd';
+                return $uniqueStatuses->implode(',');
             },
         )->shouldCache();
     }
-
 
     /**
      * Haalt de menselijke naam van de status op.

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class SubProject extends Model
 {
@@ -43,9 +44,30 @@ class SubProject extends Model
     /**
      * Get the Project that owns the subproject.
      */
-    public function parent_project(): BelongsTo
+    public function parentProject(): BelongsTo
     {
         return $this->belongsTo(Project::class,'projects_id','id');
+    }
+
+    /**
+     * Get the ProjectFunctions for the subproject.
+     */
+    public function projectFunctions(): HasMany
+    {
+        return $this->hasMany(ProjectFunction::class,'subproject_id','id');
+    }
+
+    /**
+     * Get all the ProjectCrew planned for the subproject via the ProjectFunction
+     */
+    public function projectCrew(): HasManyThrough
+    {
+        return $this->hasManyThrough(ProjectCrew::class,
+        ProjectFunction::class,
+        'subproject_id',
+        'function_id',
+        'id',
+        'id');
     }
 
 

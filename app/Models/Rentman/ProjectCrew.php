@@ -4,6 +4,7 @@ namespace App\Models\Rentman;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectCrew extends Model
 {
@@ -84,5 +85,25 @@ class ProjectCrew extends Model
     public function getHoursRegisteredInDecimalAttribute()
     {
         return $this->hours_registered / 3600;
+    }
+
+    /**
+     * Relationship to ProjectFunction
+     * The ProjectFunction where this Crew member is planned for
+     */
+    public function projectFunction() : BelongsTo
+    {
+        return $this->belongsTo(ProjectFunction::class,'function_id','id');
+    }
+
+    /**
+     * Relationship to Crew
+     * The Crew member that is planned for the ProjectFunction
+     */
+    public function member(): BelongsTo
+    {
+        // 'crewmember_id' is de kolom in je rm_projectcrew tabel
+        // die verwijst naar de id in je rm_crew tabel.
+        return $this->belongsTo(Crew::class, 'crew_id', 'id');
     }
 }
