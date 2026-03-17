@@ -507,4 +507,58 @@ class RentmanApiService
         // Reuse your existing base method for the API call
         return $this->get_rentman_endpoint($account, $endpoint);
     }
+
+
+
+    /**
+     * Haal ALLE actieve RM-ID's op (over alle pagina's heen).
+     */
+    public function getActiveRmIds(Account $account, string $endpoint, ?callable $log): array
+    {
+        $allIds = [];
+        $limit = config('services.rentman.page_limit', 100); // Hoeveel we per keer ophalen
+        $offset = 0;
+        $hasMore = true;
+
+        $log("+-> Processing Endpoint: $endpoint",'warn');
+        while ($hasMore) {
+            $log(".",'output');
+            $response = $this->client
+                ->withToken($account->api_token)
+                ->beforeSending(function ($request) use ($account, $log) {
+                    $url = $request->url();
+                    Log::info("~~~~> Calling endpoint $url for account {$account->account} ... ");
+                    // $log("      ~~~~> Calling endpoint $url for account {$account->account} ... ","comment");
+                })
+                ->get($endpoint, [
+                    'fields' => 'id',
+                    'limit'  => $limit,
+                    'offset' => $offset,
+                    'modified[gte]' => '2025-01-01',
+                ]);
+
+            if ($response->failed()) {
+                // Stop onmiddellijk en geef een lege array om veiligheidsredenen
+                Log::error("Rentman API Cleanup mislukt op endpoint: $endpoint");
+                $log("Rentman API Cleanup mislukt op endpoint: $endpoint","error");
+                return [];
+            }
+
+            $data = $response->json('data');
+            $ids = collect($data)->pluck('id')->toArray();
+            $cnt = count($ids);
+            // $log("  $endpoint: found $cnt items","info");
+
+            $allIds = array_merge($allIds, $ids);
+
+            // Als we minder resultaten kregen dan de limit, zijn we bij de laatste pagina
+            if (count($data) < $limit) {
+                $hasMore = false;
+            } else {
+                $offset += $limit;
+            }
+        }
+
+        return $allIds;
+    }
 }
