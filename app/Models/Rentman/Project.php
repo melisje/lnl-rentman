@@ -188,4 +188,13 @@ class Project extends Model
             },
         );
     }
+
+
+    /**
+     *
+     */
+    public function getFullDisplayNameAttribute()
+    {
+        return "{$this->number} - {$this->name}";
+    }
 }
