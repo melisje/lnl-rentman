@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Production\ChecklistTemplateSeeder;
 use Database\Seeders\Rentman\CustomFieldSeeder;
 use Database\Seeders\Rentman\CustomFieldMappingSeeder;
 use Database\Seeders\Rentman\StatusSeeder;
@@ -21,6 +22,7 @@ class RentmanSeeder extends Seeder
                 CustomFieldSeeder::class,
                 CustomFieldMappingSeeder::class,
                 StatusSeeder::class,
+                ChecklistTemplateSeeder::class,
             ]
         );
 
