@@ -20,6 +20,7 @@ class RoleSeeder extends Seeder
             'status',
             'accounts',
             'custom_fields',
+            'checklists',
         ];
 
         foreach ($roles as $roleName) {
