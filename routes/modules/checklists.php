@@ -7,7 +7,8 @@ use App\Http\Controllers\Production\ChecklistTemplateController;
 use App\Http\Controllers\Production\ChecklistTemplateItemController;
 
 
-Route::prefix('production')
+Route::middleware(['can:access-checklists'])
+  ->prefix('production')
   ->name('production.')
   ->group(function () {
 
@@ -20,29 +21,29 @@ Route::prefix('production')
 
     // Hoofdresource
     Route::resource('checklist', ChecklistController::class);
+
+
+  /*
+  * Checklist template routes
+  */
+  Route::prefix('checklist')
+  ->name('checklist.')
+  ->group(function(){
+    Route::resource('template', ChecklistTemplateController::class);
+
+    // Nested Template Item routes with unique names
+    Route::resource('template.items', ChecklistTemplateItemController::class)
+      ->shallow()
+      ->names([
+        'index'   => 'template.items.index',
+        'store'   => 'template.items.store',
+        'create'  => 'template.items.create',
+        'show'    => 'template-items.show',
+        'edit'    => 'template-items.edit',
+        'update'  => 'template-items.update',
+        'destroy' => 'template-items.destroy',
+      ]);
   });
 
 
-/*
- * Checklist routes
- */
-Route::resource('templates', ChecklistTemplateController::class);
-
-/*
- * Checklist template routes
- */
-
-Route::resource('templates', ChecklistTemplateController::class);
-
-// Nested Template Item routes with unique names
-Route::resource('templates.items', ChecklistTemplateItemController::class)
-  ->shallow()
-  ->names([
-    'index'   => 'templates.items.index',
-    'store'   => 'templates.items.store',
-    'create'  => 'templates.items.create',
-    'show'    => 'template-items.show',
-    'edit'    => 'template-items.edit',
-    'update'  => 'template-items.update',
-    'destroy' => 'template-items.destroy',
-  ]);
+});
