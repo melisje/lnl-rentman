@@ -32,6 +32,7 @@ class SyncRentman extends Command
         $this->call('rentman:sync-subprojects');
         $this->call('rentman:sync-project-functions');
         $this->call('rentman:sync-project-crew');
+        $this->call('rentman:sync-equipment');
         // $this->call('rentman:import-projects', [
         //     '--limit' => 500 // Je kunt ook argumenten/opties meegeven
         // ]);
