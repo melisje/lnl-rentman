@@ -4,24 +4,25 @@ namespace App\Console\Commands\Rentman;
 
 use Illuminate\Console\Command;
 use App\Models\Rentman\Account;
-use App\Services\Rentman\Api\EquipmentFetcher;
+use App\Services\Rentman\Api\SerialNumberFetcher;
+use App\Services\Rentman\Api\StockLocationFetcher;
 use Carbon\Carbon;
 
-class SyncEquipment extends Command
+class SyncStockLocations extends Command
 {
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'rentman:sync-equipment {account? : The specific account name to sync}';
+    protected $signature = 'rentman:sync-stocklocations {account? : The specific account name to sync}';
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
     /**
      * The console command description.
      */
-    protected $description = 'Sync Rentman equipment for all accounts';
+    protected $description = 'Sync Rentman stock locations for all accounts';
 
-    public function handle(EquipmentFetcher $fetcher)
+    public function handle(StockLocationFetcher $fetcher)
     {
         $accountName = $this->argument('account');
 
@@ -41,69 +42,28 @@ class SyncEquipment extends Command
         }
 
         foreach ($accounts as $account) {
-            $this->info("\n~~~> Processing equipment for account: {$account->account}");
+            $this->info("\n~~~> Processing stock locations for account: {$account->account}");
 
             $hasMore = true;
 
-            // required fields
             $requiredFields = [
-                'id',
+                'rm_id',
+                'account',
                 'created',
                 'modified',
                 'creator',
                 'displayname',
-                'folder',
-                'code',
-                'factor_group',
                 'name',
-                'internal_remark',
-                'external_remark',
-                'unit',
-                'in_shop',
-                'surface_article',
-                'shop_description_short',
-                'shop_description_long',
-                'shop_seo_title',
-                'shop_seo_keyword',
-                'shop_seo_description',
-                'shop_featured',
-                'price',
-                'subrental_costs',
-                'critical_stock_level',
+                'city',
+                'street',
+                'house_number',
+                'postal_code',
+                'state_province',
+                'country',
+                'active',
                 'type',
-                'rental_sales',
-                'temporary',
-                'in_planner',
+                'color',
                 'in_archive',
-                'stock_management',
-                'taxclass',
-                'list_price',
-                'volume',
-                'packed_per',
-                'height',
-                'width',
-                'length',
-                'weight',
-                'empty_weight',
-                'power',
-                'current',
-                'country_of_origin',
-                'image',
-                'ledger',
-                'ledger_debit',
-                'defaultgroup',
-                'is_combination',
-                'is_physical',
-                'can_edit_content_during_planning',
-                'strict_container_content',
-                'qrcodes',
-                'qrcodes_of_serial_numbers',
-                'tags',
-                'current_quantity_excl_cases',
-                'current_quantity',
-                'quantity_in_cases',
-                'location_in_warehouse',
-                'custom',
                 'updateHash',
             ];
 
@@ -121,17 +81,16 @@ class SyncEquipment extends Command
             }
 
             // Define endpoint
-            $endpoint = "equipment" ;
+            // https://api.rentman.net/stocklocations
+            $endpoint = "stocklocations"; ;
 
             // Fetch data via your existing service
             $fetcher->fetchAll($account,$endpoint,$queryParams, $requiredFields, [$this,'myCallable'] );
 
-            $this->info(".    +--> Equipment synchronisation process finished. We created or updated {$this->nrOfItems} equipment items for account '{$account->account}'.");
-
-
+            $this->info(".    +--> Stocklocation synchronisation process finished. We created or updated {$this->nrOfItems} serial items for account '{$account->account}'.");
         }
 
-        $this->info("\n✅ Equipment synchronisation process finished. We created or updated {$this->totalItems} equipment items over all accounts.");
+        $this->info("\n✅ Stocklocation synchronisation process finished. We created or updated {$this->totalItems} serial items over all accounts.");
         return Command::SUCCESS;
     }
 

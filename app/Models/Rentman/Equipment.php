@@ -5,6 +5,7 @@ namespace App\Models\Rentman;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipment extends Model
 {
@@ -42,6 +43,14 @@ class Equipment extends Model
                 return "custom_" . $this->rm_id;
             },
         );
+    }
+
+    /**
+     * Relatie naar SerialNumbers (1 equipment kan meerdere serial numbers hebben)
+     */
+    public function serialNumbers(): HasMany
+    {
+        return $this->hasMany(SerialNumber::class, 'equipment_id', 'id');
     }
 
 }
