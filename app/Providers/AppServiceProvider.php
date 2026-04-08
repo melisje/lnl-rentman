@@ -87,10 +87,16 @@ class AppServiceProvider extends ServiceProvider
 
             return $user->hasAnyRole(['purchase','admin']);
         });
+
         // checklist rights
         Gate::define('access-checklists', function (User $user) {
 
             return $user->hasAnyRole(['checklists','admin']);
+        });
+        // testtom rights
+        Gate::define('access-testtom', function (User $user) {
+
+            return $user->hasAnyRole(['testtom','admin']);
         });
     }
 }
