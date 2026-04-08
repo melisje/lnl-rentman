@@ -22,6 +22,11 @@
             <a class="dropdown-item" href="{{ route('admin.rentman.customfield.index')}}">{{ __('customfields')}}</a>
         </li>
         @endcan
+        @can('access-testtom')
+        <li class="">
+            <a class="dropdown-item" href="{{ route('testtom.index')}}">{{ __('testtom')}}</a>
+        </li>
+        @endcan
     </ul>
 </li>
 @endcan

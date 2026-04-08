@@ -13,8 +13,6 @@ class ProjectFunctionsTestController extends Controller
      */
     public function index(Project $project)
     {
-        dump($project->projectFunctions);
-
         $projectfunctions = $project->projectFunctions;
         return view('testtom.project.subproject.projectfunction.index', compact('project', 'projectfunctions'));
     }

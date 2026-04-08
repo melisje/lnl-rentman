@@ -7,10 +7,22 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::middleware(['can:access-testtom'])
-    ->prefix('testtom/project/{project}')
+    ->prefix('testtom')
     ->name('testtom.')
     ->group(function () {
 
-      Route::resource('projectfunctions', ProjectFunctionsTestController::class);
+      Route::get('/', function () {
+        $search = request('search');
+        $projects = \App\Models\Rentman\Project::orderBy('number')
+          ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
+                                      ->orWhere('number', 'like', "%{$search}%"))
+          ->paginate(15)
+          ->withQueryString();
+        return view('testtom.index', compact('projects', 'search'));
+      })->name('index');
+
+      Route::prefix('project/{project}')->group(function () {
+        Route::resource('projectfunctions', ProjectFunctionsTestController::class);
+      });
 
     });
