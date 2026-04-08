@@ -16,7 +16,10 @@ class SyncProjectFunctions extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'rentman:sync-project-functions {account? : The specific account name to sync}';
+    protected $signature = 'rentman:sync-project-functions
+        {account? : The specific account name to sync}
+        {--project= : The specific project RMID to sync}';
+
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
@@ -134,8 +137,14 @@ class SyncProjectFunctions extends Command
                 'modified',
             ];
 
+            // Optionele filter op project RMID
+            $fltProjectId = $this->option('project');
+
             // filter related subprojects
-            $subproject_rmids = SubProject::where('account',$account->account)->pluck('rm_id')->toArray();
+            $subproject_rmids = SubProject::where('account',$account->account)
+                ->where('project','like', '%'.$fltProjectId . '%') // filter op project
+                ->pluck('rm_id')
+                ->toArray();
 
             // Verdeel de ID's in groepjes van 50 (or otherwise configured)
             $chunks = array_chunk($subproject_rmids, config('services.rentman.chunck_size',50));
