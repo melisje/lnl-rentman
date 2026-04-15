@@ -29,6 +29,7 @@
                 <tr>
                     <th width="100px">Nummer</th>
                     <th>Naam</th>
+                    <th>Account</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +37,7 @@
                 <tr>
                     <td><a class="text-decoration-none" href="{{ route('testtom.projectfunctions.index', [$project, 'search' => $search ?? '']) }}">{{ $project->number }}</a></td>
                     <td><a class="text-decoration-none" href="{{ route('testtom.projectfunctions.index', [$project, 'search' => $search ?? '']) }}">{{ $project->name }}</a></td>
+                    <td>{{ $project->account }}</td>
                 </tr>
                 @endforeach
             </tbody>
