@@ -17,9 +17,22 @@ class ProjectFunctionsTestController extends Controller
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
                 ->orWhere('number', 'like', "%{$search}%"))
             ->paginate(15)
-            ->withQueryString();
+            ->withQueryString()
+            ->through(fn($project) => [
+                'id'      => $project->id,
+                'number'  => $project->number,
+                'name'    => $project->name,
+                'account' => $project->account,
+                'url'     => route('testtom.projectfunctions.index', $project),
+            ]);
 
-        return view('testtom.search', compact('projects', 'search'));
+        //return view('testtom.search', compact('projects', 'search'));
+
+        return Inertia::render('Testtom/Search', [
+            'projects'    => $projects,
+            'search'    => $search,
+            'indexUrl' => route('testtom.index'),
+        ]);
     }
 
     public function overview(Request $request)

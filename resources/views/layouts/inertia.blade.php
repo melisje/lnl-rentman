@@ -37,7 +37,7 @@
     <div class="sticky-bottom">
         <footer class="mt-auto py-3 bg-dark">
             <div class="container">
-                <span class="text-white-50">© 2026 - L&L StageService</span>
+                <span class="text-white-50">© 2026 - L&L StageService (Vue)</span>
             </div>
         </footer>
     </div>
