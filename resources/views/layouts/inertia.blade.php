@@ -25,8 +25,7 @@
     @endif
 </head>
 
-<body class="d-flex flex-column min-vh-100" style="background-image: url('{{ asset('images/background-app.webp') }}'); background-size: cover; background-repeat:no-repeat; background-attachment: fixed;">
-
+<body class="d-flex flex-column min-vh-100" >
     <div id="wrapper" class="flex-grow-1">
         @include('layouts.navigation')
         <main class="py-4">
@@ -37,7 +36,7 @@
     <div class="sticky-bottom">
         <footer class="mt-auto py-3 bg-dark">
             <div class="container">
-                <span class="text-white-50">© 2026 - L&L StageService</span>
+                <span class="text-white-50">© 2026 - L&L StageService (Vue)</span>
             </div>
         </footer>
     </div>
