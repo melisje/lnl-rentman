@@ -2,6 +2,7 @@
 
 namespace App\Models\Rentman;
 
+use App\Scopes\AccountScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,6 +43,17 @@ class Project extends Model
             'equipment_period_to' => 'datetime', // Dit cast de kolom naar Carbon
             'custom' => 'array', // Dit cast de JSON-kolom naar een PHP-array
         ];
+    }
+
+    /**
+     * Boot the model and apply the global scope.
+     */
+    protected static function booted()
+    {
+        // Filter all queries automatically based on the current account.
+        // If you do want to run a query without this scope, you can
+        // use: Project::withoutGlobalScope(AccountScope::class)->get();
+        static::addGlobalScope(new AccountScope);
     }
 
     /**
