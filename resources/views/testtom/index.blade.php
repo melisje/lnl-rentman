@@ -45,7 +45,6 @@
                     </td>
                     <td>{{ $project->planperiod_start?->format('d/m') }}</td>
                     <td>{{ $project->planperiod_end?->format('d/m') }}</td>
-                    <td>{{ $project->account }}</td>
                 </tr>
                 @empty
                 <tr>
