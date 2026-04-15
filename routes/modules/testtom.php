@@ -1,6 +1,7 @@
     <?php
 
 use App\Http\Controllers\testtom\ProjectFunctionsTestController;
+use App\Http\Controllers\testtom\TestJefController;
 use Illuminate\Support\Facades\Route;
     // use App\Http\Controllers\Rentman\llstageservice\ProjectController;
 
@@ -17,4 +18,9 @@ use Illuminate\Support\Facades\Route;
         Route::resource('projectfunctions', ProjectFunctionsTestController::class);
       });
 
+
+      Route::get('projects_with_account_scope', [TestJefController::class, 'projects_with_account_scope'])->name('projects_with_account_scope');
+
     });
+
+
