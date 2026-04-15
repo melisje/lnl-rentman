@@ -13,7 +13,7 @@
 
         <div class="row">
             <div class="col-6">
-                <a href="{{ route('testtom.index', ['search' => request('search')]) }}">Terug naar overzicht</a>
+                <a href="{{ route('testtom.index') }}">Terug naar overzicht</a>
             </div>
             <div class="col-6">
                 Aantal functies: {{ $project->projectfunctions->count()}}

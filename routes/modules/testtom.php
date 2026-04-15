@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
     ->group(function () {
 
       Route::get('/', [ProjectFunctionsTestController::class, 'overview'])->name('index');
+      Route::get('/search', [ProjectFunctionsTestController::class, 'search'])->name('search');
 
       Route::prefix('project/{project}')->group(function () {
         Route::resource('projectfunctions', ProjectFunctionsTestController::class);
