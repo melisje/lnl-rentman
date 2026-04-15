@@ -33,7 +33,7 @@ class ProjectFunctionsTestController extends Controller
             ->select('rm_projects.*')
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
-            ->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
+            //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
             ->where(function ($q) use ($thisWeekStart, $thisWeekEnd) {
                 $q->whereBetween('planperiod_start', [$thisWeekStart, $thisWeekEnd])
                     ->orWhereBetween('planperiod_end', [$thisWeekStart, $thisWeekEnd])
@@ -48,7 +48,7 @@ class ProjectFunctionsTestController extends Controller
             ->select('rm_projects.*')
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
-            ->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
+            //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
             ->where(function ($q) use ($nextWeekStart, $nextWeekEnd) {
                 $q->whereBetween('planperiod_start', [$nextWeekStart, $nextWeekEnd])
                     ->orWhereBetween('planperiod_end', [$nextWeekStart, $nextWeekEnd])
