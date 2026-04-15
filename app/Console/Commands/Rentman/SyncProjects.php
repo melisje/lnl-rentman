@@ -14,7 +14,11 @@ class SyncProjects extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'rentman:sync-projects {account? : The specific account name to sync}';
+
+    protected $signature = 'rentman:sync-projects
+        {account? : The specific account name to sync}
+        {--project= : The specific project RMID to sync}';
+
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
@@ -81,6 +85,10 @@ class SyncProjects extends Command
                 // 'created[gte]' => '2026-01-01',
                 'modified[gte]' => '2026-01-01',
             ];
+
+            // Optionele filter op project RMID
+            $fltProjectId = $this->option('project');
+            $queryParams['id'] = $fltProjectId ? $fltProjectId : null;
 
             // If required fields are defined, put them in the queryparamets array
             if ($requiredFields && !empty($requiredFields)) {
