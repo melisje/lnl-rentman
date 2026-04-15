@@ -5,6 +5,7 @@ namespace App\Http\Controllers\testtom;
 use App\Http\Controllers\Controller;
 use App\Models\Rentman\Project;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProjectFunctionsTestController extends Controller
 {
@@ -58,7 +59,21 @@ class ProjectFunctionsTestController extends Controller
             })
             ->get();
 
-        return view('testtom.index', compact('thisWeekProjects', 'nextWeekProjects'));
+        $mapProject = fn($project) => [
+            'id'              => $project->id,
+            'number'          => $project->number,
+            'name'            => $project->name,
+            'url'             => route('testtom.projectfunctions.index', $project),
+            'planperiod_start' => $project->planperiod_start?->format('d/m'),
+            'planperiod_end'   => $project->planperiod_end?->format('d/m'),
+        ];
+
+        return Inertia::render('Testtom/Index', [
+            'thisWeekLabel'    => $thisWeekStart->format('d/m') . ' – ' . $thisWeekEnd->format('d/m'),
+            'nextWeekLabel'    => $nextWeekStart->format('d/m') . ' – ' . $nextWeekEnd->format('d/m'),
+            'thisWeekProjects' => $thisWeekProjects->map($mapProject),
+            'nextWeekProjects' => $nextWeekProjects->map($mapProject),
+        ]);
     }
 
     /**
