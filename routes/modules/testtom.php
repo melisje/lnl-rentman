@@ -19,7 +19,15 @@ use Illuminate\Support\Facades\Route;
       });
 
 
+
+      /**
+       * --- IGNORE ---
+       * Just for testing by Jef Melis and can be removed after testing
+       */
+      // Test route to check if the AccountScope is working correctly on the Project model
       Route::get('projects_with_account_scope', [TestJefController::class, 'projects_with_account_scope'])->name('projects_with_account_scope');
+
+
 
     });
 
