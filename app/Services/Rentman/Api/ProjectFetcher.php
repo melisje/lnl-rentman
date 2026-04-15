@@ -2,8 +2,12 @@
 
 namespace App\Services\Rentman\Api;
 
+use App\Models\Rentman\CustomField;
+use App\Models\Rentman\CustomFieldMapping;
 use App\Models\Rentman\Project;
+use App\Scopes\AccountScope;
 use App\Services\Rentman\Api\AbstractRentmanFetcher;
+use Illuminate\Support\Str;
 
 class ProjectFetcher extends AbstractRentmanFetcher
 {
@@ -18,8 +22,10 @@ class ProjectFetcher extends AbstractRentmanFetcher
             // We add all fields to db that are returned by the API call ($items).
             $fillables = $this->fillables($item);
 
+            // dump($item['id'], $item['displayname']);
+
             // Laravel-style update or create
-            $crew = Project::updateOrCreate(
+            $project = Project::updateOrCreate(
                 // Deel 1: De unieke velden om het record te vinden
                 [
                     'account' => $account,
@@ -28,6 +34,12 @@ class ProjectFetcher extends AbstractRentmanFetcher
                 // Deel 2: De velden die ingevuld of bijgewerkt moeten worden
                 $fillables
             );
+
+            // Process custom fields
+            $this->processCustomFields($account,$item,$project);
+
         }
     }
+
+
 }

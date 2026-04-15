@@ -4,9 +4,12 @@ namespace App\Services\Rentman\Api;
 
 use App\Contracts\Rentman\DataProcessor;
 use App\Models\Rentman\Account;
+use App\Models\Rentman\CustomFieldMapping;
+use App\Scopes\AccountScope;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 abstract class AbstractRentmanFetcher implements DataProcessor
 {
@@ -130,7 +133,42 @@ abstract class AbstractRentmanFetcher implements DataProcessor
             }
         }
 
-        // dump($fillables);
         return $fillables;
+    }
+
+    /**
+     * Process custom fields for a given item and model.
+     */
+    public function processCustomFields(string $account, array $item, $model): void
+    {
+        // List model attributes
+        $fields = $model->getAttributes();
+
+        // process custom fields
+        $customFields = $item['custom'] ?? [];
+
+        // Loop through custom fields and find the mapping for each field,
+        // then save the value in the corresponding model fields.
+        foreach ($customFields as $key => $value) {
+            // Find the custom field mapping for this account
+            $cf_rm_id = (int)Str::afterLast($key, '_'); // Assuming the key is something like "custom_field_123", we extract "123" as the RMID
+            $custom_field_mapping = CustomFieldMapping::withoutGlobalScope(AccountScope::class)
+                ->where('account', $account)
+                ->where('rm_id', $cf_rm_id)->value('customfield_id');
+
+            // Check if the mapping exists and if the corresponding field is fillable in the model
+            if (array_key_exists($custom_field_mapping, $fields)) {
+                $model->$custom_field_mapping = $value;
+            }
+
+            if (array_key_exists($key, $fields)) {
+                // Het attribuut is aanwezig in de huidige instantie
+                $model->$key = $value;
+            }
+
+            $model->save();
+
+            // dump("$model->displayname: $cf_rm_id, $custom_field_mapping: $value");
+        }
     }
 }
