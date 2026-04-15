@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         // Bind de data aan je navigatie-view (pas het pad aan naar jouw navbar blade file)
-        View::composer('layouts.app', function ($view) {
+        View::composer(['layouts.app', 'layouts.inertia'], function ($view) {
             $current_account = session('current_account', null);
             $view->with('current_account', $current_account)->with('globalAccounts', Account::all());
         });
