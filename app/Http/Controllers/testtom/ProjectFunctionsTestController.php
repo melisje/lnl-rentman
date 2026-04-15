@@ -47,6 +47,7 @@ class ProjectFunctionsTestController extends Controller
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
             //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
+            ->where('project_type', 'LIKE', '/projecttypes/104')
             ->where(function ($q) use ($thisWeekStart, $thisWeekEnd) {
                 $q->whereBetween('planperiod_start', [$thisWeekStart, $thisWeekEnd])
                     ->orWhereBetween('planperiod_end', [$thisWeekStart, $thisWeekEnd])
@@ -62,6 +63,7 @@ class ProjectFunctionsTestController extends Controller
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
             //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
+            ->where('project_type', 'LIKE', '/projecttypes/104')
             ->where(function ($q) use ($nextWeekStart, $nextWeekEnd) {
                 $q->whereBetween('planperiod_start', [$nextWeekStart, $nextWeekEnd])
                     ->orWhereBetween('planperiod_end', [$nextWeekStart, $nextWeekEnd])
@@ -95,7 +97,13 @@ class ProjectFunctionsTestController extends Controller
     public function index(Project $project)
     {
         $projectfunctions = $project->projectFunctions;
-        return view('testtom.project.subproject.projectfunction.index', compact('project', 'projectfunctions'));
+        //return view('testtom.project.subproject.projectfunction.index', compact('project', 'projectfunctions'));
+
+        return Inertia::render('Testtom/Detail', [
+            'project'    => $project,
+            'functions'    => $projectfunctions,
+            'indexUrl' => route('testtom.index'),
+        ]);
     }
 
     /**

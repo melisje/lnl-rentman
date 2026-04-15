@@ -8,16 +8,53 @@
                 <div class="col-4 mt-1">
                     <form method="GET" :action="searchUrl" class="mb-3">
                         <div class="input-group">
-                            <input
-                                type="text"
-                                name="search"
-                                class="form-control"
-                                placeholder="Zoek op naam of nummer..."
-                                :value="search ?? ''"
-                            >
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Zoek op naam of nummer..." :value="search ?? ''">
                             <button class="btn btn-outline-secondary" type="submit">Zoeken</button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <h2>Huidige week</h2>
+            <div class="row">
+                <div v-for="project in thisWeekProjects" :key="project.id" class="col-md-4 p-2">
+                    <a :href="project.url" class="text-decoration-none">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 v-if="project.name.length < 40">{{ project.name }}</h4>
+                                <h4 v-else>{{ project.name.substring(0, 40) + ".." }}</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 text-center p-4">
+                                    <h1><i class="bi bi-speaker"></i></h1>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 25%"
+                                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center p-4">
+                                    <h1><i class="bi bi-lightbulb"></i></h1>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 25%"
+                                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center p-4">
+                                    <h1><i class="bi bi-puzzle"></i></h1>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 25%"
+                                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="text-black">{{ project.planperiod_start }} - {{ project.planperiod_end
+                                }}</span>
+                            </div>
+                        </div>
+
+                    </a>
                 </div>
             </div>
 
@@ -59,6 +96,7 @@
                     <tr v-if="nextWeekProjects.length === 0">
                         <td colspan="4" class="text-muted">Geen projecten volgende week</td>
                     </tr>
+
                     <tr v-for="project in nextWeekProjects" :key="project.id">
                         <td>
                             [<a class="text-decoration-none" :href="project.url">{{ project.number }}</a>]

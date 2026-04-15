@@ -25,8 +25,7 @@
     @endif
 </head>
 
-<body class="d-flex flex-column min-vh-100" style="background-image: url('{{ asset('images/background-app.webp') }}'); background-size: cover; background-repeat:no-repeat; background-attachment: fixed;">
-
+<body class="d-flex flex-column min-vh-100" >
     <div id="wrapper" class="flex-grow-1">
         @include('layouts.navigation')
         <main class="py-4">
