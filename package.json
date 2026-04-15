@@ -18,6 +18,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "@inertiajs/vue3": "^3.0.3",
         "bootstrap-icons": "^1.13.1",
         "datatables.net-bs5": "^2.3.7",
         "datatables.net-plugins": "^2.3.6",
