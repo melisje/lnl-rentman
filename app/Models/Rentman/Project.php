@@ -5,9 +5,11 @@ namespace App\Models\Rentman;
 use App\Scopes\AccountScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class Project extends Model
 {
@@ -79,6 +81,17 @@ class Project extends Model
         );
     }
 
+    /**
+     * Get the project type object for the project.
+     */
+    public function projectType(): BelongsTo
+    {
+        return $this->belongsTo(ProjectType::class, 'project_type_id', 'id');
+    }
+
+    /**
+     * Haalt unieke crewleden op voor het gehele project (over alle subprojecten heen)
+     */
     public function projectCrewUnique()
     {
         return $this->subprojects->flatMap->projectFunctions->flatMap->projectCrew->map->member->unique('id');
@@ -203,10 +216,60 @@ class Project extends Model
 
 
     /**
-     *
+     * Een accessor om de volledige naam van het project te krijgen, bestaande
+     * uit het nummer en de naam. Bijvoorbeeld: "1234 - Mijn Project".
      */
     public function getFullDisplayNameAttribute()
     {
         return "{$this->number} - {$this->name}";
     }
+
+
+    /**
+     * Fetch the budgets for this project by looking at the project functions
+     * with the "budget" tag. The project_function duration fields contains
+     * a value in seconds. We convert this to hours by dividing by 3600.
+     *
+     * @return Collection A collection where the keys are the budget types
+     * (e.g. "rigging", "lighting") and the values are the duration in
+     * hours for that budget type.
+     */
+    public function getBudgetsAttribute() : Collection
+    {
+        // create a collection with the tags as keys and the duration in hours as values
+        $collection =  $this
+                        ->projectfunctions()
+                        ->where('tags', 'like', '%budget%')
+                        ->pluck(DB::raw('duration / 3600'), 'tags');
+
+        // De "budget, " prefix verwijderen uit de keys
+        // since the tags look like "budget, rigging" or "budget, lighting",
+        // we want to remove the "budget, " part and just keep "rigging"
+        // or "lighting" as the key in our collection. We also trim
+        //any whitespace just in case.
+        return $collection->mapWithKeys(function ($duration, $tags)
+                {
+                    // remove "budget, " from the tags to get the clean key
+                    $cleanKey = str_replace(['budget', ',', ' '], '', $tags);
+
+                    // return the clean key and the duration in hours as a key-value pair
+                    return [$cleanKey => (float) $duration];
+                });
+    }
+
+    /**
+     * Calculate the number of weeks until the project starts, based on the usageperiod_start date. If the start date is in the past, this will return 0 or
+     */
+    public function getWeeksUntilStartAttribute()
+    {
+        if (!$this->usageperiod_start) {
+            return null;
+        }
+
+        $start = $this->usageperiod_start;
+
+        // Bereken het verschil in dagen en deel door 7 voor de weken.
+        return (int) (now()->diffInDays($start) / 7);
+    }
+
 }

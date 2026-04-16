@@ -3,15 +3,28 @@
 namespace App\Http\Controllers\testtom;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Rentman\Project;
+use App\Scopes\AccountScope;
+use Illuminate\Support\Facades\DB;
 
 class TestJefController extends Controller
 {
     //
-    public function projects_with_account_scope()
+    public function test1()
     {
-        $projects = \App\Models\Rentman\Project::all();
-        return $projects;
+        $projects = Project::orderBy('usageperiod_start')
+            ->where('displayName', 'like', '%TEST%PROJECT%')
+            ->where('usageperiod_start', '<', now()->addWeeks(4))
+            // ->where('usageperiod_start', '>', now())
+            ->get()
+            // ->sortBy('weeks_until_start') // Sorteert oplopend (0, 1, 2, 3...)
+            ;
+
+        return view('testtom.project.budget.test1', [
+            'models' => $projects,
+        ]);
+
+
     }
 
 }
