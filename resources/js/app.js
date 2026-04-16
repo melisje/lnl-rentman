@@ -5,6 +5,8 @@ import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import * as bootstrap from 'bootstrap';
 
 // STAP A: Maak jQuery als ALLEREERSTE globaal beschikbaar
 window.$ = window.jQuery = $;
