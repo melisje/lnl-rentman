@@ -42,34 +42,34 @@ class ProjectFunctionsTestController extends Controller
         $nextWeekStart = now()->addWeek()->startOfWeek();
         $nextWeekEnd   = now()->addWeek()->endOfWeek();
 
-        $thisWeekProjects = Project::orderBy('planperiod_start')
+        $thisWeekProjects = Project::orderBy('usageperiod_start')
             ->select('rm_projects.*')
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
             //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
             ->where('project_type', 'LIKE', '/projecttypes/104')
             ->where(function ($q) use ($thisWeekStart, $thisWeekEnd) {
-                $q->whereBetween('planperiod_start', [$thisWeekStart, $thisWeekEnd])
-                    ->orWhereBetween('planperiod_end', [$thisWeekStart, $thisWeekEnd])
+                $q->whereBetween('usageperiod_start', [$thisWeekStart, $thisWeekEnd])
+                    ->orWhereBetween('usageperiod_end', [$thisWeekStart, $thisWeekEnd])
                     ->orWhere(function ($q) use ($thisWeekStart, $thisWeekEnd) {
-                        $q->where('planperiod_start', '<=', $thisWeekStart)
-                            ->where('planperiod_end', '>=', $thisWeekEnd);
+                        $q->where('usageperiod_start', '<=', $thisWeekStart)
+                            ->where('usageperiod_end', '>=', $thisWeekEnd);
                     });
             })
             ->get();
 
-        $nextWeekProjects = Project::orderBy('planperiod_start')
+        $nextWeekProjects = Project::orderBy('usageperiod_start')
             ->select('rm_projects.*')
             ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) AS productie") //Dit moet uit een custom veld komen uit DB
             ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(JSON_UNQUOTE(custom),'$.custom_33')) = ?", ['1']) //Filter uit producties
             //->where('account', session('current_account')) //Gaan we nadien globaal aanpakken
             ->where('project_type', 'LIKE', '/projecttypes/104')
             ->where(function ($q) use ($nextWeekStart, $nextWeekEnd) {
-                $q->whereBetween('planperiod_start', [$nextWeekStart, $nextWeekEnd])
-                    ->orWhereBetween('planperiod_end', [$nextWeekStart, $nextWeekEnd])
+                $q->whereBetween('usageperiod_start', [$nextWeekStart, $nextWeekEnd])
+                    ->orWhereBetween('usageperiod_end', [$nextWeekStart, $nextWeekEnd])
                     ->orWhere(function ($q) use ($nextWeekStart, $nextWeekEnd) {
-                        $q->where('planperiod_start', '<=', $nextWeekStart)
-                            ->where('planperiod_end', '>=', $nextWeekEnd);
+                        $q->where('usageperiod_start', '<=', $nextWeekStart)
+                            ->where('usageperiod_end', '>=', $nextWeekEnd);
                     });
             })
             ->get();
@@ -79,8 +79,13 @@ class ProjectFunctionsTestController extends Controller
             'number'          => $project->number,
             'name'            => $project->name,
             'url'             => route('testtom.projectfunctions.index', $project),
-            'planperiod_start' => $project->planperiod_start?->format('d/m'),
-            'planperiod_end'   => $project->planperiod_end?->format('d/m'),
+            'usageperiod_start' => $project->usageperiod_start?->format('d/m'),
+            'usageperiod_end'   => $project->usageperiod_end?->format('d/m'),
+            'sound'             => mt_rand(0, 100),
+            'light'             => mt_rand(0, 100),
+            'rigging'             => mt_rand(0, 100),
+            'checklist'             => mt_rand(0, 100),
+            
         ];
 
         return Inertia::render('Testtom/Index', [
