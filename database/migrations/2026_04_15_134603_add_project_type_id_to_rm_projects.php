@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::table('rm_projects', function (Blueprint $table) {
             //
-            $table->foreignId('project_type_id')->after('project_type')->nullable()->constrained('rm_project_types', 'id')->nullOnDelete();
+            if (!Schema::hasColumn('rm_projects', 'project_type_id'))
+            {
+                $table->foreignId('project_type_id')->after('project_type')->nullable()->constrained('rm_project_types', 'id')->nullOnDelete();
+            }
         });
     }
 
