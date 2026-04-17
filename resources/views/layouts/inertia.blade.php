@@ -233,6 +233,7 @@
             font-size: 0.95rem;
             transition: all 0.2s ease;
             cursor: pointer;
+            text-decoration: none !important;
         }
 
         .submenu-left .item i {
