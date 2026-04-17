@@ -21,7 +21,6 @@ class ProjectTypeFetcher extends AbstractRentmanFetcher
             // We add all fields to db that are returned by the API call ($items).
             $fillables = $this->fillables($item);
 
-
             // Laravel-style update or create
             $model = ProjectType::updateOrCreate(
                 // Deel 1: De unieke velden om het record te vinden
