@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
        */
       // Test route to check if the AccountScope is working correctly on the Project model
       Route::get('testjef1', [TestJefController::class, 'test1'])->name('projects_with_account_scope');
+      Route::get('testjef2', [TestJefController::class, 'test2'])->name('projecttypes');
 
 
 
