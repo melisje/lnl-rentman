@@ -2,6 +2,7 @@
 
 namespace App\Models\Rentman;
 
+use App\Scopes\AccountScope;
 use Illuminate\Database\Eloquent\Model;
 
 class ProjectTypeApplicationMapping extends Model
@@ -37,26 +38,3 @@ class ProjectTypeApplicationMapping extends Model
     }
 }
 
-
-<?php
-
-namespace App\Models\Rentman;
-
-use App\Scopes\AccountScope;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
-class ProjectType extends Model
-{
-    //
-
-    /**
-     * Get the subprojects for the project.
-     */
-    public function projects(): HasMany
-    {
-        return $this->hasMany(Project::class, 'projects_id', 'id');
-        return $this->hasMany(Project::class, 'project_type_id', 'id');
-    }
-
-}

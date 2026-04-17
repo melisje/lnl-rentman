@@ -29,29 +29,35 @@ class Application extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Boot the model and apply the global scope.
-     */
-    protected static function booted()
+
+
+    public function projectTypes($account)
     {
-        // Filter all queries automatically based on the current account.
-        // If you do want to run a query without this scope, you can
-        // use: Project::withoutGlobalScope(AccountScope::class)->get();
-        static::addGlobalScope(new AccountScope);
+        return ProjectTypeApplicationMapping::where('account', $account)
+            ->where('application_id', $this->id)
+            ->get();
     }
 
     /**
-     * Get the subprojects for the project.
+     * Find all projects that are related to this application based on the
+     * table rm_project_type_application_mapping.
+     * We need to ignore the global scope here, because that scope would
+     * filter on the current account, while we want to be able to
+     * specify the account as a parameter to this function.
      */
-    public function projectTypes(): HasManyThrough
+    public function projects($account)
     {
-        return $this->hasManyThrough(
-            ProjectType::class,   // Het doel
-            SubProject::class,    // De eerste tussenstap
-            'projects_id',        // Foreign key op SubProject tabel (naar Project)
-            'subproject_id',      // Foreign key op ProjectCrew tabel (naar SubProject)
-            'id',                 // Local key op Project tabel
-            'id'                  // Local key op SubProject tabel
-        );
+        $projects = Project::withoutGlobalScope(AccountScope::class)
+            ->where('account', $account)
+            ->whereIn('project_type_id', function ($query) use ($account) {
+                $query->select('project_type_id')
+                    ->from('rm_project_type_application_mappings')
+                    ->where('application_id', $this->id)
+                    ->where('account', $account);
+            })
+            ->get();
+
+        return $projects;
+
     }
 }
