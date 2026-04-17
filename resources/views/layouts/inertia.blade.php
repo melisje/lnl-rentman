@@ -12,9 +12,12 @@
 
     <style>
         :root {
-            --sidebar-bg: linear-gradient(180deg, #0f1b3d 0%, #0b1631 100%);
+            --sidebar-bg: linear-gradient(180deg, #1a2d52 0%, #142440 100%);
             --sidebar-text: rgba(255, 255, 255, 0.82);
             --sidebar-muted: rgba(255, 255, 255, 0.55);
+
+            --submenu-bg: #eef2f8;
+            --submenu-text: #24304a;
 
             --surface: #f5f7fb;
             --surface-2: #ffffff;
@@ -153,6 +156,7 @@
             align-items: center;
             padding: 12px 0;
             box-shadow: 6px 0 20px rgba(9, 16, 35, 0.14);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .menu-left-top,
@@ -189,7 +193,7 @@
         .menu-left .item.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            box-shadow: inset 3px 0 0 var(--accent);
+            box-shadow: inset 0 0 2px var(--accent);
         }
 
         .submenu-left {
@@ -199,8 +203,8 @@
             bottom: 0;
             width: var(--submenu-width);
             padding-top: calc(var(--topbar-height) + 14px);
-            background: rgba(8, 16, 37, 0.94);
-            color: white;
+            background: var(--submenu-bg);
+            color: var(--submenu-text);
             z-index: 40;
             box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
         }
@@ -217,7 +221,7 @@
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--sidebar-muted);
+            color: var(--submenu-text);
             margin: 14px 10px 8px;
         }
 
@@ -229,7 +233,7 @@
             padding: 0 12px;
             margin-bottom: 4px;
             border-radius: 12px;
-            color: var(--sidebar-text);
+            color: var(--submenu-text);
             font-size: 0.95rem;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -243,14 +247,14 @@
         }
 
         .submenu-left .item:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: #fff;
+            background: #ffffff;
+            border-color: var(--border);
+            color: var(--accent);
         }
 
         .submenu-left .item.active {
             background: var(--accent-soft);
-            color: #fff;
-            box-shadow: inset 3px 0 0 var(--accent);
+            box-shadow: inset 0 0 2px var(--accent);
         }
 
         .submenu-spacer {
@@ -261,13 +265,14 @@
             margin-top: 14px;
             padding: 14px 10px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--sidebar-muted);
+            color: var(--submenu-text);
             font-size: 0.88rem;
         }
 
         .content {
-            min-height: calc(100vh - var(--topbar-height));
+            height: calc(100vh - var(--topbar-height));
             padding: var(--content-padding);
+            overflow: auto;
         }
 
         .content-frame {
@@ -276,7 +281,13 @@
             border: 1px solid rgba(255, 255, 255, 0.55);
             border-radius: var(--radius-lg);
             padding: 18px;
+            padding-bottom: 90px;
             box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .content-main {
+            flex: 1;
         }
 
         .page-header {
@@ -438,25 +449,6 @@
             background: #e9edf5;
         }
 
-        .footer-bar {
-            margin-top: 18px;
-            padding: 14px 2px 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            color: var(--muted);
-            font-size: 0.88rem;
-            border-top: 1px solid rgba(231, 235, 243, 0.9);
-        }
-
-        .footer-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
         @media (max-width: 1200px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
@@ -483,6 +475,7 @@
 
             .content-frame {
                 padding: 12px;
+                padding-bottom: 90px;
             }
 
             .page-header {
@@ -497,9 +490,6 @@
     <div class="wrapper">
         <div class="menu-left">
             <div class="menu-left-top">
-                <a href="#" class="item">
-                    <i class="bi bi-list"></i>
-                </a>
                 <a href="#" class="item active">
                     <i class="bi bi-house-fill"></i>
                 </a>
@@ -559,7 +549,7 @@
                     <i class="bi bi-list"></i>
                 </button>
                 <h2 class="brand-title">
-                    <span class="accent">App</span>Name
+                    <span class="accent">L&L</span> Stage Service
                 </h2>
             </div>
 
@@ -574,90 +564,86 @@
         <div class="dashboard-shell">
             <main class="content">
                 <div class="content-frame">
-                    <section class="page-header">
-                        <div>
-                            <h1>Paginatitel</h1>
-                            <p>Subtitel of extra informatie komt hier</p>
-                        </div>
-
-                        <div class="page-actions">
-                            <button class="btn-primary-modern" type="button">Primaire actie</button>
-                            <button class="btn-secondary-modern" type="button">Secundaire actie</button>
-                        </div>
-                    </section>
-
-                    <section class="dashboard-grid">
-                        <div class="card-modern">
-                            <div class="card-modern-header">
-                                <h2 class="card-modern-title">Sectietitel</h2>
-                                <button class="topbar-icon" type="button">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
+                    <div class="content-main">
+                        <section class="page-header">
+                            <div>
+                                <h1>Paginatitel</h1>
+                                <p>Subtitel of extra informatie komt hier</p>
                             </div>
-                            <div class="card-modern-body">
-                                <div class="placeholder-block"></div>
-                            </div>
-                        </div>
 
-                        <div style="display:flex; flex-direction:column; gap:16px;">
+                            <div class="page-actions">
+                                <button class="btn-primary-modern" type="button">Primaire actie</button>
+                                <button class="btn-secondary-modern" type="button">Secundaire actie</button>
+                            </div>
+                        </section>
+
+                        <section class="dashboard-grid">
                             <div class="card-modern">
                                 <div class="card-modern-header">
-                                    <h2 class="card-modern-title">Samenvatting</h2>
+                                    <h2 class="card-modern-title">Sectietitel</h2>
+                                    <button class="topbar-icon" type="button">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
                                 </div>
                                 <div class="card-modern-body">
-                                    <div class="summary-list">
-                                        <div class="summary-row">
-                                            <span class="summary-label">Label</span>
-                                            <span class="summary-value"></span>
+                                    <div class="placeholder-block"></div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:16px;">
+                                <div class="card-modern">
+                                    <div class="card-modern-header">
+                                        <h2 class="card-modern-title">Samenvatting</h2>
+                                    </div>
+                                    <div class="card-modern-body">
+                                        <div class="summary-list">
+                                            <div class="summary-row">
+                                                <span class="summary-label">Label</span>
+                                                <span class="summary-value"></span>
+                                            </div>
+                                            <div class="summary-row">
+                                                <span class="summary-label">Label</span>
+                                                <span class="summary-value"></span>
+                                            </div>
+                                            <div class="summary-row">
+                                                <span class="summary-label">Label</span>
+                                                <span class="summary-value"></span>
+                                            </div>
+                                            <div class="summary-row">
+                                                <span class="summary-label">Label</span>
+                                                <span class="summary-value"></span>
+                                            </div>
                                         </div>
-                                        <div class="summary-row">
-                                            <span class="summary-label">Label</span>
-                                            <span class="summary-value"></span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span class="summary-label">Label</span>
-                                            <span class="summary-value"></span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span class="summary-label">Label</span>
-                                            <span class="summary-value"></span>
+                                    </div>
+                                </div>
+
+                                <div class="card-modern">
+                                    <div class="card-modern-header">
+                                        <h2 class="card-modern-title">Snelle acties</h2>
+                                    </div>
+                                    <div class="card-modern-body">
+                                        <div class="quick-actions">
+                                            <div class="quick-action">
+                                                <span class="quick-action-icon"></span>
+                                                <span class="quick-action-line"></span>
+                                            </div>
+                                            <div class="quick-action">
+                                                <span class="quick-action-icon"></span>
+                                                <span class="quick-action-line"></span>
+                                            </div>
+                                            <div class="quick-action">
+                                                <span class="quick-action-icon"></span>
+                                                <span class="quick-action-line"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </section>
+                        
+                    </div>
 
-                            <div class="card-modern">
-                                <div class="card-modern-header">
-                                    <h2 class="card-modern-title">Snelle acties</h2>
-                                </div>
-                                <div class="card-modern-body">
-                                    <div class="quick-actions">
-                                        <div class="quick-action">
-                                            <span class="quick-action-icon"></span>
-                                            <span class="quick-action-line"></span>
-                                        </div>
-                                        <div class="quick-action">
-                                            <span class="quick-action-icon"></span>
-                                            <span class="quick-action-line"></span>
-                                        </div>
-                                        <div class="quick-action">
-                                            <span class="quick-action-icon"></span>
-                                            <span class="quick-action-line"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <footer class="footer-bar">
-                        <div>© 2026 AppName. Alle rechten voorbehouden.</div>
-                        <div class="footer-links">
-                            <a href="#">Privacy</a>
-                            <a href="#">Gebruiksvoorwaarden</a>
-                            <a href="#">Help &amp; Support</a>
-                        </div>
-                    </footer>
+                   
                 </div>
             </main>
         </div>
