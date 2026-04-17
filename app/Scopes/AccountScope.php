@@ -13,8 +13,11 @@ class AccountScope implements Scope
    */
   public function apply(Builder $builder, Model $model): void
   {
-    if (session()->has('current_account')) {
-      $builder->where('account', session('current_account'));
+    if (session()->has('current_account'))
+    {
+      /** @var \Illuminate\Database\Eloquent\Model $model */
+      // qualifyColumn maakt van 'account' automatisch 'naam_van_tabel.account'
+      $builder->where( $model->qualifyColumn('account'), session('current_account'));
     }
   }
 }
