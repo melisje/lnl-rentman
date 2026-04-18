@@ -15,19 +15,20 @@ class TestJefController extends Controller
     //
     public function test1()
     {
-        $projects = Project::orderBy('usageperiod_start')
+        $app = Application::where('name', 'project_dashboard')->first();
+
+        $account = 'llstageservice';
+        $projects = $app->projects($account)
+            ->orderBy('usageperiod_start')
             ->where('displayName', 'like', '%TEST%PROJECT%')
-            ->where('usageperiod_start', '<', now()->addWeeks(4))
-            // ->where('usageperiod_start', '>', now())
-            ->get()
-            // ->sortBy('weeks_until_start') // Sorteert oplopend (0, 1, 2, 3...)
-            ;
+            // ->where('usageperiod_start', '<=', now()->addWeeks(4))
+            // ->where('usageperiod_start', '>=', now())
+            ->where('usageperiod_start', '>=', now()->subWeeks(2))
+            ->get();
 
         return view('testtom.project.budget.test1', [
             'models' => $projects,
         ]);
-
-
     }
 
     /**

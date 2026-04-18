@@ -10,43 +10,70 @@
         @include('layouts.errors')
 
 
+        <table class="table table-striped table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Weeks</th>
+                    <th>id</th>
+                    <th>Project Type</th>
+                    <th>account</th>
+                    <th>rm_id</th>
+                    <th>usage start</th>
+                    <th>Project</th>
+                    <th>AM</th>
+                    <th>PM</th>
+                    <th>Status</th>
+                    <th class="text-center">PM (U)</th>
+                    <th class="text-center">Light (U)</th>
+                    <th class="text-center">Sound (U)</th>
+                    <th class="text-center">Rigging (U)</th>
+                    <th class="text-center">Checklist (tasks)</th>
+                </tr>
+            </thead>
+            <tbody>
 
-        <div class="container-fluid mt-4">
-            <div class="row bg-dark text-white py-2 fw-bold border-bottom">
-                <div class="col col-auto">Weeks</div>
-                <div class="col-auto">id</div>
-                <div class="col-auto">Project Type</div>
-                <div class="col-auto">account</div>
-                <div class="col-auto">rm_id</div>
-                <div class="col-auto">usage start</div>
-                <div class="col">Project</div>
-                <div class="col-auto text-center">Light (Uur)</div>
-                <div class="col-auto text-center">Sound (Uur)</div>
-                <div class="col-auto text-center">Rigging (Uur)</div>
-                <div class="col-auto text-center">Checklist (tasks)</div>
-            </div>
+                @php
+                $lastWeeks = null;
+                $useAltBg = false;
+                @endphp
 
+                @foreach($models as $key => $model)
 
-            @foreach($models as $key => $model)
+                @php
+                // Als de waarde anders is dan de vorige, wisselen we van kleur
+                if ($lastWeeks !== $model->weeks_until_start)
+                {
+                $useAltBg = !$useAltBg;
+                $lastWeeks = $model->weeks_until_start;
+                }
 
-            <div class="row py-2 border-bottom align-items-center bg-light">
-                <div class="col col-auto"><span class="badge bg-secondary">{{ $model->weeks_until_start }}</span></div>
-                <div class="col-auto text-muted">{{ $model->id }}</div>
-                <div class="col-auto text-muted">{{ $model->projectType->name ?? $model->project_type }}</div>
-                <div class="col-auto text-muted">{{ $model->account }}</div>
-                <div class="col-auto text-muted">{{ $model->rm_id }}</div>
-                <div class="col-auto text-muted">{{ $model->usageperiod_start }}</div>
-                <div class="col text-muted">{{ $model->full_display_name }}</div>
-                <div class="col-auto text-muted text-center">{{ number_format($model->budgets['light'] ?? 0, 2) }}</div>
-                <div class="col-auto text-muted text-center">{{ number_format($model->budgets['sound'] ?? 0, 2) }}</div>
-                <div class="col-auto text-muted text-center">{{ number_format($model->budgets['rigging'] ?? 0, 2) }}</div>
-                <div class="col-auto text-muted text-center">24/7 (todo)</div>
-            </div>
+                // Bepaal de class op basis van de toggle
+                $rowClass = $useAltBg ? 'table-primary' : 'table-white';
+                @endphp
 
-            @endforeach
+                <tr class="{{ $rowClass }}">
+                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->weeks_until_start }}</span></td>
+                    <td class="text-muted">{{ $model->id }}</td>
+                    <td class="text-muted">{{ $model->projectType->name ?? $model->project_type }}</td>
+                    <td class="text-muted">{{ $model->account }}</td>
+                    <td class="text-muted">{{ $model->rm_id }}</td>
+                    <td class="text-muted">{{ $model->usageperiod_start }}</td>
+                    <td class="text-muted">{{ $model->full_display_name }}</td>
+                    <td class="text-muted">{{ $model->am_name }}</td>
+                    <td class="text-muted">{{ $model->pm_name }}</td>
+                    <td class="text-muted">{{ $model->status_name }}</td>
+                    <td class="text-muted text-center">{{ number_format($model->budget_consumption['projectmanager'] ?? 0, 2) }}/{{ number_format($model->budgets['projectmanager'] ?? 0, 2) }}</td>
+                    <td class="text-muted text-center">{{ number_format($model->budget_consumption['light'] ?? 0, 2) }}/{{ number_format($model->budgets['light'] ?? 0, 2) }}</td>
+                    <td class="text-muted text-center">{{ number_format($model->budget_consumption['sound'] ?? 0, 2) }}/{{ number_format($model->budgets['sound'] ?? 0, 2) }}</td>
+                    <td class="text-muted text-center">{{ number_format($model->budget_consumption['rigging'] ?? 0, 2) }}/{{ number_format($model->budgets['rigging'] ?? 0, 2) }}</td>
+                    <td class="text-muted text-center">{{ $model->count_checklist_items_completed }}/{{ $model->count_checklist_items }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-        </div>
     </div>
+
 </div>
 @endsection
 
