@@ -2,7 +2,10 @@
 
 namespace App\Models\Rentman;
 
+use App\Models\Production\Checklist;
+use App\Models\Production\ChecklistItem;
 use App\Scopes\AccountScope;
+use Dom\Attr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -229,32 +232,70 @@ class Project extends Model
      * Fetch the budgets for this project by looking at the project functions
      * with the "budget" tag. The project_function duration fields contains
      * a value in seconds. We convert this to hours by dividing by 3600.
+     * This method returns an array with the summed duration for each
+     * budget type (e.g. "light", "sound", "rigging") that is found
+     * in the tags of the project functions.
      *
      * @return Collection A collection where the keys are the budget types
      * (e.g. "rigging", "lighting") and the values are the duration in
      * hours for that budget type.
      */
-    public function getBudgetsAttribute() : Collection
+    public function getBudgetsAttribute():Collection
     {
-        // create a collection with the tags as keys and the duration in hours as values
-        $collection =  $this
-                        ->projectfunctions()
-                        ->where('tags', 'like', '%budget%')
-                        ->pluck(DB::raw('duration / 3600'), 'tags');
 
-        // De "budget, " prefix verwijderen uit de keys
-        // since the tags look like "budget, rigging" or "budget, lighting",
-        // we want to remove the "budget, " part and just keep "rigging"
-        // or "lighting" as the key in our collection. We also trim
-        //any whitespace just in case.
-        return $collection->mapWithKeys(function ($duration, $tags)
-                {
-                    // remove "budget, " from the tags to get the clean key
-                    $cleanKey = str_replace(['budget', ',', ' '], '', $tags);
+        $budgets = $this->projectFunctions
+            // 1. Filter alleen de items waar 'budget' in de tags voorkomt
+            ->filter(fn($item) => str_contains($item->tags, 'budget'))
 
-                    // return the clean key and the duration in hours as a key-value pair
-                    return [$cleanKey => (float) $duration];
-                });
+            // 2. Loop door de gefilterde lijst en bouw de som op
+            ->reduce(function ($carry, $item) {
+                // Splits de tags (bijv. "budget, light, sound" wordt ['budget', 'light', 'sound'])
+                $tags = array_map('trim', explode(',', $item->tags));
+
+                foreach ($tags as $tag) {
+                    // We negeren de algemene 'budget' tag zelf voor de som
+                    if ($tag !== 'budget' && !empty($tag)) {
+                        $carry[$tag] = ($carry[$tag] ?? 0) + $item->duration / 3600;
+                    }
+                }
+
+                return $carry;
+            }, []); // Start met een lege array
+
+            return collect($budgets);
+    }
+
+    /**
+     * Calculate the total budget consumption for the budget types budgetted for
+     * this project.
+     *
+     * @TODO: In deze voorbeeldimplementatie gebruiken we random waarden om de
+     *        consumptie te simuleren, maar in een echte implementatie zou je
+     *        hier de logica moeten toepassen om de consumptie te berekenen
+     *        op basis van gerelateerde data (bijv. timesheets, equipment
+     *        usage, etc.)
+     */
+    public function getBudgetConsumptionAttribute(): Collection
+    {
+        $budgets = $this->budgets;
+
+        // Voor elk budgettype, bereken de consumptie. In dit voorbeeld gaan we
+        // ervan uit dat de consumptie een random percentagie is van het budget,
+        // maar in een realistisch scenario zou je hier een andere logica
+        // kunnen toepassen.
+        $consumptions = [];
+        foreach ($budgets as $type => $amount)
+        {
+            // A random number between 0 and the budget amount, to simulate
+            $percentage = rand(0, 100) / 100; // Random percentage tussen 0% en 100%
+            // consumption. In a real implementation, you would replace
+            // this with the actual logic to calculate consumption
+            // based on related data (e.g. timesheets, equipment
+            // usage, etc.)
+            $consumptions[$type] = $amount * $percentage; // Hier zou je de echte consumptie moeten berekenen
+        }
+        // Tel alle budgetten bij elkaar op voor een totaal consumptie
+        return collect($consumptions);
     }
 
     /**
@@ -270,6 +311,53 @@ class Project extends Model
 
         // Bereken het verschil in dagen en deel door 7 voor de weken.
         return (int) (now()->diffInDays($start) / 7);
+    }
+
+    /**
+     * Get the checklists for the project.
+     */
+    public function checklists(): HasMany
+    {
+        return $this->hasMany(Checklist::class, 'project_id', 'id');
+    }
+
+    /**
+     * Get the checklist items for the project.
+     */
+    public function checklistItems(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ChecklistItem::class,   // Het doel
+            Checklist::class,    // De eerste tussenstap
+            'project_id',        // Foreign key op Checklist tabel (naar Project)
+            'checklist_id',      // Foreign key op ChecklistItem tabel (naar Checklist)
+            'id',                 // Local key op Project tabel
+            'id'                  // Local key op Checklist tabel
+        );
+    }
+
+    /**
+     * Calculate the number of checklist items for this project, by counting
+     * the related checklist items through the checklists relationship.
+     * We can use Eloquent's withCount('checklistItems') in the
+     * controller to eager load this count and avoid N+1
+     * query issues.
+     */
+    public function getCountChecklistItemsAttribute(): int
+    {
+        return $this->checklistItems()->count();
+    }
+
+    /**
+     * Calculate the number of completed checklist items for this project, by counting
+     * the related checklist items through the checklists relationship.
+     * We can use Eloquent's withCount('checklistItems') in the
+     * controller to eager load this count and avoid N+1
+     * query issues.
+     */
+    public function getCountChecklistItemsCompletedAttribute(): int
+    {
+        return $this->checklistItems()->where('is_completed', true)->count();
     }
 
 }
