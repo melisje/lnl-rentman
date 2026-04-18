@@ -3,6 +3,7 @@
 namespace App\Models\Rentman;
 
 use App\Scopes\AccountScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -45,7 +46,7 @@ class Application extends Model
      * filter on the current account, while we want to be able to
      * specify the account as a parameter to this function.
      */
-    public function projects($account)
+    public function projects($account): Builder
     {
         $projects = Project::withoutGlobalScope(AccountScope::class)
             ->where('account', $account)
@@ -54,8 +55,7 @@ class Application extends Model
                     ->from('rm_project_type_application_mappings')
                     ->where('application_id', $this->id)
                     ->where('account', $account);
-            })
-            ->get();
+            });
 
         return $projects;
 
