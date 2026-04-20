@@ -25,8 +25,7 @@
                     <th>AM</th>
                     <th>PM</th>
                     <th>#subprojs</th>
-                    <th>Status (P)</th>
-                    <th>Status (N)</th>
+                    <th>Status</th>
                     <th class="text-center">PM (U)</th>
                     <th class="text-center">Light (U)</th>
                     <th class="text-center">Sound (U)</th>
@@ -69,7 +68,6 @@
                     <td class="text-muted">{{ $model->pm_name }}</td>
                     <td class="text-muted">{{ $model->nr_of_subprojects }}</td>
                     <td class="text-muted">{{ $model->calculated_status }}</td>
-                    <td class="text-muted">{{ $model->status_name }}</td>
                     <td class="text-muted text-center">{{ number_format($model->budget_consumption['projectmanager'] ?? 0, 2) }}/{{ number_format($model->budgets['projectmanager'] ?? 0, 2) }}</td>
                     <td class="text-muted text-center">{{ number_format($model->budget_consumption['light'] ?? 0, 2) }}/{{ number_format($model->budgets['light'] ?? 0, 2) }}</td>
                     <td class="text-muted text-center">{{ number_format($model->budget_consumption['sound'] ?? 0, 2) }}/{{ number_format($model->budgets['sound'] ?? 0, 2) }}</td>
