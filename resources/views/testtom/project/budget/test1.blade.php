@@ -13,12 +13,13 @@
         <table class="table table-striped table-hover table-sm">
             <thead>
                 <tr>
-                    <th>Days</th>
-                    <th>Weeks</th>
+                    <th>Days(P)</th>
+                    <th>Weeks(P)</th>
                     <th>id</th>
                     <th>Project Type</th>
                     <th>account</th>
                     <th>rm_id</th>
+                    <th>planned start</th>
                     <th>usage start</th>
                     <th>Project</th>
                     <th>AM</th>
@@ -42,10 +43,10 @@
 
                 @php
                 // Als de waarde anders is dan de vorige, wisselen we van kleur
-                if ($lastWeeks !== $model->weeks_until_start)
+                if ($lastWeeks !== $model->weeks_until_start_usage)
                 {
                 $useAltBg = !$useAltBg;
-                $lastWeeks = $model->weeks_until_start;
+                $lastWeeks = $model->weeks_until_start_usage;
                 }
 
                 // Bepaal de class op basis van de toggle
@@ -53,13 +54,14 @@
                 @endphp
 
                 <tr class="{{ $rowClass }}">
-                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->days_until_start }}d</span></td>
-                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->weeks_until_start }}w</span></td>
+                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->days_until_start_plan }}d</span></td>
+                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->weeks_until_start_plan }}w</span></td>
                     <td class="text-muted">{{ $model->id }}</td>
                     <td class="text-muted">{{ $model->projectType->name ?? $model->project_type }}</td>
                     <td class="text-muted">{{ $model->account }}</td>
                     <td class="text-muted">{{ $model->rm_id }}</td>
-                    <td class="text-muted">{{ $model->usageperiod_start }}</td>
+                    <td class="text-muted">{{ $model->planperiod_start?->toDateString() }}</td>
+                    <td class="text-muted">{{ $model->usageperiod_start->toDateString() }}</td>
                     <td class="text-muted">{{ $model->full_display_name }}</td>
                     <td class="text-muted">{{ $model->am_name }}</td>
                     <td class="text-muted">{{ $model->pm_name }}</td>
