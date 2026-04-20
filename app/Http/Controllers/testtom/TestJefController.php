@@ -24,7 +24,14 @@ class TestJefController extends Controller
             ->where('usageperiod_start', '<=', now()->addWeeks(4))
             // ->where('usageperiod_start', '>=', now())
             ->where('usageperiod_start', '>=', now()->subWeeks(2))
-            ->get();
+            ->get()
+            // filter only projects that are not cancelled
+            ->filter(
+                function ($project)
+                {
+                    // Behoud alleen projecten die NIET de status "geannulleerd" hebben
+                    return $project->calculatedStatus !== 'Geannuleerd';
+                });
 
         return view('testtom.project.budget.test1', [
             'models' => $projects,
