@@ -4,6 +4,7 @@ namespace App\Models\Rentman;
 
 use App\Models\Production\Checklist;
 use App\Models\Production\ChecklistItem;
+use App\Models\Production\ChecklistTemplate;
 use App\Scopes\AccountScope;
 use Dom\Attr;
 use Illuminate\Support\Facades\Log;
@@ -387,6 +388,31 @@ class Project extends Model
         // return (int) (now()->diffInWeeks($start, false, true));
         $diff =  (int) (now()->diffInHours($start)) / 24 / 7;
         return ($diff >= 0) ? ceil($diff) : floor($diff);
+    }
+
+    /**
+     * Add a checklist to the project based on a given template. This method
+     * creates a new Checklist model, associates it with this project, and then
+     * calls the addTemplateItems method to populate the checklist with items
+     * based on the provided template.
+     */
+    public function addChecklist(ChecklistTemplate $template): Project
+    {
+
+        $checklist = Checklist::create(
+            [
+                'project_id' => $this->id,
+                'name' => 'Checklist for project ' . $this->full_display_name . " (" . $this->number . ")",
+                'remarks' => 'Checklist created on ' . now()->toDateTimeString() . " and based on template " . $template->name,
+            ]
+        );
+
+        // Add items to the checklist based on the template
+        $checklist->addTemplateItems($template);
+
+
+        // return this model to allow chaining
+        return $this;
     }
 
     /**
