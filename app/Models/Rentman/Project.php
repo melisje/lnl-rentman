@@ -378,7 +378,7 @@ class Project extends Model
         }
 
         $start = $this->planperiod_start;
-        Log::info("Calculating weeks until start for project {$this->id}, planperiod_start: {$start}");
+        // Log::debug("Calculating weeks until start for project {$this->id}, planperiod_start: {$start}");
 
         // Bereken het verschil in weken. We gebruiken diffInWeeks met de
         // absolute waarde uitgeschakeld, zodat we negatieve waarden
