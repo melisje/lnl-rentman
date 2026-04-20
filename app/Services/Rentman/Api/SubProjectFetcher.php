@@ -14,7 +14,8 @@ class SubProjectFetcher extends AbstractRentmanFetcher
     public function processPage(string $account, array $items): void
     {
 
-        foreach ($items as $item) {
+        foreach ($items as $item)
+        {
 
             // map fields on values, for updateCreate function below
             // We add all fields to db that are returned by the API call ($items).
@@ -26,7 +27,7 @@ class SubProjectFetcher extends AbstractRentmanFetcher
             $fillables['projects_id'] = $project ? $project->id : null;
 
             // Laravel-style update or create
-            $crew = SubProject::updateOrCreate(
+            $model = SubProject::updateOrCreate(
                 // Deel 1: De unieke velden om het record te vinden
                 [
                     'account' => $account,
@@ -35,6 +36,9 @@ class SubProjectFetcher extends AbstractRentmanFetcher
                 // Deel 2: De velden die ingevuld of bijgewerkt moeten worden
                 $fillables
             );
+
+            // Process custom fields
+            $this->processCustomFields($account, $item, $model);
         }
     }
 }
