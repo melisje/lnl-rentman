@@ -122,17 +122,29 @@ class Project extends Model
                 // 1. Haal alle unieke statussen van de subprojecten op
                 $uniqueStatuses = $this->subprojects->pluck('status')->filter()->unique();
 
-                // 2. Als er geen subprojecten zijn
+
+                // replace status paths with human readable names using the Status model
+                $uniqueStatuses = $uniqueStatuses->map(function ($statusPath) {
+                    $statusId = extract_id($statusPath);
+                    $status = Status::where('account', $this->account)
+                        ->where('rm_id', $statusId)
+                        ->first();
+                    return $status ? $status->name : "????";
+                });
+
+                // if no statuses are found, return "geen subprojecten"
                 if ($uniqueStatuses->isEmpty()) {
                     return 'geen subprojecten';
                 }
 
-                // 3. Als er precies 1 unieke status is, hebben ze allemaal dezelfde status
+                // If only one unique status is found, return that status as the
+                // calculated status for the project
                 if ($uniqueStatuses->count() === 1) {
                     return $uniqueStatuses->first();
                 }
 
-                // 4. In alle andere gevallen zijn de statussen verschillend
+                // Otherwise, if there are multiple unique statuses, we can
+                // return a combined string
                 return $uniqueStatuses->implode(',');
             },
         )->shouldCache();
