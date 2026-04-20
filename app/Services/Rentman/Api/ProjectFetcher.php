@@ -44,6 +44,7 @@ class ProjectFetcher extends AbstractRentmanFetcher
             $project->project_type_id = $projectTypeId;
             $project->save();
 
+            // update project_status
 
 
             // Process custom fields

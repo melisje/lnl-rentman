@@ -16,7 +16,10 @@ class SyncSubProjects extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'rentman:sync-subprojects {account? : The specific account name to sync}';
+    protected $signature = 'rentman:sync-subprojects
+        {account? : The specific account name to sync}
+        {--project= : The specific project RMID to sync}';
+
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
@@ -56,6 +59,7 @@ class SyncSubProjects extends Command
                 'reference',
                 'project',
                 'number',
+                'status',
                 'planperiod_start',
                 'planperiod_end',
                 'usageperiod_start',
@@ -73,8 +77,22 @@ class SyncSubProjects extends Command
                 'tags',
             ];
 
+            // Optionele filter op project RMID
+            $fltProjectId = $this->option('project');
+
+            // filter projects
+            $projects = Project::where('account',$account->account);
+            if ($fltProjectId)
+            {
+                // 1. Convert "123,456,789" into [123, 456, 789]
+                $projectIds = explode(',', $fltProjectId);
+
+                // 2. Use whereIn to filter by the array
+                $projects->whereIn('rm_id', $projectIds);
+            }
+
             // find rm_ids from projects
-            $rmids = Project::where('account',$account->account)->pluck('rm_id')->toArray();
+            $rmids = $projects->pluck('rm_id')->toArray();
 
             // Verdeel de ID's in groepjes van 50 (or otherwise configured)
             $chunks = array_chunk($rmids, config('services.rentman.chunck_size', 50));
@@ -91,7 +109,6 @@ class SyncSubProjects extends Command
                     // 'modified' => '2026-01-01',
                     'project' => implode(',', $chunk),
                 ];
-
 
                 if ($requiredFields && !empty($requiredFields)) {
                     $queryParams['fields'] = implode(',', $requiredFields);
