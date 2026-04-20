@@ -299,7 +299,31 @@ class Project extends Model
     }
 
     /**
-     * Calculate the number of weeks until the project starts, based on the usageperiod_start date. If the start date is in the past, this will return 0 or
+     * Calculate the number of days until the project starts, based on the
+     * usageperiod_start date. If the start date is in the past, this will
+     * a negative value. We can use this in the view to show how many
+     * days until the project starts, or if it's already started,
+     * how many days ago it started.
+     */
+    public function getDaysUntilStartAttribute()
+    {
+        if (!$this->usageperiod_start) {
+            return null;
+        }
+
+        $start = $this->usageperiod_start;
+
+        // Bereken het verschil in dagen.
+        // return (int) (now()->diffInHours($start))/24;
+        return (int) (now()->diffInDays($start));
+    }
+
+    /**
+     * Calculate the number of weeks until the project starts, based on the
+     * usageperiod_start date. If the start date is in the past, this will
+     * return a negative value. We can use this in the view to show how
+     * many weeks until the project starts, or if it's already started,
+     * how many weeks ago it started.
      */
     public function getWeeksUntilStartAttribute()
     {
@@ -309,8 +333,13 @@ class Project extends Model
 
         $start = $this->usageperiod_start;
 
-        // Bereken het verschil in dagen en deel door 7 voor de weken.
-        return (int) (now()->diffInDays($start) / 7);
+        // Bereken het verschil in weken. We gebruiken diffInWeeks met de
+        // absolute waarde uitgeschakeld, zodat we negatieve waarden
+        // krijgen voor projecten die in het verleden zijn begonnen.
+
+        // return (int) (now()->diffInWeeks($start, false, true));
+        $diff =  (int) (now()->diffInHours($start)) / 24 / 7;
+        return ($diff >= 0) ? ceil($diff) : floor($diff);
     }
 
     /**

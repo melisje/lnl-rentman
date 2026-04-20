@@ -20,7 +20,7 @@ class TestJefController extends Controller
         $account = 'llstageservice';
         $projects = $app->projects($account)
             ->orderBy('usageperiod_start')
-            ->where('displayName', 'like', '%TEST%PROJECT%')
+            // ->where('displayName', 'like', '%TEST%PROJECT%')
             ->where('usageperiod_start', '<=', now()->addWeeks(4))
             // ->where('usageperiod_start', '>=', now())
             ->where('usageperiod_start', '>=', now()->subWeeks(2))

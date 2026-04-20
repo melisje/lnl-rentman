@@ -13,6 +13,7 @@
         <table class="table table-striped table-hover table-sm">
             <thead>
                 <tr>
+                    <th>Days</th>
                     <th>Weeks</th>
                     <th>id</th>
                     <th>Project Type</th>
@@ -52,7 +53,8 @@
                 @endphp
 
                 <tr class="{{ $rowClass }}">
-                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->weeks_until_start }}</span></td>
+                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->days_until_start }}d</span></td>
+                    <td><span class="badge {{ $useAltBg ? 'bg-primary' : 'bg-secondary' }}">{{ $model->weeks_until_start }}w</span></td>
                     <td class="text-muted">{{ $model->id }}</td>
                     <td class="text-muted">{{ $model->projectType->name ?? $model->project_type }}</td>
                     <td class="text-muted">{{ $model->account }}</td>
