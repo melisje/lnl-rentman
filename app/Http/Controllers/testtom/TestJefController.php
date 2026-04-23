@@ -7,6 +7,7 @@ use App\Models\Rentman\Account;
 use App\Models\Rentman\Application;
 use App\Models\Rentman\Project;
 use App\Models\Rentman\ProjectType;
+use App\Models\Rentman\SubProject;
 use App\Scopes\AccountScope;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ class TestJefController extends Controller
 
         $account = 'llstageservice';
         $projects = $app->projects($account)
-            ->orderBy('usageperiod_start')
+            ->orderBy('planperiod_start')
             // ->where('displayName', 'like', '%TEST%PROJECT%')
             ->where('usageperiod_start', '<=', now()->addWeeks(4))
             // ->where('usageperiod_start', '>=', now())
@@ -58,6 +59,27 @@ class TestJefController extends Controller
             dump("Account: $account, project count: $result");
         }
 
+    }
+
+    public function test3()
+    {
+        // Find the project that we are working on
+        $app = Application::where('name','warehouse_dashboard')->first();
+        // dump($app);
+
+        $builder = SubProject::with('parentProject')
+            // ->releasedForWarehouse()
+            ->notCancelled()
+            ->whereDate('planperiod_start', '>=',today())
+            ->orderBy('planperiod_start')
+        ;
+
+        dump($builder->toRawSql());
+        $subProjects = $builder->get();
+
+        return view('testtom.project.budget.test3', [
+            'models' => $subProjects,
+        ]);
     }
 
 }
