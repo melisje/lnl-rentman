@@ -16,47 +16,52 @@ class ProjectTypeApplicationMappingSeeder extends Seeder
      */
     public function run(): void
     {
-        // Make sure the application exists before creating mappings
-        $appId = Application::updateOrCreate(
+        $mappings = [
+            'project_dashboard' =>
             [
-                'name' => 'project_dashboard' // De unieke waarde om op te zoeken
+                'llstageservice' => [104,107],
+                'ledvisions' => [104]
             ],
+
+            'warehouse_dashboard' =>
             [
-                'remarks' => 'seeded'         // De waarde die geüpdatet of gezet moet worden
-            ]
-        );
+                'llstageservice' => [102,104,105,106,107,107,109,111,112],
+                'ledvisions' => []
+            ],
+        ];
 
-        $fields = [];
+        // dump($mappings);
 
-        // Find the project type ids for account llstageservice with rentman ids 104 and 107
-        $account = 'llstageservice';
-        $rmIds = [104, 107];
-        foreach ($rmIds as $rmId) {
-            $projectTypeId = ProjectType::where('rm_id', $rmId)
-                ->where('account', $account)
-                ->value('id');
-            $fields[] = [ 'account' => $account, 'project_type_id' => $projectTypeId, 'application_id' => $appId->id];
+        foreach ($mappings as $appName => $accounts)
+        {
+            // Make sure application exists
+            $appId = Application::updateOrCreate
+            (
+                ['name' => $appName],      // De unieke waarde om op te zoeken
+                ['remarks' => 'seeded']    // De waarde die geüpdatet of gezet moet worden
+            );
 
+            foreach ($accounts as $account => $projectRmIds)
+            {
+                $fields = [];
+
+                // Find the project type ids for account llstageservice with rentman ids 104 and 107
+                foreach ($projectRmIds as $rmId)
+                {
+                    $projectTypeId = ProjectType::where('rm_id', $rmId)
+                        ->where('account', $account)
+                        ->value('id');
+                    $fields[] = [ 'account' => $account, 'project_type_id' => $projectTypeId, 'application_id' => $appId->id];
+                }
+
+                // Gebruik upsert om dubbelingen te voorkomen op basis van id
+                DB::table('rm_project_type_application_mappings')->upsert(
+                    $fields,
+                    ['account', 'project_type_id', 'application_id'], // Unieke combinatie van deze drie velden
+                    ['updated_at'] // Geen update, alleen insert als er geen match is
+                );
             }
-
-        // Find the project type ids for account ledvisions with rentman ids 104
-        $account = 'ledvisions';
-        $rmIds = [104];
-        foreach ($rmIds as $rmId) {
-            $projectTypeId = ProjectType::where('rm_id', $rmId)
-                ->where('account', $account)
-                ->value('id');
-            $fields[] = [ 'account' => $account, 'project_type_id' => $projectTypeId, 'application_id' => $appId->id];
-
-            }
-
-
-        // Gebruik upsert om dubbelingen te voorkomen op basis van id
-        DB::table('rm_project_type_application_mappings')->upsert(
-            $fields,
-            ['account', 'project_type_id', 'application_id'], // Unieke combinatie van deze drie velden
-            ['updated_at'] // Geen update, alleen insert als er geen match is
-        );
+        }
 
         $this->command->info('Rentman Project Type Application Mappings successfully seeded!');    }
 }
