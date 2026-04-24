@@ -312,6 +312,21 @@ class Project extends Model
         return collect($consumptions);
     }
 
+    public function getBudgetConsumptionPercentageAttribute(): Collection
+    {
+        $budgets = $this->budgets;
+        $consumptions = $this->budgetConsumption;
+
+        $percentages = [];
+        foreach ($budgets as $type => $amount)
+        {
+            $consumption = $consumptions[$type] ?? 0;
+            // Bereken het percentage consumptie ten opzichte van het budget
+            $percentages[$type] = ($amount > 0) ? ($consumption / $amount) * 100 : 0;
+        }
+        return collect($percentages);
+    }
+
     /**
      * Calculate the number of days until the project starts, based on the
      * usageperiod_start date. If the start date is in the past, this will
