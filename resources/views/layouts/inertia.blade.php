@@ -68,6 +68,19 @@
             min-height: 100vh;
             padding-left: calc(var(--sidebar-width) + var(--submenu-width));
             padding-top: var(--topbar-height);
+            transition: padding-left 0.25s ease;
+        }
+
+        .dashboard-shell.submenu-collapsed {
+            padding-left: var(--sidebar-width);
+        }
+
+        .submenu-left {
+            transition: transform 0.25s ease;
+        }
+
+        .submenu-left.submenu-hidden {
+            transform: translateX(-100%);
         }
 
         .menu-top {
@@ -76,8 +89,7 @@
             left: var(--sidebar-width);
             right: 0;
             height: var(--topbar-height);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.97);
             border-bottom: 1px solid rgba(231, 235, 243, 0.95);
             display: flex;
             align-items: center;
@@ -102,8 +114,15 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 18px;
             cursor: pointer;
+        }
+
+        .brand-toggle::before {
+            content: "\f479";
+            font-family: "bootstrap-icons";
+            line-height: 1;
+            pointer-events: none;
         }
 
         .brand-title {
@@ -135,14 +154,37 @@
             align-items: center;
             justify-content: center;
             font-size: 1rem;
-            transition: all 0.2s ease;
+            transition: all 0s ease;
             cursor: pointer;
         }
 
-        .topbar-icon:hover {
+        .topbar-icon:hover,
+        .topbar-icon.show {
             background: #f5f7fb;
             border-color: var(--border);
             color: var(--accent);
+        }
+
+        .topbar-icon.show {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: transparent;
+        }
+
+        .dropdown-menu {
+            --bs-dropdown-spacer: 0;
+            background: #f5f7fb !important;
+            border-color: var(--border) !important;
+            color: var(--accent);
+            margin-top: -3px !important;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0 !important;
+            box-shadow: -10px 6px 12px rgba(9, 16, 35, 0.10);
+        }
+
+        .dropdown-item:hover {
+            color: var(--accent) !important;
+            background-color: white !important;
         }
 
         .menu-left {
@@ -181,7 +223,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1rem;
-            transition: all 0.2s ease;
+            transition: all 0s ease;
             cursor: pointer;
         }
 
@@ -198,11 +240,11 @@
 
         .submenu-left {
             position: fixed;
-            top: 0;
+            top: var(--topbar-height);
             left: var(--sidebar-width);
             bottom: 0;
             width: var(--submenu-width);
-            padding-top: calc(var(--topbar-height) + 14px);
+            padding-top: 14px;
             background: var(--submenu-bg);
             color: var(--submenu-text);
             z-index: 40;
@@ -217,11 +259,11 @@
         }
 
         .submenu-section-label {
-            font-size: 0.72rem;
+            font-size: 0.72rem !important;
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--submenu-text);
+            color: var(--submenu-text) !important;
             margin: 14px 10px 8px;
         }
 
@@ -232,10 +274,10 @@
             min-height: 42px;
             padding: 0 12px;
             margin-bottom: 4px;
-            border-radius: 12px;
+            border-radius: 12px !important;
             color: var(--submenu-text);
             font-size: 0.95rem;
-            transition: all 0.2s ease;
+            transition: all 0s ease;
             cursor: pointer;
             text-decoration: none !important;
         }
@@ -248,8 +290,8 @@
 
         .submenu-left .item:hover {
             background: #ffffff;
-            border-color: var(--border);
-            color: var(--accent);
+            border-color: var(--border) !important;
+            color: var(--accent) !important;
         }
 
         .submenu-left .item.active {
@@ -332,7 +374,7 @@
             font-weight: 600;
             font-size: 0.92rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0s ease;
         }
 
         .btn-primary-modern {
@@ -487,6 +529,7 @@
 </head>
 
 <body>
+
     <div class="wrapper">
         <div class="menu-left">
             <div class="menu-left-top">
@@ -545,19 +588,39 @@
 
         <div class="menu-top">
             <div class="brand">
-                <button class="brand-toggle" type="button">
-                    <i class="bi bi-list"></i>
-                </button>
+                <button class="brand-toggle" type="button" onclick="toggleSubmenu()"></button>
                 <h2 class="brand-title">
                     <span class="accent">L&L</span> Stage Service
+                    <!--<span class="accent">LED</span> Visions-->
                 </h2>
             </div>
 
             <div class="topbar-actions">
-                <button class="topbar-icon" type="button"><i class="bi bi-buildings-fill"></i></button>
-                <button class="topbar-icon" type="button"><i class="bi bi-globe-europe-africa"></i></button>
+                <div class="dropdown">
+                    <button class="topbar-icon" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-buildings-fill"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Selecteer Firma</h6>
+                        <a class="dropdown-item" href="#">L&L Stage Service</a>
+                        <a class="dropdown-item" href="#">Led Visions</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="topbar-icon" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-globe-europe-africa"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Wijzig taal</h6>
+                        <a class="dropdown-item" href="#">NL</a>
+                        <a class="dropdown-item" href="#">EN</a>
+                    </div>
+                </div>
                 <button class="topbar-icon" type="button"><i class="bi bi-search"></i></button>
-                <button class="topbar-icon" type="button"><i class="bi bi-person-fill"></i></button>
+                <div class="dropdown">
+                    <button class="topbar-icon" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-person-fill"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Mijn account</h6>
+                        <a class="dropdown-item" href="#">Instellingen</a>
+                        <a class="dropdown-item text-danger" href="#">Afmelden</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -640,14 +703,21 @@
                                 </div>
                             </div>
                         </section>
-                        
+
                     </div>
 
-                   
+
                 </div>
             </main>
         </div>
     </div>
+
+    <script>
+        function toggleSubmenu() {
+            document.querySelector('.submenu-left').classList.toggle('submenu-hidden');
+            document.querySelector('.dashboard-shell').classList.toggle('submenu-collapsed');
+        }
+    </script>
 </body>
 
 </html>
