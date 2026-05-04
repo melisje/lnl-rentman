@@ -2,6 +2,8 @@
 
 namespace App\Models\Rentman;
 
+use App\Scopes\AccountScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,11 +44,44 @@ class SubProject extends Model
     }
 
     /**
+     * Boot the model and apply the global scope.
+     */
+    protected static function booted()
+    {
+        // Filter all queries automatically based on the current account.
+        // If you do want to run a query without this scope, you can
+        // use: Project::withoutGlobalScope(AccountScope::class)->get();
+        static::addGlobalScope(new AccountScope);
+    }
+
+    /**
+     * Scope of projects that are released for the warehouse.
+     * Select only subprojects where the 'vrijgave_voor_warehouse' column is true.
+     */
+    public function scopeReleasedForWarehouse(Builder $query): Builder
+    {
+        return $query->where('vrijgave_voor_warehouse', true);
+    }
+
+    /**
+     * Scope of projects that are NOT cancelled (status name is not "Geannuleerd").
+     */
+    public function scopeNotCancelled(Builder $query): Builder
+    {
+        // find the status_id for "Geannuleerd" for the current account
+        // and filter the subprojects that do NOT have this status_id in their 'status' column.
+        $statusId = Status::where('name', 'Geannuleerd')
+            ->value('rm_id');
+
+        return $query->where('status', '!=', "/statuses/$statusId");
+    }
+
+    /**
      * Get the Project that owns the subproject.
      */
     public function parentProject(): BelongsTo
     {
-        return $this->belongsTo(Project::class,'projects_id','id');
+        return $this->belongsTo(Project::class, 'projects_id', 'id');
     }
 
     /**

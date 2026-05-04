@@ -91,4 +91,25 @@ class Checklist extends Model
     {
         return $this->belongsTo(Project::class,'project_id','id');
     }
+
+    /**
+     * Add items to the checklist based on a template. The template is an array
+     * of item data, where each item data is an associative array with a
+     * 'description' key.
+     */
+    public function addTemplateItems(ChecklistTemplate $template): Checklist
+    {
+        $templateItems = $template->items()->get();
+
+        foreach ($templateItems as $itemData)
+        {
+            $this->items()->create([
+                'name' => $itemData['name'],
+                'sequence' => $itemData['sequence'],
+                'is_completed' => false,
+            ]);
+        }
+
+        return $this;
+    }
 }
