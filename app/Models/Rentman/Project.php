@@ -312,6 +312,9 @@ class Project extends Model
         return collect($consumptions);
     }
 
+    /**
+     * Calculate the budget consumption in percentage
+     */
     public function getBudgetConsumptionPercentageAttribute(): Collection
     {
         $budgets = $this->budgets;
@@ -412,9 +415,8 @@ class Project extends Model
         // absolute waarde uitgeschakeld, zodat we negatieve waarden
         // krijgen voor projecten die in het verleden zijn begonnen.
 
-        // return (int) (now()->diffInWeeks($start, false, true));
         $diff =  (int) (now()->diffInHours($start)) / 24 / 7;
-        return ($diff >= 0) ? ceil($diff) : floor($diff);
+        return floor($diff);
     }
 
     /**
