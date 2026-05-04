@@ -44,10 +44,10 @@
 
                 @php
                 // Als de waarde anders is dan de vorige, wisselen we van kleur
-                if ($lastWeeks !== $model->weeks_until_start_usage)
+                if ($lastWeeks !== $model->weeks_until_start_plan)
                 {
                 $useAltBg = !$useAltBg;
-                $lastWeeks = $model->weeks_until_start_usage;
+                $lastWeeks = $model->weeks_until_start_plan;
                 }
 
                 // Bepaal de class op basis van de toggle

@@ -21,10 +21,9 @@ class TestJefController extends Controller
         $account = 'llstageservice';
         $projects = $app->projects($account)
             ->orderBy('planperiod_start')
-            // ->where('displayName', 'like', '%TEST%PROJECT%')
-            ->where('usageperiod_start', '<=', now()->addWeeks(4))
-            // ->where('usageperiod_start', '>=', now())
-            ->where('usageperiod_start', '>=', now()->subWeeks(2))
+            ->where('displayName', 'like', '%TEST%PROJECT%')
+            ->where('planperiod_start', '<=', now()->addWeeks(4))
+            ->where('planperiod_start', '>=', now()->subWeeks(50))
             ->get()
             // filter only projects that are not cancelled
             ->filter(
