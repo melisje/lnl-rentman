@@ -21,12 +21,13 @@
                     </td>
 
                     <td v-for="category in ['projectmanager', 'light', 'sound', 'rigging']" :key="category"
-                        class="text-center cell-toggle" :style="budgetCellStyle(item, category)">
+                        class="text-center cell-toggle" :style="budgetCellStyle(item, category)"
+                        :data-label="{ projectmanager: 'PM', light: 'Light', sound: 'Sound', rigging: 'Rigging' }[category]">
                         <span class="cell-pct">{{ fmtPct(budgetPercent(item, category)) }}%</span>
                         <span class="cell-fraction">{{ fmt(budgetConsumption(item, category)) }} / {{ fmt(budget(item, category)) }}</span>
                     </td>
 
-                    <td class="text-center cell-toggle" :style="checklistCellStyle(item)">
+                    <td class="text-center cell-toggle" data-label="Checklist" :style="checklistCellStyle(item)">
                         <span class="cell-pct">{{ fmtPct(checklistPercent(item)) }}%</span>
                         <span class="cell-fraction">{{ item.count_checklist_items_completed ?? 0 }} / {{ item.count_checklist_items ?? 0 }}</span>
                     </td>
@@ -163,5 +164,56 @@ function fmtPct(value) {
 .cell-pct {
     font-weight: bold;
     font-size: 25px;
+}
+
+@media (max-width: 768px) {
+    .row-week-header {
+        display: flex;
+    }
+    .row-week-header td:first-child {
+        width: 100%;
+    }
+    .row-week-header td:not(:first-child) {
+        display: none;
+    }
+
+    .row-default,
+    .row-alt {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* Datums: vaste smalle kolom */
+    .row-default td:nth-child(1),
+    .row-alt td:nth-child(1) {
+        flex: 0 0 25%;
+        width: 25%;
+    }
+
+    /* Projectnaam + namen: rest van eerste rij */
+    .row-default td:nth-child(2),
+    .row-alt td:nth-child(2) {
+        flex: 0 0 75%;
+        width: 75%;
+    }
+
+    /* 5 budget-cellen: elk 20%, wrappen naar tweede rij */
+    .row-default td:nth-child(n+3),
+    .row-alt td:nth-child(n+3) {
+        flex: 0 0 20%;
+        width: 20%;
+    }
+
+    /* Legende boven elk cijfer */
+    .row-default td[data-label]::before,
+    .row-alt td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.6rem;
+        font-weight: 700;
+        opacity: 0.75;
+        letter-spacing: 0.04em;
+        margin-bottom: 2px;
+    }
 }
 </style>
