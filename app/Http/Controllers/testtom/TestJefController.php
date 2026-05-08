@@ -10,10 +10,46 @@ use App\Models\Rentman\ProjectType;
 use App\Models\Rentman\SubProject;
 use App\Scopes\AccountScope;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class TestJefController extends Controller
 {
-    //
+    //Nodig met map om te vertalen naar een array omdat Inertia problemen heeft met Collections die een Scope hebben
+    public function weekoverzicht()
+    {
+        $app = Application::where('name', 'project_dashboard')->first();
+
+        $projects = $app->projects('llstageservice')
+            ->orderBy('planperiod_start')
+            ->where('planperiod_start', '<=', now()->addWeeks(4))
+            ->where('planperiod_start', '>=', now()->subWeeks(2))
+            ->get()
+            ->filter(fn($p) => $p->calculatedStatus !== 'Geannuleerd')
+            ->map(fn($p) => [
+                'id'                              => $p->id,
+                'days_until_start_plan'           => $p->days_until_start_plan,
+                'weeks_until_start_plan'          => $p->weeks_until_start_plan,
+                'project_type_name'               => $p->projectType->name ?? $p->project_type,
+                'account'                         => $p->account,
+                'rm_id'                           => $p->rm_id,
+                'planperiod_start'                => $p->planperiod_start?->toDateString(),
+                'usageperiod_start'               => $p->usageperiod_start->toDateString(),
+                'full_display_name'               => $p->full_display_name,
+                'am_name'                         => $p->am_name,
+                'pm_name'                         => $p->pm_name,
+                'nr_of_subprojects'               => $p->nr_of_subprojects,
+                'calculated_status'               => $p->calculated_status,
+                'budget_consumption'              => $p->budget_consumption,
+                'budgets'                         => $p->budgets,
+                'count_checklist_items'           => $p->count_checklist_items,
+                'count_checklist_items_completed' => $p->count_checklist_items_completed,
+            ]);
+
+        return Inertia::render('Testtom/Weekoverzicht', [
+            'models' => $projects->values(),
+        ]);
+    }
+
     public function test1()
     {
         $app = Application::where('name', 'project_dashboard')->first();
