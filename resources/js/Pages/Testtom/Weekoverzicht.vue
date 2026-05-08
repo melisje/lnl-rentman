@@ -4,7 +4,7 @@
         <tbody>
             <template v-for="item in processedModels" :key="item.type === 'header' ? `week-${item.weeks}` : item.id">
                 <tr v-if="item.type === 'header'" class="row-week-header">
-                    <td colspan="2" class="fw-bold week">{{ weekLabel(item.weeks) }}</td>
+                    <td colspan="2" class="fw-bold week" v-html="weekLabelHtml(item.weeks)"></td>
                     <td width="100px" class="text-center">PM<br>(U)</td>
                     <td width="100px" class="text-center">Light<br>(U)</td>
                     <td width="100px" class="text-center">Sound<br>(U)</td>
@@ -65,6 +65,13 @@ const processedModels = computed(() => {
 
     return result;
 });
+
+function weekLabelHtml(weeks) {
+    const label = weekLabel(weeks);
+    const space = label.indexOf(' ');
+    if (space === -1) return `<span class="accent">${label}</span>`;
+    return `<span class="accent">${label.slice(0, space)}</span>${label.slice(space)}`;
+}
 
 function weekLabel(weeks) {
     if (weeks < 0) return `${Math.abs(weeks)} ${Math.abs(weeks) !== 1 ? 'weken' : 'week'} geleden`;
@@ -130,6 +137,10 @@ function fmtPct(value) {
     color: var(--submenu-text);
 }
 
+.row-week-header .week :deep(.accent) {
+    color: var(--accent);
+}
+
 .row-week-header .week {
     padding: 20px;
     font-size: 1.4rem;
@@ -169,6 +180,7 @@ function fmtPct(value) {
 @media (max-width: 768px) {
     .row-week-header {
         display: flex;
+        text-align: center;
     }
     .row-week-header td:first-child {
         width: 100%;
