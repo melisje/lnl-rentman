@@ -13,9 +13,9 @@
                 <li class="nav-item"><a href="{{ route('home' )}}" class="nav-link active">{{ __('home') }}</a></li>
 
                 @include('layouts.nav_invoices')
-                @include('layouts.nav_projects')
                 @include('layouts.nav_webhookcalls')
-                @include('layouts.nav_checklists')
+                @include('layouts.nav_production')
+                @include('layouts.nav_testing')
 
                 <!-- Allow adding extra navbar items form child views -->
                 @stack('navbar-top-left')

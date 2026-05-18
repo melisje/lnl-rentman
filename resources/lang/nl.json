@@ -13,6 +13,7 @@
   "account_manager": "Account Manager",
   "overview": "Overzicht",
   "fetch": "Ophalen",
+  "project": "Project",
   "projects": "Projecten",
   "name": "Naam",
   "value": "Waarde",
@@ -38,10 +39,14 @@
   "Optie": "Optie",
   "Retour": "Retour",
   "Verwijderd": "Verwijderd",
+  "checklist": "Checklist",
   "checklists": "Checklists",
+  "template": "Template",
+  "templates": "Templates",
   "Name": "Naam",
   "Function": "Functie",
-  "": "",
+  "production": "Productie",
+  "weekoverview": "Weekoverzicht",
   "zzzz": "",
   "testtom": "Test Tom"
 }

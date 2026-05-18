@@ -38,8 +38,12 @@
   "Retour": "Returned",
   "Verwijderd": "Deleted",
   "checklists": "Checklists",
+  "checklist": "Checklist",
+  "templates": "Templates",
   "Name": "Name",
   "Function": "Function",
+  "production": "Production",
+  "weekoverview": "Weekoverzicht",
   "": "",
   "zzzz": "",
   "testtom": "Test Tom"
