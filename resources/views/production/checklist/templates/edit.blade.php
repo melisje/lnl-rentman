@@ -6,7 +6,7 @@
         <div class="col-md-8">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('templates.index') }}">Templates</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('production.checklist.template.index') }}">Templates</a></li>
                     <li class="breadcrumb-item active">Edit Template</li>
                 </ol>
             </nav>
@@ -14,13 +14,13 @@
             <div class="card shadow-sm border-warning">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-warning">Edit Template: {{ $template->name }}</h5>
-                    <form action="{{ route('templates.destroy', $template) }}" method="POST" onsubmit="return confirm('Delete this entire template and all its items?')">
+                    <form action="{{ route('production.checklist.template.destroy', $template) }}" method="POST" onsubmit="return confirm('Delete this entire template and all its items?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete Template</button>
                     </form>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('templates.update', $template) }}" method="POST">
+                    <form action="{{ route('production.checklist.template.update', $template) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -38,7 +38,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('templates.show', $template) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="{{ route('production.checklist.template.show', $template) }}" class="btn btn-outline-secondary">Cancel</a>
                             <button type="submit" class="btn btn-warning">Update Template</button>
                         </div>
                     </form>

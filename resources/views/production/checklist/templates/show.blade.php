@@ -5,12 +5,12 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('templates.index') }}">Templates</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('production.checklist.template.index') }}">Templates</a></li>
                 <li class="breadcrumb-item active">{{ $template->name }}</li>
             </ol>
         </nav>
         <div>
-            <a href="{{ route('templates.edit', $template) }}" class="btn btn-sm btn-outline-primary">Edit Name/Remarks</a>
+            <a href="{{ route('production.checklist.template.edit', $template) }}" class="btn btn-sm btn-outline-primary">Edit Name/Remarks</a>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
                                 <td><small class="text-muted">{{ $item->remarks }}</small></td>
                                 <td class="text-end">
                                     {{-- Delete Item Form --}}
-                                    <form action="{{ route('template-items.destroy', $item) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('production.checklist.template-items.destroy', $item) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-2" onclick="return confirm('Remove this item?')">Delete</button>
                                     </form>

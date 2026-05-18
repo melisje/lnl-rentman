@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('templates.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="{{ route('production.checklist.template.index') }}" class="btn btn-outline-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Save Template</button>
                         </div>
                     </form>

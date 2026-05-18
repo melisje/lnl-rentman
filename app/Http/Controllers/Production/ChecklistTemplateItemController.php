@@ -29,7 +29,7 @@ class ChecklistTemplateItemController extends Controller
 
         $template->items()->create($validated);
 
-        return redirect()->route('templates.show', $template)
+        return redirect()->route('production.checklist.template.show', $template)
             ->with('success', 'Item added to template successfully.');
     }
 
@@ -48,7 +48,7 @@ class ChecklistTemplateItemController extends Controller
         $item->update($validated);
 
         // Redirect back to the parent template's show page
-        return redirect()->route('templates.show', $item->template_id)
+        return redirect()->route('production.checklist.template.show', $item->template_id)
             ->with('success', 'Template item updated.');
     }
 
@@ -62,7 +62,7 @@ class ChecklistTemplateItemController extends Controller
 
         $item->delete();
 
-        return redirect()->route('templates.show', $templateId)
+        return redirect()->route('production.checklist.template.show', $templateId)
             ->with('success', 'Item removed from template.');
     }
 }
