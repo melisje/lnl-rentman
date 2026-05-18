@@ -44,12 +44,21 @@
 @section('content')
 <div class="container">
     <div class="mx-2 p-3 bg-light rounded-3">
-        <h1>{{ $checklist->name }}</h1>
+        <h1>{{ $checklist->name }} </h1>
+        <span class="badge text-bg-primary fs-6">Project: {{ $checklist->project->name ?? 'Geen project gekoppeld' }}</span>
+        <div class="text-secondary ">{{ $checklist->remarks }}</div>
         @include('layouts.errors')
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Checklist Items</h5>
+
+                <a href="{{ route('production.checklist.edit', $checklist->id) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Edit Checklist
+                </a>
+                <a href="{{ route('production.checklist.add-template-items.form', $checklist->id) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Add Template Items
+                </a>
                 <button class="btn btn-sm btn-success" id="add-item-btn">
                     <i class="bi bi-plus-lg"></i> Item toevoegen
                 </button>

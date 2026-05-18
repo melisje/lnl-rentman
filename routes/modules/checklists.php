@@ -16,6 +16,8 @@ Route::middleware(['can:access-checklists'])
     Route::patch('/checklist-items/{item}', [ChecklistItemController::class, 'update'])->name('checklist.item.update');
     Route::delete('/checklist-items/{item}', [ChecklistItemController::class, 'destroy'])->name('checklist.item.destroy');
     Route::post('/checklist/{checklist}/items', [ChecklistItemController::class, 'store'])->name('checklist.item.store');
+    Route::get('/checklist/{checklist}/add-template-items', [ChecklistController::class, 'addTemplateItemsForm'])->name('checklist.add-template-items.form');
+    Route::post('/checklist/{checklist}/add-template-items', [ChecklistController::class, 'addTemplateItemsStore'])->name('checklist.add-template-items.store');
 
     /*
     * Checklist template routes (Eerst de specifieke 'checklist/template' paden!)

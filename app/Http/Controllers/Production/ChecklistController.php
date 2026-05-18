@@ -102,7 +102,7 @@ class ChecklistController extends Controller
      */
     public function edit(Checklist $checklist)
     {
-        //
+        return view('production.checklist.edit', compact('checklist'));
     }
 
     /**
@@ -110,8 +110,60 @@ class ChecklistController extends Controller
      */
     public function update(Request $request, Checklist $checklist)
     {
-        //
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'remarks' => 'nullable|string',
+            ]);
+
+        $checklist->update($validated);
+
+        return view('production.checklist.show', compact('checklist'));
     }
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function addTemplateItemsForm(Checklist $checklist)
+    {
+        $templates = ChecklistTemplate::select('id', 'name')->get();
+
+        return view('production.checklist.add-template-items', compact('checklist', 'templates'));
+    }
+
+    /**
+     * Store extra template items for a checklist.
+     */
+    public function addTemplateItemsStore(Request $request, Checklist $checklist)
+    {
+        // Validatie van de input, we moeten zeker weten dat er een geldige template_id is
+        $request->validate([
+            'template_id' => 'required|exists:prod_checklist_templates,id',
+        ]);
+
+        $template = ChecklistTemplate::with('items')->find($request->template_id);
+
+        // We starten bij de hoogste sequence van de bestaande items, zodat we netjes achteraan toevoegen
+        $nextSequence = $checklist->items()->max('sequence') ?? 0;
+
+        DB::transaction(function () use ($checklist, $template, $nextSequence) {
+            foreach ($template->items as $item) {
+                // We verhogen de sequence voor elk nieuw item dat we toevoegen
+                $nextSequence++;
+
+                // We maken een nieuw item aan voor de checklist, gebaseerd op het template item
+                $checklist->items()->create([
+                    'sequence' => $nextSequence,
+                    'name' => $item->name,
+                    'remarks' => $item->remarks,
+                ]);
+            }
+        });
+
+        // Na het toevoegen van de items, redirecten we terug naar de checklist detailpagina
+        return redirect()->route('production.checklist.show', $checklist)->with('success', 'Items succesvol toegevoegd van template!');
+    }
+
 
     /**
      * Remove the specified resource from storage.
