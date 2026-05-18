@@ -280,6 +280,43 @@ class Project extends Model
     }
 
     /**
+     * Fetch the budgets for this project by looking at the project functions
+     * with the "budget" tag. The project_function price_total fields contains
+     * a value in euro.
+     * This method returns an array with the summed budget prices for each
+     * budget type (e.g. "light", "sound", "rigging") that is found
+     * in the tags of the project functions.
+     *
+     * @return Collection A collection where the keys are the budget types
+     * (e.g. "rigging", "lighting") and the values are the duration in
+     * hours for that budget type.
+     */
+    public function getEuroBudgetsAttribute():Collection
+    {
+
+        $budgets = $this->projectFunctions
+            // 1. Filter alleen de items waar 'budget' in de tags voorkomt
+            ->filter(fn($item) => str_contains($item->tags, 'budget'))
+
+            // 2. Loop door de gefilterde lijst en bouw de som op
+            ->reduce(function ($carry, $item) {
+                // Splits de tags (bijv. "budget, light, sound" wordt ['budget', 'light', 'sound'])
+                $tags = array_map('trim', explode(',', $item->tags));
+
+                foreach ($tags as $tag) {
+                    // We negeren de algemene 'budget' tag zelf voor de som
+                    if ($tag !== 'budget' && !empty($tag)) {
+                        $carry[$tag] = ($carry[$tag] ?? 0) + $item->price_total;
+                    }
+                }
+
+                return $carry;
+            }, []); // Start met een lege array
+
+            return collect($budgets);
+    }
+
+    /**
      * Calculate the total budget consumption for the budget types budgetted for
      * this project.
      *

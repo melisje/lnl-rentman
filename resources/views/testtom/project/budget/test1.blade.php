@@ -102,6 +102,7 @@
 
                     <td class="text-center fw-bold" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid #dee2e6;">
                         {{ number_format($consumption, 2) }} / {{ number_format($budget, 2) }} {{ number_format($percent, 2) }}%
+                        <div>{{ $model->euro_budgets[$category] ?? 0 }}€</div>
                     </td>
                     @endforeach
 
