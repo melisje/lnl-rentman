@@ -1,7 +1,7 @@
 <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('templates.items.store', $template) }}" method="POST">
+            <form action="{{ route('production.checklist.template.items.store', $template) }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="addItemModalLabel">Add Item to {{ $template->name }}</h5>

@@ -41,7 +41,7 @@ class ChecklistTemplateController extends Controller
 
         ChecklistTemplate::create($validated);
 
-        return redirect()->route('templates.index')
+        return redirect()->route('production.checklist.template.index')
             ->with('success', 'Template created successfully.');
     }
 
@@ -78,7 +78,7 @@ class ChecklistTemplateController extends Controller
 
         $template->update($validated);
 
-        return redirect()->route('templates.show', $template)
+        return redirect()->route('production.checklist.template.show', $template)
             ->with('success', 'Template header updated successfully.');
     }
 
@@ -91,7 +91,7 @@ class ChecklistTemplateController extends Controller
         // all linked items will be deleted automatically.
         $template->delete();
 
-        return redirect()->route('templates.index')
+        return redirect()->route('production.checklist.template.index')
             ->with('success', 'Template and all its items deleted.');
     }
 }
