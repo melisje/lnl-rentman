@@ -4,8 +4,8 @@
     </a>
     <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="{{ route('testtom.projects_with_account_scope', ['account' => 'llstageservice']) }}">testjef1</a></li>
-        <li><a class="dropdown-item" href="{{ route('testtom.projecttypes', ['account' => 'llstageservice']) }}">testjef2</a></li>
-        <li><a class="dropdown-item" href="{{ route('testtom.warehouse_dashboard', ['account' => 'llstageservice']) }}">testjef3</a></li>
+        <li><a class="dropdown-item" href="{{ route('testtom.projecttypes', ['account' => 'llstageservice']) }}" target="_blank">testjef2</a></li>
+        <li><a class="dropdown-item" href="{{ route('testtom.warehouse_dashboard', ['account' => 'llstageservice']) }}" target="_blank">testjef3</a></li>
         <li>
             <hr class="dropdown-divider">
         </li>
