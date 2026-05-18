@@ -1,42 +1,44 @@
 @extends('layouts.app')
 
 @push('styles')
-/* Maak de inputs onzichtbaar totdat je erop focust */
-.bg-transparent {
-border: 1px solid transparent !important;
-transition: all 0.2s ease;
-}
+<style>
+    /* Maak de inputs onzichtbaar totdat je erop focust */
+    .bg-transparent {
+        border: 1px solid transparent !important;
+        transition: all 0.2s ease;
+    }
 
-.bg-transparent:focus {
-background-color: #fff !important;
-border-color: #86b7fe !important;
-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-}
+    .bg-transparent:focus {
+        background-color: #fff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
 
-/* De sleep-cursor voor de grip handle */
-.cursor-move {
-cursor: grab;
-}
+    /* De sleep-cursor voor de grip handle */
+    .cursor-move {
+        cursor: grab;
+    }
 
-.cursor-move:active {
-cursor: grabbing;
-}
+    .cursor-move:active {
+        cursor: grabbing;
+    }
 
-/* Highlight de rij die wordt verplaatst */
-.sortable-ghost {
-opacity: 0.4;
-background-color: #f8f9fa !important;
-}
+    /* Highlight de rij die wordt verplaatst */
+    .sortable-ghost {
+        opacity: 0.4;
+        background-color: #f8f9fa !important;
+    }
 
-/* Verwijder de default blauwe gloed van checkboxes voor een rustiger beeld */
-.form-check-input:focus {
-box-shadow: none;
-}
+    /* Verwijder de default blauwe gloed van checkboxes voor een rustiger beeld */
+    .form-check-input:focus {
+        box-shadow: none;
+    }
 
-/* Hover effect op de rij om delete/drag handles te accentueren */
-#sortable-items tr:hover {
-background-color: rgba(0,0,0,0.02);
-}
+    /* Hover effect op de rij om delete/drag handles te accentueren */
+    #sortable-items tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+</style>
 @endpush
 
 @section('content')
