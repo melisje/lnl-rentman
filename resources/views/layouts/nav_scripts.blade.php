@@ -12,6 +12,7 @@
         testtom: [
             { type: 'item', icon: 'bi-patch-question-fill',       label: 'Test Tom', url: '/testtom' },
             { type: 'item', icon: 'bi-calendar-date-fill',      label: 'Weekoverzicht',     url: '/testtom/weekoverzicht' },
+            { type: 'item', icon: 'bi-list-check',      label: 'Checklist',     url: '/testtom/checklist' },
         ],
         settings: [
             { type: 'item', icon: 'bi-sliders',    label: 'Instellingen', url: '#' },
