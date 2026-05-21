@@ -502,6 +502,14 @@ a {
     background: #e9edf5;
 }
 
+.bg-orange {
+    background: var(--accent);
+}
+
+.text-orange {
+    color: var(--accent);
+}
+
 // Responsive
 
 @media (max-width: 1200px) {

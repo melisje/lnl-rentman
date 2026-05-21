@@ -17,19 +17,25 @@
                     </td>
                     <td>
                         <h4 style="margin-bottom: -2px">{{ item.full_display_name }}</h4>
-                        {{ item.am_name }} {{ item.pm_name }}
+                        <span v-if="item.am_name"><span class="badge rounded-pill bg-orange">AM</span> {{ item.am_name }}</span> 
+                        <span v-else><span class="badge rounded-pill bg-orange">AM</span> <span class="text-danger">Niet toegewezen</span></span>
+                         - 
+                        <span v-if="item.pm_name"><span class="badge rounded-pill bg-orange">PM</span> {{ item.pm_name }}</span>
+                        <span v-else><span class="badge rounded-pill bg-orange">PM</span> <span class="text-danger">Niet toegewezen</span></span>
                     </td>
 
                     <td v-for="category in ['projectmanager', 'light', 'sound', 'rigging']" :key="category"
                         class="text-center cell-toggle" :style="budgetCellStyle(item, category)"
                         :data-label="{ projectmanager: 'PM', light: 'Light', sound: 'Sound', rigging: 'Rigging' }[category]">
                         <span class="cell-pct">{{ fmtPct(budgetPercent(item, category)) }}%</span>
-                        <span class="cell-fraction">{{ fmt(budgetConsumption(item, category)) }} / {{ fmt(budget(item, category)) }}</span>
+                        <span class="cell-fraction">{{ fmt(budgetConsumption(item, category)) }} / {{ fmt(budget(item,
+                            category)) }}</span>
                     </td>
 
                     <td class="text-center cell-toggle" data-label="Checklist" :style="checklistCellStyle(item)">
                         <span class="cell-pct">{{ fmtPct(checklistPercent(item)) }}%</span>
-                        <span class="cell-fraction">{{ item.count_checklist_items_completed ?? 0 }} / {{ item.count_checklist_items ?? 0 }}</span>
+                        <span class="cell-fraction">{{ item.count_checklist_items_completed ?? 0 }} / {{
+                            item.count_checklist_items ?? 0 }}</span>
                     </td>
                 </tr>
             </template>
@@ -182,9 +188,11 @@ function fmtPct(value) {
         display: flex;
         text-align: center;
     }
+
     .row-week-header td:first-child {
         width: 100%;
     }
+
     .row-week-header td:not(:first-child) {
         display: none;
     }

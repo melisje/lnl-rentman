@@ -50,6 +50,11 @@ class TestJefController extends Controller
         ]);
     }
 
+    public function checklist()
+    {
+        return Inertia::render('Testtom/Checklist');
+    }
+
     public function test1()
     {
         $app = Application::where('name', 'project_dashboard')->first();
