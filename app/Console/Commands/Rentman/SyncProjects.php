@@ -32,7 +32,7 @@ class SyncProjects extends Command
         $accountName = $this->argument('account');
 
         // 1. Determine time window (current week start to +6 weeks end)
-        $start = Carbon::now()->startOfWeek()->toIso8601String();
+        $start = Carbon::now()->subWeeks(20)->startOfWeek()->toIso8601String();
         $end = Carbon::now()->addWeeks(6)->endOfWeek()->toIso8601String();
 
         // 2. Get accounts
@@ -82,8 +82,8 @@ class SyncProjects extends Command
             $queryParams = [
                 'limit' => config('services.rentman.page_limit'),
                 'offset' => 0,
-                // 'created[gte]' => '2026-01-01',
-                'modified[gte]' => '2026-01-01',
+                // 'created[gte]' => $start,
+                'modified[gte]' => $start,
             ];
 
             // Optionele filter op project RMID
