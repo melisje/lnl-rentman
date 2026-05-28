@@ -88,7 +88,6 @@ class TestJefController extends Controller
         // Find the project that we are working on
         $app = Application::first();
 
-
         // Find all projects that are related to this application based on the
         // table rm_project_type_application_mapping.
 
@@ -98,6 +97,31 @@ class TestJefController extends Controller
             $result = $app->projects($account)->count();
             dump("Account: $account, project count: $result");
         }
+
+
+
+
+        $projects = Project::where('number', 'like', '%8306%')
+            // ->orderBy('planperiod_start')
+            // ->where('planperiod_start', '<=', now()->addWeeks(4))
+            // ->where('planperiod_start', '>=', now()->subWeeks(2))
+            ->get();
+
+
+
+
+            foreach ($projects as $project)
+            {
+                // dump($project->timeRegistrations);
+                $consumption = $project->budget_consumption;
+                $consumption = $project->budget_versus_consumption;
+                dump($consumption);
+                // dump("Project: {$project->displayname}, Budget Type: $type, Consumption: $amount hours");
+
+
+            }
+
+            // ->filter(fn($p) => $p->calculatedStatus !== 'Geannuleerd')
 
     }
 
