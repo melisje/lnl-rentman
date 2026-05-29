@@ -17,7 +17,7 @@ class TestJefController extends Controller
     //Nodig met map om te vertalen naar een array omdat Inertia problemen heeft met Collections die een Scope hebben
     public function weekoverzicht()
     {
-        $app = Application::where('name', 'project_dashboard')->first();
+        $app = Application::query()->where('name', 'project_dashboard')->first();
 
         $projects = $app->projects('llstageservice')
             ->orderBy('planperiod_start')
@@ -57,7 +57,7 @@ class TestJefController extends Controller
 
     public function test1()
     {
-        $app = Application::where('name', 'project_dashboard')->first();
+        $app = Application::query()->where('name', 'project_dashboard')->first();
 
         $account = 'llstageservice';
         $projects = $app->projects($account)
@@ -86,7 +86,9 @@ class TestJefController extends Controller
     public function test2()
     {
         // Find the project that we are working on
-        $app = Application::first();
+        $app = Application::query()
+            ->where('name', 'project_dashboard')
+            ->first();
 
         // Find all projects that are related to this application based on the
         // table rm_project_type_application_mapping.
@@ -99,50 +101,24 @@ class TestJefController extends Controller
         }
 
 
-
-
-        $projects = Project::where('number', 'like', '%8306%')
-            // ->orderBy('planperiod_start')
-            // ->where('planperiod_start', '<=', now()->addWeeks(4))
-            // ->where('planperiod_start', '>=', now()->subWeeks(2))
-            ->get();
-
-
-
-
-            foreach ($projects as $project)
-            {
-                // dump($project->timeRegistrations);
-                $consumption = $project->budget_consumption;
-                $consumption = $project->budget_versus_consumption;
-                dump($consumption);
-                // dump("Project: {$project->displayname}, Budget Type: $type, Consumption: $amount hours");
-
-
-            }
-
             // ->filter(fn($p) => $p->calculatedStatus !== 'Geannuleerd')
 
     }
 
     public function test3()
     {
-        // Find the project that we are working on
-        $app = Application::where('name','warehouse_dashboard')->first();
-        // dump($app);
+        // Find project with numnbeer 8306
+        $project = Project::query()
+            ->where('number', '8306')
+            ->first();
 
-        $builder = SubProject::with('parentProject')
-            // ->releasedForWarehouse()
-            ->notCancelled()
-            ->whereDate('planperiod_start', '>=',today())
-            ->orderBy('planperiod_start')
-        ;
+        // dump("budgets:". $project->budgets);
+        // dump("Consumptions:". $project->budget_consumption);
+        // dump("Consumptions:". $project->budget_versus_consumption);
 
-        dump($builder->toRawSql());
-        $subProjects = $builder->get();
-
+        // Show the project in a view
         return view('testtom.project.budget.test3', [
-            'models' => $subProjects,
+            'model' => $project,
         ]);
     }
 

@@ -6,32 +6,45 @@
 @section('content')
 <div class="container-fluid">
     <div class="mx-2 p-3 bg-light rounded-3">
-        <H1>Test Magazijn overzicht</H1>
+        <H1>Demo project budget & consumption</H1>
         @include('layouts.errors')
 
+        <hr>
+        <h3>Budgets:</h3>
+        <code>
+            $project->budgets =
+            {{ $model->budgets }}
+        </code>
 
-        <table class="table table-striped table-hover table-sm">
-            <thead>
-                <tr>
-                    <th>project</th>
-                    <th>subproject</th>
-                    <th>status</th>
-                    <th>planstart</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($models as $model)
-                <tr class="">
-                    <td class="text-muted">{{ $model->parentProject->full_display_name ?? 'N/A' }}</td>
-                    <td class="text-muted">{{ $model->name ?? 'N/A' }}</td>
-                    <td class="text-muted">{{ $model->status_name ?? 'N/A' }}</td>
-                    <td class="text-muted">{{ $model->planperiod_start->toDateString() ?? 'N/A' }}</td>
-                    <td class="text-muted">{{ $model->vrijgave_voor_warehouse ?? 'N/A' }}</td>
-                    {{-- <td class="text-muted">{{ $model }}</td> --}}
-                </tr>
+        <hr>
+        <h3>Budget Consumption:</h3>
+        <code>
+            $project->budget_consumption =
+            {{ $model->budget_consumption }}
+        </code>
+
+        <hr>
+        <h3>Budget vs Consumption:</h3>
+        <code>
+            $project->budget_versus_consumption =
+            {{ $model->budget_versus_consumption }}
+        </code>
+
+        <hr>
+        <div class="bg-light rounded-3 p-3">
+            @foreach($model->budget_versus_consumption as $budgetType => $values)
+            <p>{{ $budgetType }}: </p>
+            <ul>
+                @foreach ($values as $key => $value)
+
+                <li>{{ $key }}: {{ $value }}</li>
+
+
                 @endforeach
-            </tbody>
-        </table>
+            </ul>
+        </div>
+        @endforeach
+
     </div>
 
 </div>
