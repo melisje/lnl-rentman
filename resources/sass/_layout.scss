@@ -396,6 +396,18 @@ a {
     border-color: var(--border);
 }
 
+.btn-orange {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+
+    &:hover, &:focus, &:active {
+        background-color: color-mix(in srgb, var(--accent) 85%, black);
+        border-color: color-mix(in srgb, var(--accent) 85%, black);
+        color: white;
+    }
+}
+
 // Cards & grid
 
 .dashboard-grid {
