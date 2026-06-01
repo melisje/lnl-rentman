@@ -69,73 +69,75 @@
                     <td class="text-muted">{{ $model->nr_of_subprojects }}</td>
                     <td class="text-muted">{{ $model->calculated_status }}</td>
 
-
-                    @foreach(['projectmanager', 'light', 'sound', 'rigging'] as $category)
                     @php
-                    $consumption = $model->budget_consumption[$category] ?? 0;
-                    $budget = $model->budgets[$category] ?? 0;
-                    $percent = $budget > 0 ? ($consumption / $budget) * 100 : 0;
-
-                    // Kleurlogica op basis van jouw specifieke HEX-codes
-                    if ($percent > 100)
-                    {
-                    $bgColor = '#0000FF'; // Blauw (>100%)
-                    $textColor = 'white';
-                    } elseif ($percent == 100)
-                    {
-                    $bgColor = '#00FF00'; // Groen (100%)
-                    $textColor = 'black';
-                    } elseif ($percent >= 75)
-                    {
-                    $bgColor = '#FFFF00'; // Geel (75-100%)
-                    $textColor = 'black';
-                    } elseif ($percent >= 50)
-                    {
-                    $bgColor = '#FF7700'; // Oranje (50-75%)
-                    $textColor = 'white';
-                    } else
-                    {
-                    $bgColor = '#FF0000'; // Rood (0-50%)
-                    $textColor = 'white';
-                    }
+                    $consumptions = $model->budget_versus_consumption ?? [];
                     @endphp
 
-                    <td class="text-center fw-bold" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid #dee2e6;">
-                        {{ number_format($consumption, 2) }} / {{ number_format($budget, 2) }} {{ number_format($percent, 2) }}%
-                    </td>
-                    @endforeach
-
+                    @foreach(['PM', 'light', 'sound', 'rigging'] as $category)
                     @php
-                    $completed = $model->count_checklist_items_completed ?? 0;
-                    $items = $model->count_checklist_items ?? 0;
-                    $percent = $items > 0 ? ($completed / $items) * 100 : 0;
-
-                    // Kleurlogica op basis van jouw specifieke HEX-codes
-                    if ($percent > 100)
-                    {
-                    $bgColor = '#0000FF'; // Blauw (>100%)
-                    $textColor = 'white';
-                    } elseif ($percent == 100)
-                    {
-                    $bgColor = '#00FF00'; // Groen (100%)
-                    $textColor = 'black';
-                    } elseif ($percent >= 75)
-                    {
-                    $bgColor = '#FFFF00'; // Geel (75-100%)
-                    $textColor = 'black';
-                    } elseif ($percent >= 50)
-                    {
-                    $bgColor = '#FF7700'; // Oranje (50-75%)
-                    $textColor = 'white';
-                    } else
-                    {
-                    $bgColor = '#FF0000'; // Rood (0-50%)
-                    $textColor = 'white';
-                    }
+                    $budgeted = $consumptions[$category]['budgeted'] ?? 0;
+                    $consumed = $consumptions[$category]['consumed'] ?? 0;
+                    $remaining = $consumptions[$category]['remaining'] ?? 0;
+                    $percentage = $consumptions[$category]['percentage'] ?? 0;
+                    $status = $consumptions[$category]['status'] ?? null;
+                    $started = $consumptions[$category]['started'] ?? null;
                     @endphp
-                    <td class="text-center fw-bold" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid #dee2e6;">
-                        {{ $completed }} / {{ $items }} {{ number_format($percent, 2) }}%
-                    </td>
+
+                    {{-- We bepalen de kleuren met Blade-tags in plaats van PHP-accolades --}}
+                    @if ($status === 'over budget') @php $bgColor = '#0000FF'; $textColor = 'white'; @endphp
+                    @elseif ($budgeted > 0 && $budgeted == $consumed) @php $bgColor = '#00FF00'; $textColor = 'black'; @endphp
+                    @elseif ($started === 'yes' && $percentage < 75) @php $bgColor='#FF7700' ; $textColor='white' ; @endphp
+                    @elseif ($percentage>= 75) @php $bgColor = '#FFFF00'; $textColor = 'black'; @endphp
+                    @else @php $bgColor = '#FF0000'; $textColor = 'white'; @endphp
+                    @endif
+
+
+                        <td class="text-center fw-bold p-0" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid #dee2e6;">
+                            {{-- We maken de hele binnenkant van de cel klikbaar en sturen filters mee in de URL --}}
+                            <a href="{{ route('production.project.timeregistration.index', ['project_id' => $model->id, 'budget_type' => $category]) }}" class="d-block text-decoration-none p-2" style="color: inherit;" target="_blank">
+
+                                {{ number_format($consumed, 2) }} / {{ number_format($budgeted, 2) }} ({{ number_format($percentage, 2) }}%)
+                                <div>{{ $model->euro_budgets[$category] ?? 0 }}€</div>
+
+                            </a>
+                        </td>
+                        @endforeach
+
+                        @php
+                        $completed = $model->count_checklist_items_completed ?? 0;
+                        $items = $model->count_checklist_items ?? 0;
+                        $percent = $items > 0 ? ($completed / $items) * 100 : 0;
+
+                        // Kleurlogica op basis van jouw specifieke HEX-codes
+                        if ($percent > 100)
+                        {
+                        $bgColor = '#0000FF'; // Blauw (>100%)
+                        $textColor = 'white';
+                        } elseif ($percent == 100)
+                        {
+                        $bgColor = '#00FF00'; // Groen (100%)
+                        $textColor = 'black';
+                        } elseif ($percent >= 75)
+                        {
+                        $bgColor = '#FFFF00'; // Geel (75-100%)
+                        $textColor = 'black';
+                        } elseif ($percent >= 50)
+                        {
+                        $bgColor = '#FF7700'; // Oranje (50-75%)
+                        $textColor = 'white';
+                        } else
+                        {
+                        $bgColor = '#FF0000'; // Rood (0-50%)
+                        $textColor = 'white';
+                        }
+                        @endphp
+
+                        <td class="text-center fw-bold" style="background-color: {{ $bgColor }}; color: {{ $textColor }}; border: 1px solid #dee2e6;">
+                            <a href="{{ route('production.checklist.index', ['project_id' => $model->id, 'budget_type' => $category]) }}" class="d-block text-decoration-none p-2" style="color: inherit;" target="_blank">
+                                {{ $completed }} / {{ $items }} {{ number_format($percent, 2) }}%
+                            </a>
+                        </td>
+
                 </tr>
                 @endforeach
             </tbody>

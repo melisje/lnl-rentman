@@ -1,0 +1,5 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=891855b1e77dec9783922261f8738ae8d83aecc66b2ff3123aae9259c688c131ef4de9cb85c568919bd28e5de061701648bad977f5f1acbbfde89e5f45f188c3
+
+{"account":"llstageservice","user":{"itemType":"Crew","id":1121,"ref":"/crew/1121"},"eventType":"update","itemType":"TimeRegistration","items":[{"id":46640,"ref":"/timeregistration/46640","parent":null}],"eventDate":"2026-02-10T09:15:29+01:00"}

@@ -14,10 +14,19 @@ class ChecklistController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // We eager load the item count to display it in the overview table
-        $checklists = Checklist::withCount('items')->get();
+        $query = Checklist::withCount('items');
+
+         // Filter 1: Als er een project_id is meegegeven in de URL, filter daarop
+        if ($request->has('project_id'))
+        {
+            $query->where('project_id', $request->get('project_id'));
+        }
+
+
+        $checklists = $query->get();
 
         return view('production.checklist.index', compact('checklists'));
     }

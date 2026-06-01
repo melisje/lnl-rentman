@@ -5,9 +5,8 @@ namespace App\Models\Rentman;
 use App\Models\Production\Checklist;
 use App\Models\Production\ChecklistItem;
 use App\Models\Production\ChecklistTemplate;
+use App\Models\ProjectTimeRegistration;
 use App\Scopes\AccountScope;
-use Dom\Attr;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Str;
 
 class Project extends Model
 {
@@ -126,7 +126,8 @@ class Project extends Model
                 // replace status paths with human readable names using the Status model
                 $uniqueStatuses = $uniqueStatuses->map(function ($statusPath) {
                     $statusId = extract_id($statusPath);
-                    $status = Status::where('account', $this->account)
+                    $status = Status::query() // we add query() to fix a intellisense error/warning detecting issue
+                        ->where('account', $this->account)
                         ->where('rm_id', $statusId)
                         ->first();
                     return $status ? $status->name : "????";
@@ -168,7 +169,8 @@ class Project extends Model
 
                 // 2. Zoek in de Status tabel naar de match voor dit account en rm_id
                 // Cache dit resultaat eventueel voor performance bij loops
-                $status = Status::where('account', $this->account)
+                $status = Status::query() // we add query() to fix a intellisense error/warning detecting issue
+                    ->where('account', $this->account)
                     ->where('rm_id', $statusId)
                     ->first();
 
@@ -195,7 +197,8 @@ class Project extends Model
 
                 // 2. Zoek in de Status tabel naar de match voor dit account en rm_id
                 // Cache dit resultaat eventueel voor performance bij loops
-                $crew = Crew::where('account', $this->account)
+                $crew = Crew::query() // we add query() to fix a intellisense error/warning detecting issue
+                    ->where('account', $this->account)
                     ->where('rm_id', $crewid)
                     ->first();
 
@@ -222,7 +225,8 @@ class Project extends Model
 
                 // 2. Zoek in de Status tabel naar de match voor dit account en rm_id
                 // Cache dit resultaat eventueel voor performance bij loops
-                $crew = Crew::where('account', $this->account)
+                $crew = Crew::query() // we add query() to fix a intellisense error/warning detecting issue
+                    ->where('account', $this->account)
                     ->where('rm_id', $crewid)
                     ->first();
 
@@ -280,36 +284,101 @@ class Project extends Model
     }
 
     /**
-     * Calculate the total budget consumption for the budget types budgetted for
-     * this project.
+     * Fetch the budgets for this project by looking at the project functions
+     * with the "budget" tag. The project_function price_total fields contains
+     * a value in euro.
+     * This method returns an array with the summed budget prices for each
+     * budget type (e.g. "light", "sound", "rigging") that is found
+     * in the tags of the project functions.
      *
-     * @TODO: In deze voorbeeldimplementatie gebruiken we random waarden om de
-     *        consumptie te simuleren, maar in een echte implementatie zou je
-     *        hier de logica moeten toepassen om de consumptie te berekenen
-     *        op basis van gerelateerde data (bijv. timesheets, equipment
-     *        usage, etc.)
+     * @return Collection A collection where the keys are the budget types
+     * (e.g. "rigging", "lighting") and the values are the duration in
+     * hours for that budget type.
+     */
+    public function getEuroBudgetsAttribute():Collection
+    {
+
+        $budgets = $this->projectFunctions
+            // 1. Filter alleen de items waar 'budget' in de tags voorkomt
+            ->filter(fn($item) => str_contains($item->tags, 'budget'))
+
+            // 2. Loop door de gefilterde lijst en bouw de som op
+            ->reduce(function ($carry, $item) {
+                // Splits de tags (bijv. "budget, light, sound" wordt ['budget', 'light', 'sound'])
+                $tags = array_map('trim', explode(',', $item->tags));
+
+                foreach ($tags as $tag) {
+                    // We negeren de algemene 'budget' tag zelf voor de som
+                    if ($tag !== 'budget' && !empty($tag)) {
+                        $carry[$tag] = ($carry[$tag] ?? 0) + $item->price_total;
+                    }
+                }
+
+                return $carry;
+            }, []); // Start met een lege array
+
+            return collect($budgets);
+    }
+
+    /**
+     * Get the time registrations for the project.
+     */
+    public function timeRegistrations(): HasMany
+    {
+        // Pas 'ProjectTimeRegistration' aan naar jouw exacte model-class en eventueel de foreign key
+        return $this->hasMany(ProjectTimeRegistration::class, 'project_id');
+    }
+
+
+    /**
+     * Calculate the total budget consumption for the budget types budgeted for
+     * this project based on actual time registrations.
      */
     public function getBudgetConsumptionAttribute(): Collection
     {
-        $budgets = $this->budgets;
+        // 1. Haal het actuele verbruik op (als Collection via pluck)
+        $actualUsage = $this->timeRegistrations()
+            ->select('budget_type', DB::raw('SUM(duration) as total_duration'))
+            ->groupBy('budget_type')
+            ->pluck('total_duration', 'budget_type'); // Bijv: ['Light' => 12.5, 'Sound' => 8.0]
 
-        // Voor elk budgettype, bereken de consumptie. In dit voorbeeld gaan we
-        // ervan uit dat de consumptie een random percentagie is van het budget,
-        // maar in een realistisch scenario zou je hier een andere logica
-        // kunnen toepassen.
-        $consumptions = [];
-        foreach ($budgets as $type => $amount)
-        {
-            // A random number between 0 and the budget amount, to simulate
-            $percentage = rand(0, 100) / 100; // Random percentage tussen 0% en 100%
-            // consumption. In a real implementation, you would replace
-            // this with the actual logic to calculate consumption
-            // based on related data (e.g. timesheets, equipment
-            // usage, etc.)
-            $consumptions[$type] = $amount * $percentage; // Hier zou je de echte consumptie moeten berekenen
-        }
-        // Tel alle budgetten bij elkaar op voor een totaal consumptie
-        return collect($consumptions);
+        // 2. Maak een collectie van de gebudgetteerde types en zet de waardes standaard op 0.0
+        // (We transformeren ['Light' => 500] naar ['Light' => 0.0])
+        $budgetKeys = collect($this->budgets ?? [])->map(fn($value) => 0.0);
+
+        // 3. Merge de twee collecties.
+        // Types in $actualUsage overschrijven de 0.0. Types die alleen in $budgets stonden blijven 0.0.
+        return $budgetKeys->merge($actualUsage);
+    }
+
+
+    public function getBudgetVersusConsumptionAttribute(): Collection
+    {
+        $budgets = collect($this->budgets ?? []);
+
+        $actualUsage = $this->timeRegistrations()
+            ->select('budget_type', DB::raw('SUM(duration) as total_duration'))
+            ->groupBy('budget_type')
+            ->pluck('total_duration', 'budget_type');
+
+        // Combineer alle unieke keys (types) uit beide collecties
+        $allTypes = $budgets->keys()->merge($actualUsage->keys())->unique();
+
+        // Bouw per type een overzichtelijke array op
+        $mergedOverviews = $allTypes->mapWithKeys(function ($type) use ($budgets, $actualUsage) {
+            return [
+                $type => [
+                    'budgeted' => $budgets->get($type, 0.0),
+                    'consumed' => $actualUsage->get($type, 0.0),
+                    'remaining' => $budgets->get($type, 0.0) - $actualUsage->get($type, 0.0),
+                    'status' => ($actualUsage->get($type, 0.0) > $budgets->get($type, 0.0)) ? 'over budget' : 'within budget',
+                    'percentage' => ($budgets->get($type, 0.0) > 0) ? ($actualUsage->get($type, 0.0) / $budgets->get($type, 0.0)) * 100 : 999, // 999% betekent dat er geen budget is maar er wel consumptie is, wat een speciale situatie is die aandacht vereist
+                    'started' => $actualUsage->get($type, 0.0) > 0 ? 'yes' : 'no', // Eenvoudige indicator of er al consumptie is geweest voor dit type
+                ]
+            ];
+        });
+
+        return $mergedOverviews;
     }
 
     /**

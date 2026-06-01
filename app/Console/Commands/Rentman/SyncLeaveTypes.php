@@ -4,36 +4,30 @@ namespace App\Console\Commands\Rentman;
 
 use Illuminate\Console\Command;
 use App\Models\Rentman\Account;
-use App\Models\Rentman\Project;
-use App\Services\Rentman\Api\CrewFetcher;
-use App\Services\Rentman\Api\ProjectFetcher;
+use App\Services\Rentman\Api\LeaveTypeFetcher;
 use Carbon\Carbon;
 
-class SyncProjects extends Command
+class SyncLeaveTypes extends Command
 {
     /**
      * The name and signature of the console command.
      */
-
-    protected $signature = 'rentman:sync-projects
-        {account? : The specific account name to sync}
-        {--project= : The specific project RMID to sync}';
-
+    protected $signature = 'rentman:sync-leavetypes {account? : The specific account name to sync}';
     protected $nrOfItems = 0; // counter of items, resetted per account
     protected $totalItems = 0; // total nr of items over all accounts
 
     /**
      * The console command description.
      */
-    protected $description = 'Sync Rentman projects for all accounts within a 5-week window';
+    protected $description = 'Sync Rentman LeaveTypes for all accounts';
 
-    public function handle(ProjectFetcher $fetcher)
+    public function handle(LeaveTypeFetcher $fetcher)
     {
         $accountName = $this->argument('account');
 
         // 1. Determine time window (current week start to +6 weeks end)
-        $start = Carbon::now()->subWeeks(20)->startOfWeek()->toIso8601String();
-        $end = Carbon::now()->addWeeks(6)->endOfWeek()->toIso8601String();
+        // $start = Carbon::now()->subWeeks(20)->startOfWeek()->toIso8601String();
+        // $end = Carbon::now()->addWeeks(6)->endOfWeek()->toIso8601String();
 
         // 2. Get accounts
         // De when methode voert de where clausule alleen uit als $accountName een waarde heeft (niet null of false is).
@@ -47,48 +41,43 @@ class SyncProjects extends Command
         }
 
         foreach ($accounts as $account) {
-            $this->info("\n~~~> Processing account: {$account->account}");
+            $this->info("\n~~~> Processing leavetypes for account: {$account->account}");
 
             $hasMore = true;
 
             // required fields
             $requiredFields = [
+                'id',
+                'rm_id',
+                'account',
                 'created',
                 'modified',
                 'creator',
-                'updateHash',
+                'balance_start_date',
+                'type',
                 'displayname',
                 'name',
-                'reference',
-                'number',
-                'planperiod_start',
-                'planperiod_end',
-                'usageperiod_start',
-                'usageperiod_end',
-                'equipment_period_from',
-                'equipment_period_to',
-                'account_manager',
-                'customer',
-                'cust_contact',
-                'loc_contact',
-                'project_total_price',
+                'payroll_code',
+                'color',
+                'requires_approval',
+                'affects_availability',
+                'has_balance',
+                'is_labor',
+                'has_calculated_duration',
+                'can_have_activities',
+                'counts_in_totals',
                 'custom',
-                'project_type',
-                'location',
-                'tags',
             ];
+
+            $requiredFields = null; // als je alle velden wilt ophalen, zet requiredFields op null of lege array. Als je alleen specifieke velden wilt ophalen, vul dan de array met veldnamen (zoals hierboven).
 
             // 3. Build query parameters with API-side filtering
             $queryParams = [
                 'limit' => config('services.rentman.page_limit'),
                 'offset' => 0,
                 // 'created[gte]' => $start,
-                'modified[gte]' => $start,
+                // 'modified[gte]' => $start,
             ];
-
-            // Optionele filter op project RMID
-            $fltProjectId = $this->option('project');
-            $queryParams['id'] = $fltProjectId ? $fltProjectId : null;
 
             // If required fields are defined, put them in the queryparamets array
             if ($requiredFields && !empty($requiredFields)) {
@@ -96,17 +85,15 @@ class SyncProjects extends Command
             }
 
             // Define endpoint
-            $endpoint = "projects" ;
+            $endpoint = "leavetypes"; ;
 
             // Fetch data via your existing service
             $fetcher->fetchAll($account,$endpoint,$queryParams, $requiredFields, [$this,'myCallable'] );
 
-            $this->info(".    +--> Project synchronisation process finished. We created or updated {$this->nrOfItems} projects for account '{$account->account}'.");
-
-
+            $this->info(".    +--> LeaveType synchronisation process finished. We created or updated {$this->nrOfItems} leave type items for account '{$account->account}'.");
         }
 
-        $this->info("\n✅ Project synchronisation process finished. We created or updated {$this->totalItems} projects over all accounts.");
+        $this->info("\n✅ LeaveType synchronisation process finished. We created or updated {$this->totalItems} leave type items over all accounts.");
         return Command::SUCCESS;
     }
 
