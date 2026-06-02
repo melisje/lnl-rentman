@@ -1,54 +1,150 @@
 <script>
     const submenus = {
-        home: [{
-                type: 'item',
-                icon: 'bi-house-door-fill',
-                label: 'Dashboard',
-                url: '#'
-            },
-            {
-                type: 'item',
-                icon: 'bi-bell-fill',
-                label: 'Meldingen',
-                url: '#'
-            },
-        ],
-        rentman: [{
-                type: 'divider',
-                label: 'Projecten'
-            },
-            {
-                type: 'item',
-                icon: 'bi-folder-fill',
-                label: 'Archief',
-                url: '#'
-            },
-            {
-                type: 'item',
-                icon: 'bi-people-fill',
-                label: 'Klanten',
-                url: '#'
-            },
-        ],
-        testtom: [{
-                type: 'item',
-                icon: 'bi-patch-question-fill',
-                label: 'Test Tom',
-                url: '/testtom'
-            },
+        home: [
+
             {
                 type: 'item',
                 icon: 'bi-calendar-date-fill',
                 label: 'Weekoverzicht',
-                url: '/testtom/weekoverzicht'
+                url: '/weekoverzicht'
             },
             {
                 type: 'item',
                 icon: 'bi-list-check',
                 label: 'Checklist',
-                url: '/testtom/checklist'
+                url: '/checklist'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bell-fill',
+                label: 'Webhook Calls',
+                url: '/webhookcall'
             },
         ],
+
+        develop: [{
+                type: 'divider',
+                label: 'Admin'
+            },
+            {
+                type: 'item',
+                icon: 'bi-speedometer2',
+                label: 'Dashboard',
+                url: '/develop/admin'
+            },
+            {
+                type: 'item',
+                icon: 'bi-shield-lock-fill',
+                label: 'Rollen',
+                url: '/develop/admin/roles'
+            },
+            {
+                type: 'item',
+                icon: 'bi-building',
+                label: 'Accounts',
+                url: '/develop/admin/rentman/accounts'
+            },
+            {
+                type: 'item',
+                icon: 'bi-sliders2',
+                label: 'Custom Fields',
+                url: '/develop/admin/rentman/customfield'
+            },
+
+            {
+                type: 'divider',
+                label: 'Productie'
+            },
+            {
+                type: 'item',
+                icon: 'bi-folder2-open',
+                label: 'Projecten',
+                url: '/develop/projects'
+            },
+            {
+                type: 'item',
+                icon: 'bi-clock-history',
+                label: 'Tijdsregistraties',
+                url: '/develop/production/project/timeregistration'
+            },
+            {
+                type: 'item',
+                icon: 'bi-check2-square',
+                label: 'Checklists',
+                url: '/develop/production/checklist'
+            },
+            {
+                type: 'item',
+                icon: 'bi-layout-text-sidebar',
+                label: 'Checklist Templates',
+                url: '/develop/production/checklist/template'
+            },
+
+            {
+                type: 'divider',
+                label: 'Financieel'
+            },
+            {
+                type: 'item',
+                icon: 'bi-receipt',
+                label: 'Facturen',
+                url: '/develop/invoices'
+            },
+            {
+                type: 'item',
+                icon: 'bi-cloud-download',
+                label: 'Facturen ophalen',
+                url: '/develop/invoices/fetch'
+            },
+            {
+                type: 'item',
+                icon: 'bi-truck',
+                label: 'Leveranciers',
+                url: '/develop/purchase/suppliers'
+            },
+
+            {
+                type: 'divider',
+                label: 'Testing'
+            },
+            {
+                type: 'item',
+                icon: 'bi-webhook',
+                label: 'Webhook Tester',
+                url: '/develop/test/webhook-tester'
+            },
+            {
+                type: 'item',
+                icon: 'bi-people',
+                label: 'Crew Sync',
+                url: '/develop/test/sync-crew'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bug',
+                label: 'Testjef 1',
+                url: '/develop/testjef1'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bug',
+                label: 'Testjef 2',
+                url: '/develop/testjef2'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bug',
+                label: 'Testjef 3',
+                url: '/develop/testjef3'
+            },
+            {
+                type: 'item',
+                icon: 'bi-patch-question-fill',
+                label: 'Test Tom',
+                url: '/overview'
+            },
+        ],
+
         settings: [{
                 type: 'item',
                 icon: 'bi-sliders',
@@ -92,6 +188,13 @@
 
         renderSubmenu(section);
         localStorage.setItem('activeSection', section);
+
+        if (window.innerWidth <= 900) {
+            document.querySelector('.wrapper').classList.add('mobile-menu-open');
+        } else {
+            document.querySelector('.submenu-left').classList.remove('submenu-hidden');
+            document.querySelector('.dashboard-shell').classList.remove('submenu-collapsed');
+        }
     }
 
     function initNav() {

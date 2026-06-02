@@ -3,28 +3,28 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Path to the subfolder where all routing files will be collected
-$moduleRoutesPath = __DIR__ . '/modules/*.php';
-
 Route::get('/', function () {
-    return view('welcome');
-})->name('root')
-;
+    return inertia('Home');
+})->name('root');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Add auth routes
 Auth::routes();
 
-// Add all routes that require authentication
-Route::middleware(['auth'])->group(function() use($moduleRoutesPath)
-{
+// Utility routes en Inertia pagina's — root niveau
+require __DIR__ . '/modules/accounts.php';
+require __DIR__ . '/modules/language.php';
+require __DIR__ . '/modules/webhooks.php';
+require __DIR__ . '/modules/testtom.php';
+
+// Blade pagina's — onder /develop
+Route::prefix('develop')->group(function () {
+    require __DIR__ . '/modules/admin.php';
+    require __DIR__ . '/modules/checklists.php';
+    require __DIR__ . '/modules/invoices.php';
+    require __DIR__ . '/modules/production.php';
+    require __DIR__ . '/modules/projects.php';
+    require __DIR__ . '/modules/purchase.php';
+    require __DIR__ . '/modules/tests.php';
 });
-
-// Use the PHP 'glob'function to find all files ending on .php in the /modules folder
-foreach (glob($moduleRoutesPath) as $filename) {
-    // require all found files. This loads and registers the routes.
-    require $filename;
-}
-
-

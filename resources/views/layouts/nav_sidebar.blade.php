@@ -4,11 +4,8 @@
         <a class="item" data-section="home" onclick="setActiveSection('home')">
             <i class="bi bi-house-fill"></i>
         </a>
-        <a class="item" data-section="rentman" onclick="setActiveSection('rentman')">
-            <i class="bi bi-cloud-check-fill"></i>
-        </a>
-        <a class="item" data-section="testtom" onclick="setActiveSection('testtom')">
-            <i class="bi bi-archive-fill"></i>
+        <a class="item" data-section="develop" onclick="setActiveSection('develop')">
+            <i class="bi bi-code-slash"></i>
         </a>
     </div>
 

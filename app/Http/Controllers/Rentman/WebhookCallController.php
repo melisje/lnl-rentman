@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rentman;
 use App\Http\Controllers\Controller;
 use App\Models\Rentman\WebhookCall;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Yajra\DataTables\Facades\DataTables;
 
 
@@ -25,7 +26,7 @@ class WebhookCallController extends Controller
 
     public function index(Request $request)
     {
-            if ($request->ajax()) {
+            if ($request->has('draw')) {
             // Gebruik select() om niet de zware 'payload' kolom op te halen als dat niet nodig is
 
             $model = WebhookCall::query()
@@ -71,8 +72,7 @@ class WebhookCallController extends Controller
         }
         else
         {
-            // Dit is de view die geopend wordt bij de start.
-            return view('rentman.webhook.index');
+            return Inertia::render('Rentman/WebhookIndex');
         }
 
 
@@ -99,7 +99,9 @@ class WebhookCallController extends Controller
      */
     public function show(WebhookCall $webhookcall)
     {
-        return view('rentman.webhook.show', compact('webhookcall'));
+        return Inertia::render('Rentman/WebhookShow', [
+            'webhookcall' => $webhookcall,
+        ]);
     }
 
     /**
