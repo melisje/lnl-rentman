@@ -15,14 +15,17 @@ use Inertia\Inertia;
 class TestJefController extends Controller
 {
     //Nodig met map om te vertalen naar een array omdat Inertia problemen heeft met Collections die een Scope hebben
-    public function weekoverzicht()
+    public function weekoverzicht(\Illuminate\Http\Request $request)
     {
+        $weeksAhead  = max(1, min(26, (int) $request->input('weeks', 4)));
+        $weeksBefore = max(0, min(12, (int) $request->input('before', 2)));
+
         $app = Application::query()->where('name', 'project_dashboard')->first();
 
         $projects = $app->projects('llstageservice')
             ->orderBy('planperiod_start')
-            ->where('planperiod_start', '<=', now()->addWeeks(4))
-            ->where('planperiod_start', '>=', now()->subWeeks(2))
+            ->where('planperiod_start', '<=', now()->addWeeks($weeksAhead))
+            ->where('planperiod_start', '>=', now()->subWeeks($weeksBefore))
             ->get()
             ->filter(fn($p) => $p->calculatedStatus !== 'Geannuleerd')
             ->map(fn($p) => [
@@ -46,7 +49,9 @@ class TestJefController extends Controller
             ]);
 
         return Inertia::render('Testtom/Weekoverzicht', [
-            'models' => $projects->values(),
+            'models'       => $projects->values(),
+            'weeksAhead'   => $weeksAhead,
+            'weeksBefore'  => $weeksBefore,
         ]);
     }
 

@@ -2,6 +2,8 @@
     const submenus = {
         home: [
 
+        
+            { type: 'divider', label: 'Productie' },
             {
                 type: 'item',
                 icon: 'bi-calendar-date-fill',
@@ -10,16 +12,23 @@
             },
             {
                 type: 'item',
-                icon: 'bi-list-check',
-                label: 'Checklist',
-                url: '/checklist'
+                icon: 'bi-clock-history',
+                label: 'Tijdsregistraties',
+                url: '/production/project/timeregistration'
             },
             {
                 type: 'item',
-                icon: 'bi-bell-fill',
-                label: 'Webhook Calls',
-                url: '/webhookcall'
+                icon: 'bi-check2-all',
+                label: 'Checklists',
+                url: '/production/checklist'
             },
+            {
+                type: 'item',
+                icon: 'bi-layout-text-sidebar',
+                label: 'Checklist Templates',
+                url: '/production/checklist/template'
+            },
+            
         ],
 
         develop: [{
@@ -156,6 +165,12 @@
                 icon: 'bi-key-fill',
                 label: 'Permissies',
                 url: '#'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bell-fill',
+                label: 'Webhook Calls',
+                url: '/webhookcall'
             },
         ],
     };

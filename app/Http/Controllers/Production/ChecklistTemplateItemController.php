@@ -14,7 +14,7 @@ class ChecklistTemplateItemController extends Controller
      * Store a newly created item for a specific template.
      * Route: templates.items.store
      */
-    public function store(Request $request, ChecklistTemplate $template): RedirectResponse
+    public function store(Request $request, ChecklistTemplate $template)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -22,15 +22,18 @@ class ChecklistTemplateItemController extends Controller
             'sequence' => 'nullable|integer',
         ]);
 
-        // If no sequence is provided, append it to the end of the list
         if (!$request->filled('sequence')) {
             $validated['sequence'] = ($template->items()->max('sequence') ?? 0) + 1;
         }
 
-        $template->items()->create($validated);
+        $item = $template->items()->create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json($item);
+        }
 
         return redirect()->route('production.checklist.template.show', $template)
-            ->with('success', 'Item added to template successfully.');
+            ->with('success', 'Item toegevoegd.');
     }
 
     /**

@@ -1,4 +1,18 @@
 <template>
+    <div class="d-flex justify-content-end align-items-center gap-3 mb-3 px-2">
+        <div class="d-flex align-items-center gap-2">
+            <label class="text-muted small mb-0">Voorloop:</label>
+            <select class="form-select form-select-sm w-auto" :value="weeksBefore" @change="setWeeksBefore">
+                <option v-for="w in beforeOptions" :key="w" :value="w">{{ w }} week{{ w !== 1 ? 'en' : '' }}</option>
+            </select>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label class="text-muted small mb-0">Vooruit:</label>
+            <select class="form-select form-select-sm w-auto" :value="weeksAhead" @change="setWeeksAhead">
+                <option v-for="w in aheadOptions" :key="w" :value="w">{{ w }} week{{ w !== 1 ? 'en' : '' }}</option>
+            </select>
+        </div>
+    </div>
 
     <table class="table">
         <tbody>
@@ -46,10 +60,23 @@
 
 <script setup>
 import { computed } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
-    models: Array,
+    models:      Array,
+    weeksAhead:  { type: Number, default: 4 },
+    weeksBefore: { type: Number, default: 2 },
 });
+
+const aheadOptions  = [1, 2, 3, 4, 6, 8, 12, 16, 26];
+const beforeOptions = [0, 1, 2, 3, 4, 6, 8];
+
+const navigate = (ahead, before) => {
+    router.get('/weekoverzicht', { weeks: ahead, before }, { preserveState: false });
+};
+
+const setWeeksAhead  = (e) => navigate(e.target.value, props.weeksBefore);
+const setWeeksBefore = (e) => navigate(props.weeksAhead, e.target.value);
 
 const processedModels = computed(() => {
     let lastWeeks = null;

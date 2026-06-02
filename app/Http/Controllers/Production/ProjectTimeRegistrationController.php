@@ -11,111 +11,128 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Str;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class ProjectTimeRegistrationController extends Controller
 {
     public function index(Request $request)
     {
-        // Start de query op basis van het account van de ingelogde gebruiker
         $query = ProjectTimeRegistration::with(['project', 'crewmember']);
 
-        // Filter 1: Als er een project_id is meegegeven in de URL, filter daarop
-        if ($request->has('project_id'))
-        {
+        if ($request->has('project_id')) {
             $query->where('project_id', $request->get('project_id'));
         }
 
-        // Filter 2: Als er een budget_type is meegegeven, filter daarop
-        // if ($request->has('budget_type'))
-        // {
-        //     $query->where('budget_type', $request->get('budget_type'));
-        // }
-
-        // Haal de gefilterde resultaten op
-        $registrations = $query->get();
-
-        return view('production.project.timeregistration.index', compact('registrations'));
+        return Inertia::render('Production/TimeRegistration/Index', [
+            'registrations' => $query->get()->map(fn($r) => [
+                'id'           => $r->id,
+                'project_name' => $r->project?->full_displayname ?? $r->project_id,
+                'crew_name'    => $r->crewmember?->displayname ?? $r->crewmember_id,
+                'budget_type'  => $r->budget_type,
+                'duration'     => $r->duration,
+                'start'        => $r->start?->format('d-m-Y H:i'),
+                'end'          => $r->end?->format('d-m-Y H:i'),
+            ]),
+        ]);
     }
 
     public function create()
     {
-        // Haal alle projecten op, gesorteerd op displayname
-        $projects = Project::orderBy('displayname','asc')->get();
+        $projects    = Project::orderBy('displayname', 'asc')->get();
+        $crewmembers = Crew::orderBy('displayname', 'asc')->get();
 
-        // Optioneel: doe hetzelfde voor crewmembers als je die ook als lijst wilt
-        $crewmembers = Crew::orderBy('displayname','asc')->get();
-
-        return view('production.project.timeregistration.create', compact('projects', 'crewmembers'));
+        return Inertia::render('Production/TimeRegistration/Create', [
+            'projects'    => $projects->map(fn($p) => ['id' => $p->id, 'label' => $p->displayname ?? $p->number]),
+            'crewmembers' => $crewmembers->map(fn($c) => ['id' => $c->id, 'label' => $c->displayname]),
+            'budgetTypes' => ['PM', 'Light', 'Sound', 'Rigging'],
+            'defaultStart'=> now()->format('Y-m-d\TH:i'),
+        ]);
     }
 
     public function store(Request $request)
     {
         $account = session('current_account');
 
-        // 1. Validatie (start is verplicht, duration is nu een string/tijdformaat)
         $validated = $request->validate([
             'project_id'    => ['required', Rule::exists('rm_projects', 'id')->where('account', $account)],
             'crewmember_id' => ['required', Rule::exists('rm_crew', 'id')->where('account', $account)],
             'budget_type'   => 'required|in:PM,Light,Sound,Rigging',
-            'start'         => 'required|date', // Nu altijd VERPLICHT
+            'start'         => 'required|date',
             'end'           => 'nullable|date|after_or_equal:start',
-            'duration'      => 'nullable|regex:/^\d+:[0-5][0-9]$/', // Valideert hh:mm (bijv. 02:30 or 120:45)
+            'duration'      => 'nullable|regex:/^\d+:[0-5][0-9]$/',
             'remarks'       => 'nullable|string',
         ]);
 
-        // Maak een Carbon instantie van de starttijd
-        $start = Carbon::parse($validated['start']);
-        $end = $validated['end'] ? Carbon::parse($validated['end']) : null;
+        $start           = Carbon::parse($validated['start']);
+        $end             = $validated['end'] ? Carbon::parse($validated['end']) : null;
         $durationDecimal = null;
 
-        // 2. Logica voor de hh:mm duration en eindtijd berekening
         if (!empty($validated['duration'])) {
-            // Splits hh:mm op
-            list($hours, $minutes) = explode(':', $validated['duration']);
-
-            // Bereken totale minuten en decimale uren (voor opslag in database, bijv. 2:30 wordt 2.5)
-            $totalMinutes = ($hours * 60) + $minutes;
-            $durationDecimal = round($totalMinutes / 60, 2);
-
-            // Als er GEEN eindtijd is ingevuld, bereken deze op basis van start + duration
+            [$hours, $minutes] = explode(':', $validated['duration']);
+            $totalMinutes      = ($hours * 60) + $minutes;
+            $durationDecimal   = round($totalMinutes / 60, 2);
             if (!$end) {
                 $end = $start->copy()->addMinutes($totalMinutes);
             }
         } elseif ($end) {
-            // Als duration LEEG is, maar end is WEL ingevuld: bereken de duration automatisch
             $durationDecimal = round($start->diffInMinutes($end) / 60, 2);
         }
 
-        // 3. Opslaan in de database
-        $registration = new ProjectTimeRegistration();
-        $registration->project_id = $validated['project_id'];
+        $registration                = new ProjectTimeRegistration();
+        $registration->project_id    = $validated['project_id'];
         $registration->crewmember_id = $validated['crewmember_id'];
-        $registration->budget_type = Str::lower($validated['budget_type']); // Sla op als lowercase (bijv. 'light' in plaats van 'Light')
-        $registration->start = $start;
-        $registration->end = $end; // Dit is nu ingevuld (indien berekend)
-        $registration->duration = $durationDecimal; // Slaat op als decimaal getal (bijv. 2.50)
-        $registration->remarks = $validated['remarks'];
-        $registration->created_by = Auth::user()->id; // Optioneel: wie heeft deze registratie gemaakt?
-        $registration->updated_by = Auth::user()->id; // Optioneel: wie heeft deze registratie bijgewerkt?
+        $registration->budget_type   = Str::lower($validated['budget_type']);
+        $registration->start         = $start;
+        $registration->end           = $end;
+        $registration->duration      = $durationDecimal;
+        $registration->remarks       = $validated['remarks'];
+        $registration->created_by    = Auth::id();
+        $registration->updated_by    = Auth::id();
         $registration->save();
 
-        return redirect()->route('production.project.timeregistration.index')->with('success', 'Tijdregistratie succesvol opgeslagen.');
+        return redirect()->route('production.project.timeregistration.index')
+            ->with('success', 'Tijdregistratie opgeslagen.');
     }
 
-    public function show(Request $request, ProjectTimeRegistration $timeregistration)
+    public function show(ProjectTimeRegistration $timeregistration)
     {
-        return view('production.project.timeregistration.show', compact('timeregistration'));
+        $timeregistration->load(['project', 'crewmember']);
+
+        return Inertia::render('Production/TimeRegistration/Show', [
+            'registration' => [
+                'id'           => $timeregistration->id,
+                'project_name' => $timeregistration->project?->full_displayname ?? $timeregistration->project_id,
+                'crew_name'    => $timeregistration->crewmember?->displayname ?? $timeregistration->crewmember_id,
+                'budget_type'  => $timeregistration->budget_type,
+                'duration'     => $timeregistration->duration,
+                'start'        => $timeregistration->start?->format('d-m-Y H:i'),
+                'end'          => $timeregistration->end?->format('d-m-Y H:i'),
+                'remarks'      => $timeregistration->remarks,
+                'created_at'   => $timeregistration->created_at?->format('d-m-Y H:i:s'),
+            ],
+        ]);
     }
 
     public function edit(ProjectTimeRegistration $timeregistration)
     {
-        // Haal alle projecten op, gesorteerd op displayname
-        $projects = Project::orderBy('displayname','asc')->get();
+        $projects    = Project::orderBy('displayname', 'asc')->get();
+        $crewmembers = Crew::orderBy('displayname', 'asc')->get();
 
-        // Optioneel: doe hetzelfde voor crewmembers als je die ook als lijst wilt
-        $crewmembers = Crew::orderBy('displayname','asc')->get();
-
-        return view('production.project.timeregistration.edit', compact('timeregistration', 'projects', 'crewmembers'));
+        return Inertia::render('Production/TimeRegistration/Edit', [
+            'registration' => [
+                'id'            => $timeregistration->id,
+                'project_id'    => $timeregistration->project_id,
+                'crewmember_id' => $timeregistration->crewmember_id,
+                'budget_type'   => ucfirst($timeregistration->budget_type),
+                'start'         => $timeregistration->start?->format('Y-m-d\TH:i'),
+                'end'           => $timeregistration->end?->format('Y-m-d\TH:i'),
+                'duration'      => $timeregistration->duration,
+                'remarks'       => $timeregistration->remarks,
+            ],
+            'projects'    => $projects->map(fn($p) => ['id' => $p->id, 'label' => $p->displayname ?? $p->number]),
+            'crewmembers' => $crewmembers->map(fn($c) => ['id' => $c->id, 'label' => $c->displayname]),
+            'budgetTypes' => ['PM', 'Light', 'Sound', 'Rigging'],
+        ]);
     }
 
     public function update(Request $request, ProjectTimeRegistration $timeregistration)
@@ -131,21 +148,23 @@ class ProjectTimeRegistrationController extends Controller
         ]);
 
         if (!isset($validated['duration']) && isset($validated['start'], $validated['end'])) {
-            $start = Carbon::parse($validated['start']);
-            $end = Carbon::parse($validated['end']);
+            $start                 = Carbon::parse($validated['start']);
+            $end                   = Carbon::parse($validated['end']);
             $validated['duration'] = round($start->diffInMinutes($end) / 60, 2);
         }
 
-        $timeregistration->updated_by = Auth::user()->id; // Optioneel: wie heeft deze registratie bijgewerkt?
-
+        $timeregistration->updated_by = Auth::id();
         $timeregistration->update($validated);
 
-        return redirect()->route('production.project.timeregistration.index')->with('success', 'Tijdregistratie succesvol bijgewerkt.');
+        return redirect()->route('production.project.timeregistration.index')
+            ->with('success', 'Tijdregistratie bijgewerkt.');
     }
 
     public function destroy(ProjectTimeRegistration $timeregistration)
     {
-        $timeregistration->delete(); // Verwijder de tijdregistratie
-        return redirect()->route('production.project.timeregistration.index')->with('success', 'Tijdregistratie verwijderd.');
+        $timeregistration->delete();
+
+        return redirect()->route('production.project.timeregistration.index')
+            ->with('success', 'Tijdregistratie verwijderd.');
     }
 }

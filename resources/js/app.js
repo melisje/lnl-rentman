@@ -6,6 +6,7 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import * as bootstrap from 'bootstrap';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import {router} from '@inertiajs/vue3'; // Importeer de router van Inertia.js
 
 // STAP A: Maak jQuery als ALLEREERSTE globaal beschikbaar
@@ -25,6 +26,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(ZiggyVue)
             .mount(el);
     },
 });

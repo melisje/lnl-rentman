@@ -8,6 +8,7 @@
     @inertiaHead
 
     <title>{{ config('app.name', 'Laravel') }}</title>
+    @routes
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 

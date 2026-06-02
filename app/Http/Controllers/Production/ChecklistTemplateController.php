@@ -5,93 +5,87 @@ namespace App\Http\Controllers\Production;
 use App\Http\Controllers\Controller;
 use App\Models\Production\ChecklistTemplate;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ChecklistTemplateController extends Controller
 {
-    /**
-     * Display a listing of the checklist templates.
-     */
-    public function index(): View
+    public function index(): Response
     {
-        // We eager load the item count to display it in the overview table
-        $templates = ChecklistTemplate::withCount('items')->get();
+        $templates = ChecklistTemplate::withCount('items')->get()->map(fn($t) => [
+            'id'         => $t->id,
+            'name'       => $t->name,
+            'remarks'    => $t->remarks,
+            'items_count'=> $t->items_count,
+            'created_at' => $t->created_at->format('d-m-Y'),
+        ]);
 
-        return view('production.checklist.templates.index', compact('templates'));
+        return Inertia::render('Production/ChecklistTemplate/Index', compact('templates'));
     }
 
-    /**
-     * Show the form for creating a new checklist template.
-     */
-    public function create(): View
+    public function create(): Response
     {
-        return view('production.checklist.templates.create');
+        return Inertia::render('Production/ChecklistTemplate/Create');
     }
 
-    /**
-     * Store a newly created checklist template in storage.
-     */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $request->validate([
+            'name'    => 'required|string|max:255',
             'remarks' => 'nullable|string',
         ]);
 
-        ChecklistTemplate::create($validated);
+        ChecklistTemplate::create($request->only('name', 'remarks'));
 
         return redirect()->route('production.checklist.template.index')
-            ->with('success', 'Template created successfully.');
+            ->with('success', 'Template aangemaakt.');
     }
 
-    /**
-     * Display the specified checklist template with its items.
-     */
-    public function show(ChecklistTemplate $template): View
+    public function show(ChecklistTemplate $template): Response
     {
-        // Load items ordered by their sequence number
-        $template->load(['items' => function ($query) {
-            $query->orderBy('sequence', 'asc');
-        }]);
+        $template->load(['items' => fn($q) => $q->orderBy('sequence')]);
 
-        return view('production.checklist.templates.show', compact('template'));
+        return Inertia::render('Production/ChecklistTemplate/Show', [
+            'template' => [
+                'id'      => $template->id,
+                'name'    => $template->name,
+                'remarks' => $template->remarks,
+                'items'   => $template->items->map(fn($i) => [
+                    'id'       => $i->id,
+                    'name'     => $i->name,
+                    'remarks'  => $i->remarks ?? '',
+                    'sequence' => $i->sequence,
+                ])->values(),
+            ],
+        ]);
     }
 
-    /**
-     * Show the form for editing the checklist template header.
-     */
-    public function edit(ChecklistTemplate $template): View
+    public function edit(ChecklistTemplate $template): Response
     {
-        return view('production.checklist.templates.edit', compact('template'));
+        return Inertia::render('Production/ChecklistTemplate/Edit', [
+            'template' => $template->only('id', 'name', 'remarks'),
+        ]);
     }
 
-    /**
-     * Update the specified checklist template in storage.
-     */
     public function update(Request $request, ChecklistTemplate $template): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
+        $request->validate([
+            'name'    => 'required|string|max:255',
             'remarks' => 'nullable|string',
         ]);
 
-        $template->update($validated);
+        $template->update($request->only('name', 'remarks'));
 
         return redirect()->route('production.checklist.template.show', $template)
-            ->with('success', 'Template header updated successfully.');
+            ->with('success', 'Template bijgewerkt.');
     }
 
-    /**
-     * Remove the specified checklist template from storage.
-     */
     public function destroy(ChecklistTemplate $template): RedirectResponse
     {
-        // Because of the 'onDelete(cascade)' in the migration,
-        // all linked items will be deleted automatically.
         $template->delete();
 
         return redirect()->route('production.checklist.template.index')
-            ->with('success', 'Template and all its items deleted.');
+            ->with('success', 'Template verwijderd.');
     }
 }
