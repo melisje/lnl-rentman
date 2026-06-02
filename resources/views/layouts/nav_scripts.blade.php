@@ -1,22 +1,66 @@
 <script>
     const submenus = {
-        home: [
-            { type: 'item', icon: 'bi-house-door-fill', label: 'Dashboard', url: '#' },
-            { type: 'item', icon: 'bi-bell-fill',       label: 'Meldingen', url: '#' },
+        home: [{
+                type: 'item',
+                icon: 'bi-house-door-fill',
+                label: 'Dashboard',
+                url: '#'
+            },
+            {
+                type: 'item',
+                icon: 'bi-bell-fill',
+                label: 'Meldingen',
+                url: '#'
+            },
         ],
-        rentman: [
-            { type: 'divider', label: 'Projecten' },
-            { type: 'item',    icon: 'bi-folder-fill',   label: 'Archief',        url: '#' },
-            { type: 'item',    icon: 'bi-people-fill',   label: 'Klanten',        url: '#' },
+        rentman: [{
+                type: 'divider',
+                label: 'Projecten'
+            },
+            {
+                type: 'item',
+                icon: 'bi-folder-fill',
+                label: 'Archief',
+                url: '#'
+            },
+            {
+                type: 'item',
+                icon: 'bi-people-fill',
+                label: 'Klanten',
+                url: '#'
+            },
         ],
-        testtom: [
-            { type: 'item', icon: 'bi-patch-question-fill',       label: 'Test Tom', url: '/testtom' },
-            { type: 'item', icon: 'bi-calendar-date-fill',      label: 'Weekoverzicht',     url: '/testtom/weekoverzicht' },
-            { type: 'item', icon: 'bi-list-check',      label: 'Checklist',     url: '/testtom/checklist' },
+        testtom: [{
+                type: 'item',
+                icon: 'bi-patch-question-fill',
+                label: 'Test Tom',
+                url: '/testtom'
+            },
+            {
+                type: 'item',
+                icon: 'bi-calendar-date-fill',
+                label: 'Weekoverzicht',
+                url: '/testtom/weekoverzicht'
+            },
+            {
+                type: 'item',
+                icon: 'bi-list-check',
+                label: 'Checklist',
+                url: '/testtom/checklist'
+            },
         ],
-        settings: [
-            { type: 'item', icon: 'bi-sliders',    label: 'Instellingen', url: '#' },
-            { type: 'item', icon: 'bi-key-fill',   label: 'Permissies',   url: '#' },
+        settings: [{
+                type: 'item',
+                icon: 'bi-sliders',
+                label: 'Instellingen',
+                url: '#'
+            },
+            {
+                type: 'item',
+                icon: 'bi-key-fill',
+                label: 'Permissies',
+                url: '#'
+            },
         ],
     };
 
@@ -32,10 +76,10 @@
                 return `<div class="submenu-section-label">${item.label}</div>`;
             }
             const isActive = item.url !== '#' && currentPath === item.url;
-            return `<a href="${item.url}" class="item${isActive ? ' active' : ''}" onclick="activateSubmenuItem(this)">
-                        <i class="bi ${item.icon}"></i>
-                        <span>${item.label}</span>
-                    </a>`;
+            return `<a href="${item.url}" data-inertia-link class="item${isActive ? ' active' : ''}">
+                <i class="bi ${item.icon}"></i>
+                <span>${item.label}</span>
+            </a>`;
         }).join('');
 
         inner.innerHTML = html + '<div class="submenu-spacer"></div>';
@@ -70,5 +114,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', initNav);
-    document.addEventListener('inertia:navigate',  initNav);
+    document.addEventListener('inertia:navigate', initNav);
+
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-inertia-link]');
+        if (!link || link.getAttribute('href') === '#') return;
+        e.preventDefault();
+        activateSubmenuItem(link);
+        window.router?.visit(link.getAttribute('href'));
+    });
 </script>

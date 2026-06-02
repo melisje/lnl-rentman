@@ -6,13 +6,11 @@
                     <h1>Weekoverzicht</h1>
                 </div>
                 <div class="col-4 mt-1">
-                    <form method="GET" :action="searchUrl" class="mb-3">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control"
-                                placeholder="Zoek op naam of nummer..." :value="search ?? ''">
-                            <button class="btn btn-outline-secondary" type="submit">Zoeken</button>
-                        </div>
-                    </form>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" v-model="searchQuery"
+                            placeholder="Zoek op naam of nummer..." @keydown.enter="doSearch">
+                        <button class="btn btn-outline-secondary" @click="doSearch">Zoeken</button>
+                    </div>
                 </div>
             </div>
 
@@ -28,7 +26,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="project in thisWeekProjects" :key="project.id">
-                    <td><a :href="project.url" class="text-decoration-none">{{ project.name }}</a></td>
+                    <td><Link :href="project.url" class="text-decoration-none">{{ project.name }}</Link></td>
                     <td :class="severityClass(project.sound)">{{ project.sound }}%</td>
                     <td :class="severityClass(project.light)">{{ project.light }}%</td>
                     <td :class="severityClass(project.rigging)">{{ project.rigging }}%</td>
@@ -47,7 +45,7 @@
                 </thead>    
                 <tbody>
                 <tr v-for="project in nextWeekProjects" :key="project.id">
-                    <td><a :href="project.url" class="text-decoration-none">{{ project.name }}</a></td>
+                    <td><Link :href="project.url" class="text-decoration-none">{{ project.name }}</Link></td>
                     <td :class="severityClass(project.sound)">{{ project.sound }}%</td>
                     <td :class="severityClass(project.light)">{{ project.light }}%</td>
                     <td :class="severityClass(project.rigging)">{{ project.rigging }}%</td>
@@ -60,13 +58,22 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
+
+const props = defineProps({
     thisWeekLabel: String,
     nextWeekLabel: String,
     thisWeekProjects: Array,
     nextWeekProjects: Array,
     search: String,
 });
+
+const searchQuery = ref(props.search ?? '');
+
+const doSearch = () => {
+    router.get('/testtom/search', { search: searchQuery.value }, { preserveState: true });
+};
 
 const severityClass = (value) => {
     if (value === null || value === undefined) return '';
@@ -75,7 +82,4 @@ const severityClass = (value) => {
     if (value >= 50)   return 'bg-warning text-black';
     return 'bg-success text-white';
 };
-
-
-const searchUrl = '/testtom/search';
 </script>
