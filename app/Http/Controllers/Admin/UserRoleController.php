@@ -8,15 +8,24 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UserRoleController extends Controller
 {
     public function index()
     {
-        $users = User::all();
-        $roles = Role::all();
+        $roles = Role::all(['id', 'name']);
+        $users = User::with('roles')->get()->map(fn($u) => [
+            'id'       => $u->id,
+            'name'     => $u->name,
+            'role_ids' => $u->roles->pluck('id'),
+        ]);
 
-        return view('admin.roles',compact('users','roles'));
+        return Inertia::render('Admin/Roles', [
+            'roles'       => $roles,
+            'users'       => $users,
+            'toggleRoute' => 'admin.roles.user.toggle',
+        ]);
     }
 
     /**

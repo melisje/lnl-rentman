@@ -3,13 +3,13 @@
         <div class="d-flex align-items-center gap-2">
             <label class="text-muted small mb-0">Voorloop:</label>
             <select class="form-select form-select-sm w-auto" :value="weeksBefore" @change="setWeeksBefore">
-                <option v-for="w in beforeOptions" :key="w" :value="w">{{ w }} week{{ w !== 1 ? 'en' : '' }}</option>
+                <option v-for="w in beforeOptions" :key="w" :value="w">{{ w }} {{ w !== 1 ? 'weken' : 'week' }}</option>
             </select>
         </div>
         <div class="d-flex align-items-center gap-2">
             <label class="text-muted small mb-0">Vooruit:</label>
             <select class="form-select form-select-sm w-auto" :value="weeksAhead" @change="setWeeksAhead">
-                <option v-for="w in aheadOptions" :key="w" :value="w">{{ w }} week{{ w !== 1 ? 'en' : '' }}</option>
+                <option v-for="w in aheadOptions" :key="w" :value="w">{{ w }} {{ w !== 1 ? 'weken' : 'week' }}</option>
             </select>
         </div>
     </div>

@@ -154,17 +154,12 @@
             },
         ],
 
-        settings: [{
-                type: 'item',
-                icon: 'bi-sliders',
-                label: 'Instellingen',
-                url: '#'
-            },
+        settings: [
             {
                 type: 'item',
                 icon: 'bi-key-fill',
-                label: 'Permissies',
-                url: '#'
+                label: 'Rechten',
+                url: '/develop/admin/roles'
             },
             {
                 type: 'item',
