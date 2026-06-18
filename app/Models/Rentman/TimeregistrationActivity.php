@@ -38,7 +38,7 @@ class TimeregistrationActivity extends Model
         'is_activity',
         'from',
         'to',
-        'update_hash',
+        'updateHash',
     ];
 
     /**
@@ -52,7 +52,7 @@ class TimeregistrationActivity extends Model
         'rm_id' => 'integer',
     ];
 
-/**
+    /**
      * Automatische conversie logica op basis van rm_id uit de paden.
      */
     protected static function booted(): void
@@ -60,37 +60,64 @@ class TimeregistrationActivity extends Model
         static::saving(function (TimeregistrationActivity $activity) {
 
             // 1. Zoek de interne database ID op basis van de rm_id uit 'time_registration'
-            if ($activity->isDirty('time_registration') && !empty($activity->time_registration)) {
-                $rmId = basename($activity->time_registration);
-
-                if (is_numeric($rmId)) {
-                    // Zoek in de rm_timeregistrations tabel naar het record met dit rm_id
-                    // Note: We pakken hier alleen de 'id' (primary key) van dat record
-                    $related = TimeRegistration::where('rm_id', (int) $rmId)->first();
-                    $activity->time_registration_id = $related ? $related->id : null;
-                } else {
-                    $activity->time_registration_id = null;
-                }
-            } elseif (empty($activity->time_registration)) {
-                $activity->time_registration_id = null;
+            if ($activity->isDirty('time_registration'))
+            {
+                $activity->updateTimeregistrationId();
             }
 
             // 2. Zoek de interne database ID op basis van de rm_id uit 'project_function'
-            if ($activity->isDirty('project_function') && !empty($activity->project_function)) {
-                $rmId = basename($activity->project_function);
-
-                if (is_numeric($rmId)) {
-                    // Zoek in de rm_project_functions tabel naar het record met dit rm_id
-                    $related = ProjectFunction::where('rm_id', (int) $rmId)->first();
-                    $activity->project_function_id = $related ? $related->id : null;
-                } else {
-                    $activity->project_function_id = null;
-                }
-            } elseif (empty($activity->project_function)) {
-                $activity->project_function_id = null;
+            if ($activity->isDirty('project_function'))
+            {
+                $activity->updateProjectFunctionId();
             }
-
         });
+    }
+
+    /**
+     * Update the timeregistration_id based on the rm_id
+     * that is found in the time_registration field.
+     */
+    public function updateTimeregistrationId():void
+    {
+        if (!empty($this->time_registration))
+        {
+            $rmId = basename($this->time_registration);
+
+            if (is_numeric($rmId))
+            {
+                $related = TimeRegistration::where('rm_id', (int) $rmId)->first();
+                $this->time_registration_id = $related ? $related->id : null;
+            } else
+            {
+                $this->time_registration_id = null;
+            }
+        } else
+        {
+            $this->time_registration_id = null;
+        }
+    }
+
+    /**
+     * Update the projectfunction_id based on the rm_id
+     * that is found in the project_function field.
+     */
+    public function updateProjectFunctionId(): void
+    {
+        if (!empty($this->project_function))
+        {
+            $rmId = basename($this->project_function);
+
+            if (is_numeric($rmId))
+            {
+                $related = ProjectFunction::where('rm_id', (int) $rmId)->first();
+                $this->project_function_id = $related ? $related->id : null;
+            } else
+            {
+                $this->project_function_id = null;
+            }
+        } else {
+            $this->project_function_id = null;
+        }
     }
 
     /**

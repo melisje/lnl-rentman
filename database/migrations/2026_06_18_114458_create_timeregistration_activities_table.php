@@ -43,7 +43,7 @@ return new class extends Migration
             // Datetime velden
             $table->dateTime('from')->nullable();
             $table->dateTime('to')->nullable();
-            $table->string('update_hash')->nullable();
+            $table->string('updateHash')->nullable();
 
             // Timestamps
             $table->dbTimestamps();

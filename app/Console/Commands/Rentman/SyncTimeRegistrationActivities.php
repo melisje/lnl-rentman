@@ -70,7 +70,7 @@ class SyncTimeRegistrationActivities extends Command
                 'is_activity',
                 'from',
                 'to',
-                'update_hash',
+                'updateHash',
             ];
 
             // 3. Build query parameters with API-side filtering
