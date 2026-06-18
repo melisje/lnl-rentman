@@ -67,4 +67,74 @@ class TimeRegistration extends Model
         'travel_time' => 'integer',
         'correction_duration' => 'integer',
     ];
+
+    /**
+     * Automatische conversie logica op basis van rm_id uit de paden.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (TimeRegistration $registration)
+        {
+
+            // 1. Zoek de interne database ID op basis van de rm_id uit 'time_registration'
+            if ($registration->isDirty('crewmember'))
+            {
+                $registration->updateCrewmemberId();
+            }
+
+            // 2. Zoek de interne database ID op basis van de rm_id uit 'project_function'
+            if ($registration->isDirty('leavetype'))
+            {
+                $registration->updateLeavetypeId();
+            }
+        });
+    }
+
+    /**
+     * Update the crewmember_id based on the rm_id
+     * that is found in the crew field.
+     */
+    public function updateCrewmemberId():void
+    {
+        if (!empty($this->crewmember))
+        {
+            $rmId = basename($this->crewmember);
+
+            if (is_numeric($rmId))
+            {
+                $related = Crew::where('rm_id', (int) $rmId)->first();
+                $this->crewmember_id = $related ? $related->id : null;
+            } else
+            {
+                $this->crewmember_id = null;
+            }
+        } else
+        {
+            $this->crewmember_id = null;
+        }
+    }
+
+    /**
+     * Update the leavetype_id based on the rm_id
+     * that is found in the leavetype field.
+     */
+    public function updateLeavetypeId():void
+    {
+        if (!empty($this->leavetype))
+        {
+            $rmId = basename($this->leavetype);
+
+            if (is_numeric($rmId))
+            {
+                $related = LeaveType::where('rm_id', (int) $rmId)->first();
+                $this->leavetype_id = $related ? $related->id : null;
+            } else
+            {
+                $this->leavetype_id = null;
+            }
+        } else
+        {
+            $this->leavetype_id = null;
+        }
+    }
 }
