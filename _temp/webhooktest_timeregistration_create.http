@@ -1,0 +1,5 @@
+POST http://rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=a4c07ff4ec5d304f1b59f3f3c850a48604dc3e76376c5f6e98089e4eea4bb14b7c875569ea1400fde5ef09fdc3222af3c9d29e5287701e968ab2130ed7653378
+
+{"account":"llstageservice","user":{"itemType":"Crew","id":1121,"ref":"/crew/1121"},"eventType":"create","itemType":"TimeRegistration","items":[{"id":49269,"ref":"/timeregistration/49269","parent":null}],"eventDate":"2026-06-22T12:34:08+02:00"}
