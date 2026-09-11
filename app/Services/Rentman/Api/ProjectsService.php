@@ -365,7 +365,9 @@ class ProjectsService
       // Make sure the crew member is synced to the local database
       if ($pm_value)
       {
-        $crew = $this->crewService->sync_crew_member($account, $pm_value);
+        $pm_id = (int) basename($pm_value); // geeft 1134
+
+        $crew = $this->crewService->sync_crew_member($account, $pm_id);
         $crew_id = $crew ? $crew->rm_id : null;
         $reference = '/crew/' . $crew_id;
       } else

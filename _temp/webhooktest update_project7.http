@@ -1,0 +1,6 @@
+POST http://lnl-rentman.test/api/webhook/rentman HTTP/1.1
+content-type: application/json
+digest: sha512=ba812301469713144f754ccd0d479fec62a516d2113ecc8ef93511194319d03864eb46e4e8a8f116d29992fc2c46b50da917cd430ba5a6d403ee2673984d56cc
+
+
+{"account":"llstageservice","user":{"itemType":"Crew","id":33,"ref":"/crew/33"},"eventType":"update","itemType":"Project","items":[{"id":8588,"ref":"/projects/8505","parent":null}],"eventDate":"2026-02-17T22:00:11+01:00"}
